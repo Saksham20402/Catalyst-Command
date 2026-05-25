@@ -4,12 +4,14 @@ CATALYST:MANIFEST — tickets.html
 PURPOSE   Canonical ticket store + Kanban board.
           ALL ticket data lives here. Edit here first, then sync index.html.
 UPDATED   2026-05-25
-NEXT ID   CAT-009
+NEXT ID   SCR-004 / DS-009 / AND-004
 
-FEATURE   Code Snippet Ingestion
-          End-to-end pipeline for ingesting, enriching, storing, and
-          rendering code snippet-based MCQ questions across backend,
-          AI pipeline, and mobile.
+FEATURES
+          Code Snippet Ingestion — scraping, storage, rendering of code MCQs
+          Daily Sessions — adaptive daily practice via Qdrant + Groq
+          Android App — roadmap wizard, session screen, explanation panel
+          Enrichment Pipeline — Groq-based question enrichment
+          Roadmap Generation — ZPD-based adaptive roadmap API
 
 EDITABLE SECTIONS (Claude: target these anchors directly)
   CATALYST:TICKETS:DATA  ~L22  — JSON array inside <script type="application/json">
@@ -25,15 +27,33 @@ TICKET SCHEMA
   created     "YYYY-MM-DD"
   updated     "YYYY-MM-DD"
 
-CURRENT TICKET INDEX (update this block when tickets change)
-  CAT-001  backend    in-progress  critical  Design code snippet schema
-  CAT-002  backend    backlog      high      Build snippet ingestion endpoint
+CURRENT TICKET INDEX (26 tickets — update when tickets change)
+  CAT-001  backend    done         critical  Design code snippet schema
+  CAT-002  backend    in-progress  high      Build snippet ingestion endpoint
   CAT-003  backend    backlog      high      Adapt Qdrant for code embeddings
-  CAT-004  backend    backlog      medium    Snippet ingestion admin CLI
+  CAT-004  backend    backlog      medium    Snippet bulk ingestion CLI
   CAT-005  ai-agents  backlog      critical  Code-aware Groq enrichment prompts
   CAT-006  ai-agents  backlog      high      Auto-detect programming language
   CAT-007  mobile     backlog      high      Code block renderer component
   CAT-008  mobile     backlog      medium    Snippet MCQ card layout
+  DS-001   backend    done         critical  daily_sessions table migration
+  DS-002   backend    done         critical  Per-topic accuracy classifier
+  DS-003   backend    done         critical  DailySessionGenerator service
+  DS-004   backend    in-progress  critical  GET /api/sessions/today endpoint
+  DS-005   backend    backlog      critical  Session submit endpoint rewrite
+  DS-006   backend    backlog      critical  Cold-start seed topics
+  DS-007   backend    backlog      high      Deduplicate questions across areas
+  DS-008   backend    backlog      high      PATCH session complete endpoint
+  AND-001  mobile     backlog      critical  Android roadmap wizard flow
+  AND-002  mobile     backlog      critical  Android generating + roadmap reveal
+  AND-003  mobile     in-progress  critical  Android session + explanation panel
+  ENR-001  backend    done         critical  Enrichment field schema + migrations
+  ENR-002  ai-agents  done         critical  Groq enrichment service
+  ENR-003  ai-agents  done         critical  Explanation prompt v1
+  RM-001   backend    done         critical  Generate roadmap API endpoint
+  SCR-001  pipeline   in-progress  critical  Rich content scraper models
+  SCR-002  pipeline   backlog      high      Code snippet extraction from scraper
+  SCR-003  pipeline   backlog      high      Image URL extraction from scraper
 
 AREA TICKET GROUPS (for targeted context loading)
   backend   → CAT-001, CAT-002, CAT-003, CAT-004
@@ -415,7 +435,7 @@ TICKET SCHEMA (all fields required)
   {
     "id": "CAT-002",
     "title": "Build snippet ingestion endpoint",
-    "description": "POST /api/questions/snippet — accepts raw code, language tag, and MCQ metadata; validates input, writes to questions table, triggers enrichment job.",
+    "description": "POST /api/questions/snippet \u2014 accepts raw code question payload, validates schema, persists to Postgres, enqueues for enrichment.",
     "area": "backend",
     "status": "in-progress",
     "priority": "high",
@@ -425,62 +445,242 @@ TICKET SCHEMA (all fields required)
   {
     "id": "CAT-003",
     "title": "Adapt Qdrant for code embeddings",
-    "description": "Switch snippet questions to a code-aware embedding strategy (text-embedding-3-small with code-optimised prompt) and re-index the affected Qdrant collection.",
+    "description": "Update embedding pipeline to concatenate subject + question_text + snippet_body before vectorising; update Qdrant payload schema to include has_snippet flag.",
     "area": "backend",
     "status": "backlog",
     "priority": "high",
     "created": "2026-05-25",
-    "updated": "2026-05-25"
+    "updated": "2026-05-26"
   },
   {
     "id": "CAT-004",
     "title": "Snippet bulk ingestion CLI",
-    "description": "Django management command that reads a JSON/CSV of snippet-based questions and bulk-ingests them; useful for initial content seeding before the API is live.",
+    "description": "Management command: python manage.py ingest_snippets --source file|url --subject str. Dry-run mode, progress bar, per-row success/failure report.",
     "area": "backend",
     "status": "backlog",
     "priority": "medium",
     "created": "2026-05-25",
-    "updated": "2026-05-25"
+    "updated": "2026-05-26"
   },
   {
     "id": "CAT-005",
     "title": "Code-aware Groq enrichment prompts",
-    "description": "Update Bloom's taxonomy classifier and distractor explanation prompts to handle code-body questions without hallucinating syntax or logic errors.",
+    "description": "Update EXPLANATION_PROMPT to detect snippet-bearing questions and produce code-specific explanations referencing the snippet directly; update distractor logic.",
     "area": "ai-agents",
     "status": "backlog",
     "priority": "critical",
     "created": "2026-05-25",
-    "updated": "2026-05-25"
+    "updated": "2026-05-26"
   },
   {
     "id": "CAT-006",
     "title": "Auto-detect programming language",
-    "description": "Add a language detection step to the enrichment pipeline that tags each snippet with its programming language before vectorisation and enrichment.",
+    "description": "Before enrichment, detect language from snippet_body using lightweight heuristic or Groq call; write to snippet_language field.",
     "area": "ai-agents",
     "status": "backlog",
     "priority": "high",
     "created": "2026-05-25",
-    "updated": "2026-05-25"
+    "updated": "2026-05-26"
   },
   {
     "id": "CAT-007",
     "title": "Code block renderer component",
-    "description": "Build a syntax-highlighted code block component for Android (and stub for iOS) using a WebView-based highlighter; support at minimum Python, Java, C++, SQL.",
+    "description": "Android: syntax-highlighted scrollable code block using WebView or Prism-equivalent; honours app theme; horizontal scroll for long lines.",
     "area": "mobile",
     "status": "backlog",
     "priority": "high",
     "created": "2026-05-25",
-    "updated": "2026-05-25"
+    "updated": "2026-05-26"
   },
   {
     "id": "CAT-008",
     "title": "Snippet MCQ card layout",
-    "description": "Design and implement the question card variant that renders a code snippet body above the answer options, with correct scroll and font-size behaviour at mobile viewports.",
+    "description": "Android: extend QuestionCard to render snippet block above options when snippet_body is non-null; font mono, background #1A1A1A, copy-to-clipboard button.",
     "area": "mobile",
     "status": "backlog",
     "priority": "medium",
     "created": "2026-05-25",
-    "updated": "2026-05-25"
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "DS-001",
+    "title": "daily_sessions table migration",
+    "description": "New table: user_id, roadmap_id, date, payload_json, session_id, is_completed, generated_at, completed_at. Unique constraint on (user_id, roadmap_id, date). Index on (user_id, date). Verified in Supabase.",
+    "area": "backend",
+    "status": "done",
+    "priority": "critical",
+    "created": "2026-05-18",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "DS-002",
+    "title": "Per-topic accuracy classifier",
+    "description": "get_topic_accuracy(user_id, roadmap_id): Redis-first, 2 DB queries, no N+1. Four states: new (<3 attempts), weakness (<65%, >=3 attempts), review (>=65%, >=3), mastered (>=80%, >=5). Invalidated on answer submit. 18 tests passing.",
+    "area": "backend",
+    "status": "done",
+    "priority": "critical",
+    "created": "2026-05-18",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "DS-003",
+    "title": "DailySessionGenerator service",
+    "description": "Qdrant-backed 5-step pipeline: cache check, LLM session plan (Groq ~300 tokens), targeted Qdrant search per focus area, Postgres fetch, persist to daily_sessions. 14-day question exclusion window. 51 tests passing.",
+    "area": "backend",
+    "status": "done",
+    "priority": "critical",
+    "created": "2026-05-18",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "DS-004",
+    "title": "GET /api/sessions/today endpoint",
+    "description": "Reads from daily_sessions cache. Lazy generation on first open. Reshapes payload to spec: wraps weeklyProgress as object, renames topic to topicName, promotes topicHeadline+reason to root, surfaces accuracy on weakness areas, adds isCompleted, strips questions from response.",
+    "area": "backend",
+    "status": "in-progress",
+    "priority": "critical",
+    "created": "2026-05-18",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "DS-005",
+    "title": "Session submit endpoint rewrite",
+    "description": "POST /api/sessions/{id}/submit. Nested focus_area_attempts grouped by topic. Server-side correctness recomputation from payload_json. 422 on unknown IDs. 409 on duplicate. Per-topic summary with updated_state. topic_type from request used as previous_state for transition logic.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "critical",
+    "created": "2026-05-26",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "DS-006",
+    "title": "Cold-start seed topics",
+    "description": "Day-1 users with zero answer history get empty sessions. Fallback: when all topics are new, seed session from canonical topic list for the subject. Canonical OS list defined. Needs GMAT/CAT equivalents.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "critical",
+    "created": "2026-05-26",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "DS-007",
+    "title": "Deduplicate questions across focus areas",
+    "description": "DailySessionGenerator returns same question ID in multiple focus areas. Add dedup step after all Qdrant searches \u2014 remove any question ID appearing more than once across focus areas before persisting.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "high",
+    "created": "2026-05-26",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "DS-008",
+    "title": "PATCH session complete endpoint",
+    "description": "PATCH /api/sessions/{id}/complete. Sets is_completed=true, completed_at=now(). Invalidates Redis accuracy cache so tomorrow generates fresh. Returns {isCompleted: true}.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "high",
+    "created": "2026-05-26",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "AND-001",
+    "title": "Android roadmap wizard flow",
+    "description": "4-screen flow: subject selection (single-select chips) \u2192 topic selection (multi-select, API-driven) \u2192 goal + exam date (stored on user profile) \u2192 diagnostic calibration (3-5 MCQs, skippable). Calls POST /api/roadmaps/generate/ on completion. Exam date powers countdown + readiness score.",
+    "area": "mobile",
+    "status": "backlog",
+    "priority": "critical",
+    "created": "2026-05-13",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "AND-002",
+    "title": "Android generating + roadmap reveal",
+    "description": "Screen 1: animated text messages ('Analysing your goals', 'Mapping subject graph', etc), text-only no spinner, dark canvas. Screen 2: roadmap reveal with topic rows (mastered/in-progress/not-started), progress bar, exam countdown if date set, Start Session CTA.",
+    "area": "mobile",
+    "status": "backlog",
+    "priority": "critical",
+    "created": "2026-05-13",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "AND-003",
+    "title": "Android session + explanation panel",
+    "description": "Session: MCQ card, per-question timer (green <60s, yellow <120s, red >=120s), Prev/Skip/Next/See Results nav. Explanation: State A (correct, green tick) and State B (incorrect, red cross), distractor note, bloom+difficulty pill, bookmark optimistic UI, 44dp tap targets.",
+    "area": "mobile",
+    "status": "in-progress",
+    "priority": "critical",
+    "created": "2026-05-13",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "ENR-001",
+    "title": "Enrichment field schema + migrations",
+    "description": "difficulty as integer 1-5, bloom_level 1-6, distractor_explanations TextField nullable, provenance source fields. Three sequential migrations for safe difficulty CharField -> integer conversion. Done.",
+    "area": "backend",
+    "status": "done",
+    "priority": "critical",
+    "created": "2026-05-07",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "ENR-002",
+    "title": "Groq enrichment service",
+    "description": "Parallel Groq pipeline with atomic claim_batch() for multi-worker idempotency, rate-limit backoff (5s/15s/45s with jitter), stuck-claim recovery after 15min. 16,000 questions enriched for $3. Running in production.",
+    "area": "ai-agents",
+    "status": "done",
+    "priority": "critical",
+    "created": "2026-05-07",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "ENR-003",
+    "title": "Explanation prompt v1",
+    "description": "Principle-first explanations (50-110 words), no sycophantic openers, mechanism-first copy. distractor_explanations nullable \u2014 only populated for genuine misconception traps. bloom 1-6, difficulty 1-5, is_relevant flag. Subject-agnostic (GMAT/CAT/GATE/CS).",
+    "area": "ai-agents",
+    "status": "done",
+    "priority": "critical",
+    "created": "2026-05-07",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "RM-001",
+    "title": "Generate roadmap API endpoint",
+    "description": "POST /api/roadmaps/generate/. ZPD-based topic sequencing using bloom_level and difficulty from enriched questions. Accepts subject, topics[], goal, exam_date, calibration_answers[]. Idempotent on same user+subject+topics. Done.",
+    "area": "backend",
+    "status": "done",
+    "priority": "critical",
+    "created": "2026-05-13",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "SCR-001",
+    "title": "Rich content scraper models",
+    "description": "Frozen dataclass Question with all pipeline fields including code_snippets[] and image_urls[]. to_embedding_input() stub. Collect-all-failures validation. Prerequisite for SCR-002 and SCR-003.",
+    "area": "pipeline",
+    "status": "in-progress",
+    "priority": "critical",
+    "created": "2026-05-20",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "SCR-002",
+    "title": "Code snippet extraction from scraper",
+    "description": "Extract fenced code blocks and inline code from scraped question HTML. Populate code_snippets[] on Question model. Language detection heuristic. Handles Sanfoundry and similar sources.",
+    "area": "pipeline",
+    "status": "backlog",
+    "priority": "high",
+    "created": "2026-05-20",
+    "updated": "2026-05-26"
+  },
+  {
+    "id": "SCR-003",
+    "title": "Image URL extraction from scraper",
+    "description": "Extract question-bearing images from scraped HTML, upload to S3/Supabase storage, populate image_urls[] on Question model. Skip decorative images using size/position/alt-text heuristic.",
+    "area": "pipeline",
+    "status": "backlog",
+    "priority": "high",
+    "created": "2026-05-20",
+    "updated": "2026-05-26"
   }
 ]
 </script>
@@ -646,12 +846,14 @@ TICKET SCHEMA (all fields required)
   const AREA_COLORS = {
     'backend':    '#888888',
     'ai-agents':  '#46675D',
-    'mobile':     '#BEDCE4'
+    'mobile':     '#BEDCE4',
+    'pipeline':   '#D3C182'
   };
   const AREA_LABELS = {
     'backend':    'Backend',
     'ai-agents':  'AI Agents',
-    'mobile':     'Mobile'
+    'mobile':     'Mobile',
+    'pipeline':   'Pipeline'
   };
 
   function formatDate(d) {

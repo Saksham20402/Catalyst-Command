@@ -1,0 +1,339 @@
+<!--
+CATALYST:MANIFEST — index.html
+════════════════════════════════════════════════════════
+PURPOSE   Dashboard overview. Stats, workstream cards, recent activity.
+          Read this to understand current project state at a glance.
+UPDATED   2026-05-25
+
+FEATURE   Code Snippet Ingestion
+
+EDITABLE SECTIONS (Claude: target these anchors directly)
+  CATALYST:STATS        ~L75   — 5 count numbers (total/backlog/progress/review/done)
+  CATALYST:WORKSTREAMS  ~L91   — 3 area cards with open/done counts + progress %
+  CATALYST:ACTIVITY     ~L143  — Recent activity list, sorted newest first
+
+WHEN TO LOAD THIS FILE
+  - Starting a new session to get project state
+  - After updating tickets (sync the stats + activity)
+  - NOT needed for ticket edits (use tickets.html directly)
+
+RELATED
+  tickets.html       → canonical ticket data (edit there first, then sync here)
+  design-system.html → design tokens referenced by inline styles
+  context.html       → full project briefing and task recipes
+════════════════════════════════════════════════════════
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalyst — Command Center</title>
+  <style>
+    :root {
+      --bg: #1F1F1F;
+      --card: #2F2F2F;
+      --green: #46675D;
+      --blue: #BEDCE4;
+      --gold: #D3C182;
+      --text: #E8E8E8;
+      --muted: #787878;
+      --border: rgba(255,255,255,0.07);
+      --r: 12px;
+      --r-sm: 8px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(31,31,31,0.96);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+    }
+    .logo { font-size: 13px; font-weight: 800; letter-spacing: 3px; color: var(--green); }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 13px;
+      padding: 6px 14px; border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-links a.active { color: var(--text); background: rgba(255,255,255,0.08); }
+
+    /* LAYOUT */
+    main { max-width: 1200px; margin: 0 auto; padding: 48px 40px 80px; }
+
+    /* HERO */
+    .hero { margin-bottom: 48px; }
+    .label {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+      color: var(--green); margin-bottom: 8px;
+    }
+    h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+    .subtitle { color: var(--muted); font-size: 15px; }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: flex; gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      margin-bottom: 48px;
+    }
+    .stat { flex: 1; background: var(--card); padding: 22px 24px; text-align: center; }
+    .stat-val { font-size: 28px; font-weight: 800; margin-bottom: 4px; line-height: 1; }
+    .stat-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+    .c-green { color: var(--green); }
+    .c-blue { color: var(--blue); }
+    .c-gold { color: var(--gold); }
+
+    /* SECTION HEADER */
+    .sec-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .sec-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); }
+    .sec-link { font-size: 12px; color: var(--muted); text-decoration: none; }
+    .sec-link:hover { color: var(--text); }
+
+    /* BENTO GRID */
+    .bento { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 48px; }
+    .area-card {
+      background: var(--card);
+      border-radius: var(--r);
+      padding: 24px;
+      border: 1px solid var(--border);
+      text-decoration: none; color: inherit;
+      display: block;
+      transition: border-color 0.2s, transform 0.15s;
+      position: relative; overflow: hidden;
+    }
+    .area-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--ac);
+    }
+    .area-card:hover { border-color: rgba(255,255,255,0.14); transform: translateY(-2px); }
+    .area-icon {
+      width: 38px; height: 38px; border-radius: 9px;
+      background: var(--ac-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; margin-bottom: 16px;
+    }
+    .area-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 4px; }
+    .area-name { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
+    .area-counts { display: flex; gap: 20px; margin-bottom: 16px; }
+    .area-count { display: flex; flex-direction: column; gap: 2px; }
+    .area-count-n { font-size: 22px; font-weight: 800; line-height: 1; }
+    .area-count-l { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+    .progress { height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; }
+    .progress-fill { height: 100%; border-radius: 2px; background: var(--ac); }
+
+    /* ACTIVITY LIST */
+    .activity-list { display: flex; flex-direction: column; gap: 6px; }
+    .activity-item {
+      background: var(--card); border-radius: var(--r-sm); padding: 14px 20px;
+      display: flex; align-items: center; gap: 16px;
+      border: 1px solid var(--border);
+      text-decoration: none; color: inherit;
+      transition: border-color 0.15s;
+    }
+    .activity-item:hover { border-color: rgba(255,255,255,0.11); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .tid { font-size: 11px; color: var(--muted); font-family: 'SF Mono', monospace; width: 64px; flex-shrink: 0; }
+    .ttitle { flex: 1; font-size: 13px; }
+    .tmeta { display: flex; align-items: center; gap: 12px; }
+    .tarea { font-size: 11px; color: var(--muted); }
+    .tdate { font-size: 11px; color: var(--muted); width: 56px; text-align: right; flex-shrink: 0; }
+
+    /* BADGES */
+    .badge {
+      padding: 3px 8px; border-radius: 4px;
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .b-done     { background: rgba(70,103,93,0.25);   color: #7ABFAE; }
+    .b-progress { background: rgba(190,220,228,0.13); color: var(--blue); }
+    .b-review   { background: rgba(211,193,130,0.15); color: var(--gold); }
+    .b-backlog  { background: rgba(255,255,255,0.07); color: var(--muted); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border); padding: 20px 40px;
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--muted); font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Catalyst</span>
+  <div class="nav-links">
+    <a href="index.html" class="active">Dashboard</a>
+    <a href="tickets.html">Tickets</a>
+    <a href="design-system.html">Design System</a>
+    <a href="specs/index.html">Specs</a>
+    <a href="context.html">Context</a>
+    <a href="guide.html">Guide</a>
+  </div>
+</nav>
+
+<main>
+  <div class="hero">
+    <div class="label">Code Snippet Ingestion</div>
+    <h1>Command Center</h1>
+    <p class="subtitle">Live overview — backend schema, AI enrichment pipeline, and mobile renderer.</p>
+  </div>
+
+  <!-- CATALYST:STATS — Claude: update these counts when ticket statuses change -->
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-val">8</div>
+      <div class="stat-lbl">Total</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val c-blue">7</div>
+      <div class="stat-lbl">Backlog</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">1</div>
+      <div class="stat-lbl">In Progress</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val c-gold">0</div>
+      <div class="stat-lbl">Review</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val c-green">0</div>
+      <div class="stat-lbl">Done</div>
+    </div>
+  </div>
+  <!-- /CATALYST:STATS -->
+
+  <!-- CATALYST:WORKSTREAMS — Claude: update open/done counts and progress % per area -->
+  <div class="sec-head">
+    <span class="sec-title">Workstreams</span>
+    <a class="sec-link" href="tickets.html">View all tickets →</a>
+  </div>
+  <div class="bento">
+    <a href="tickets.html?area=backend" class="area-card"
+       style="--ac:#888; --ac-dim:rgba(136,136,136,0.1);">
+      <div class="area-icon">⚙️</div>
+      <div class="area-label">Workstream</div>
+      <div class="area-name">Backend</div>
+      <div class="area-counts">
+        <div class="area-count"><span class="area-count-n">4</span><span class="area-count-l">Open</span></div>
+        <div class="area-count"><span class="area-count-n">0</span><span class="area-count-l">Done</span></div>
+      </div>
+      <div class="progress"><div class="progress-fill" style="width:0%"></div></div>
+    </a>
+
+    <a href="tickets.html?area=ai-agents" class="area-card"
+       style="--ac:#46675D; --ac-dim:rgba(70,103,93,0.12);">
+      <div class="area-icon">🤖</div>
+      <div class="area-label">Workstream</div>
+      <div class="area-name">AI Pipeline</div>
+      <div class="area-counts">
+        <div class="area-count"><span class="area-count-n">2</span><span class="area-count-l">Open</span></div>
+        <div class="area-count"><span class="area-count-n">0</span><span class="area-count-l">Done</span></div>
+      </div>
+      <div class="progress"><div class="progress-fill" style="width:0%"></div></div>
+    </a>
+
+    <a href="tickets.html?area=mobile" class="area-card"
+       style="--ac:#BEDCE4; --ac-dim:rgba(190,220,228,0.1);">
+      <div class="area-icon">📱</div>
+      <div class="area-label">Workstream</div>
+      <div class="area-name">Mobile</div>
+      <div class="area-counts">
+        <div class="area-count"><span class="area-count-n">2</span><span class="area-count-l">Open</span></div>
+        <div class="area-count"><span class="area-count-n">0</span><span class="area-count-l">Done</span></div>
+      </div>
+      <div class="progress"><div class="progress-fill" style="width:0%"></div></div>
+    </a>
+  </div>
+  <!-- /CATALYST:WORKSTREAMS -->
+
+  <!-- CATALYST:ACTIVITY — Claude: keep sorted by updated date desc, most recent first -->
+  <div class="sec-head">
+    <span class="sec-title">Recent Activity</span>
+  </div>
+  <div class="activity-list">
+    <a class="activity-item" href="tickets.html">
+      <div class="dot" style="background:#888"></div>
+      <span class="tid">CAT-001</span>
+      <span class="ttitle">Design code snippet schema</span>
+      <div class="tmeta">
+        <span class="badge b-progress">In Progress</span>
+        <span class="tarea">Backend</span>
+      </div>
+      <span class="tdate">May 25</span>
+    </a>
+    <a class="activity-item" href="tickets.html">
+      <div class="dot" style="background:#888"></div>
+      <span class="tid">CAT-002</span>
+      <span class="ttitle">Build snippet ingestion endpoint</span>
+      <div class="tmeta">
+        <span class="badge b-backlog">Backlog</span>
+        <span class="tarea">Backend</span>
+      </div>
+      <span class="tdate">May 25</span>
+    </a>
+    <a class="activity-item" href="tickets.html">
+      <div class="dot" style="background:#888"></div>
+      <span class="tid">CAT-003</span>
+      <span class="ttitle">Adapt Qdrant for code embeddings</span>
+      <div class="tmeta">
+        <span class="badge b-backlog">Backlog</span>
+        <span class="tarea">Backend</span>
+      </div>
+      <span class="tdate">May 25</span>
+    </a>
+    <a class="activity-item" href="tickets.html">
+      <div class="dot" style="background:#46675D"></div>
+      <span class="tid">CAT-005</span>
+      <span class="ttitle">Code-aware Groq enrichment prompts</span>
+      <div class="tmeta">
+        <span class="badge b-backlog">Backlog</span>
+        <span class="tarea">AI Pipeline</span>
+      </div>
+      <span class="tdate">May 25</span>
+    </a>
+    <a class="activity-item" href="tickets.html">
+      <div class="dot" style="background:#BEDCE4"></div>
+      <span class="tid">CAT-007</span>
+      <span class="ttitle">Code block renderer component</span>
+      <div class="tmeta">
+        <span class="badge b-backlog">Backlog</span>
+        <span class="tarea">Mobile</span>
+      </div>
+      <span class="tdate">May 25</span>
+    </a>
+  </div>
+  <!-- /CATALYST:ACTIVITY -->
+</main>
+
+<footer>
+  <span>Catalyst Command Center · Last updated May 25, 2026</span>
+  <span style="color:var(--green)">8 tickets · 3 workstreams · Code Snippet Ingestion</span>
+</footer>
+
+</body>
+</html>

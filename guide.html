@@ -1,0 +1,700 @@
+<!--
+CATALYST:MANIFEST — guide.html
+════════════════════════════════════════════════════════
+PURPOSE   Complete operational guide. How to use the Catalyst
+          HTML artifact system day-to-day, with every workflow
+          documented end-to-end.
+UPDATED   2026-05-25
+
+SECTIONS
+  #rules          — 4 golden rules (read first)
+  #daily          — daily workflow
+  #llm-ops        — using LLMs to manage everything
+  #notion         — Notion integration (LLM handles it)
+  #handoff        — designer spec workflow
+  #adding         — how to add tickets, workstreams, components
+  #context        — transferring context between chats
+  #reference      — all files, anchors, and schemas
+
+DO NOT edit data here. This is read-only documentation.
+════════════════════════════════════════════════════════
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalyst — Guide</title>
+  <style>
+    :root {
+      --bg: #1F1F1F; --card: #2F2F2F; --card2: #353535;
+      --green: #46675D; --blue: #BEDCE4; --gold: #D3C182;
+      --text: #E8E8E8; --muted: #787878;
+      --border: rgba(255,255,255,0.07); --r: 12px; --r-sm: 8px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(31,31,31,0.96); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px;
+    }
+    .logo { font-size: 13px; font-weight: 800; letter-spacing: 3px; color: var(--green); }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; padding: 6px 14px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-links a.active { color: var(--text); background: rgba(255,255,255,0.08); }
+
+    .layout { display: flex; min-height: calc(100vh - 56px); }
+
+    aside {
+      width: 232px; flex-shrink: 0; border-right: 1px solid var(--border);
+      padding: 28px 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto;
+    }
+    .aside-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); padding: 0 24px; margin-bottom: 6px; margin-top: 20px; }
+    .aside-label:first-child { margin-top: 0; }
+    .aside-link { display: block; padding: 6px 24px; font-size: 13px; color: var(--muted); text-decoration: none; border-left: 2px solid transparent; transition: color 0.12s, border-color 0.12s; }
+    .aside-link:hover { color: var(--text); }
+    .aside-link.active { color: var(--text); border-left-color: var(--green); }
+
+    main { flex: 1; padding: 48px 60px 120px; max-width: 860px; overflow-x: hidden; }
+
+    .sec { margin-bottom: 72px; scroll-margin-top: 72px; }
+    .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--green); margin-bottom: 8px; }
+    h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 8px; }
+    h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; margin-top: 28px; }
+    h3:first-of-type { margin-top: 0; }
+    p, .body-text { font-size: 14px; color: var(--muted); line-height: 1.75; margin-bottom: 16px; max-width: 640px; }
+    p strong, .body-text strong { color: var(--text); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 56px 0; }
+
+    /* GOLDEN RULES */
+    .rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 0; }
+    .rule {
+      background: var(--card); border-radius: var(--r); padding: 20px 22px;
+      border: 1px solid var(--border);
+    }
+    .rule-num { font-size: 11px; font-weight: 800; color: var(--green); letter-spacing: 1px; margin-bottom: 8px; }
+    .rule-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .rule-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* STEPS */
+    .steps { display: flex; flex-direction: column; gap: 0; margin-bottom: 20px; }
+    .step { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .step:last-child { border-bottom: none; }
+    .step-n {
+      width: 24px; height: 24px; border-radius: 50%; background: var(--green);
+      color: white; font-size: 11px; font-weight: 700; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0; margin-top: 2px;
+    }
+    .step-body { flex: 1; }
+    .step-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .step-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* CALLOUTS */
+    .callout {
+      border-radius: var(--r-sm); padding: 14px 18px; margin-bottom: 16px;
+      font-size: 13px; line-height: 1.6; display: flex; gap: 12px;
+    }
+    .callout-icon { flex-shrink: 0; }
+    .callout-tip    { background: rgba(70,103,93,0.1);  border: 1px solid rgba(70,103,93,0.22); color: #9ABFB4; }
+    .callout-warn   { background: rgba(211,193,130,0.08); border: 1px solid rgba(211,193,130,0.2); color: #C8B878; }
+    .callout-info   { background: rgba(190,220,228,0.08); border: 1px solid rgba(190,220,228,0.18); color: #9BBFC8; }
+
+    /* CODE BLOCKS */
+    .code-wrap { position: relative; margin-bottom: 20px; }
+    .code-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+    .code-block {
+      background: #161616; border: 1px solid var(--border); border-radius: var(--r-sm);
+      padding: 16px 20px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px;
+      line-height: 1.8; overflow-x: auto; white-space: pre; color: #C0D8CC;
+    }
+    .code-block .cm  { color: var(--muted); }
+    .code-block .ck  { color: var(--blue); }
+    .code-block .cv  { color: var(--gold); }
+    .code-block .cg  { color: #7ABFAE; }
+    .code-block .cr  { color: #E8847A; }
+    .copy-wrap { position: relative; }
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      background: rgba(255,255,255,0.08); border: 1px solid var(--border);
+      color: var(--muted); font-size: 11px; padding: 4px 10px; border-radius: 5px;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.13); color: var(--text); }
+
+    /* PROMPT CARDS */
+    .prompt-card { background: var(--card); border-radius: var(--r); border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; }
+    .prompt-head { padding: 14px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .prompt-title { font-size: 13px; font-weight: 700; }
+    .prompt-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; background: rgba(70,103,93,0.15); color: var(--green); padding: 3px 8px; border-radius: 4px; }
+    .prompt-body { padding: 0; }
+    .prompt-code {
+      background: #161616; padding: 14px 18px;
+      font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px;
+      line-height: 1.8; overflow-x: auto; white-space: pre-wrap; color: #C0D8CC;
+    }
+    .prompt-foot { padding: 10px 18px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
+    .copy-prompt-btn {
+      background: rgba(70,103,93,0.15); border: 1px solid rgba(70,103,93,0.25);
+      color: var(--green); font-size: 11px; font-weight: 600; padding: 5px 12px;
+      border-radius: 6px; cursor: pointer; transition: background 0.15s;
+    }
+    .copy-prompt-btn:hover { background: rgba(70,103,93,0.28); }
+
+    /* FILE TABLE */
+    .file-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+    .file-table th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); padding: 0 14px 10px; font-weight: 600; }
+    .file-table td { padding: 11px 14px; border-top: 1px solid var(--border); vertical-align: top; }
+    .file-table tr:last-child td { border-bottom: 1px solid var(--border); }
+    .file-table a { color: var(--blue); text-decoration: none; font-family: 'SF Mono', monospace; font-size: 11px; }
+    .file-table a:hover { text-decoration: underline; }
+
+    /* NOTION WORKFLOW CARDS */
+    .workflow-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .wf-card { background: var(--card); border-radius: var(--r); padding: 20px; border: 1px solid var(--border); }
+    .wf-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; margin-bottom: 12px; display: inline-block; }
+    .wf-badge-easy   { background: rgba(70,103,93,0.25);   color: #7ABFAE; }
+    .wf-badge-medium { background: rgba(211,193,130,0.15); color: var(--gold); }
+    .wf-badge-power  { background: rgba(190,220,228,0.13); color: var(--blue); }
+    .wf-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .wf-desc  { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* SCHEMA TABLE */
+    .schema-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .schema-table th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); padding: 0 12px 8px; font-weight: 600; }
+    .schema-table td { padding: 9px 12px; border-top: 1px solid var(--border); vertical-align: top; }
+    .schema-table td:first-child { font-family: 'SF Mono', monospace; color: var(--blue); font-size: 11px; }
+    .schema-table td:nth-child(2) { color: var(--gold); font-family: 'SF Mono', monospace; font-size: 11px; }
+    .schema-table td:last-child { color: var(--muted); line-height: 1.5; }
+
+    /* ANCHOR PILL */
+    .anchor-pill { display: inline-block; font-family: 'SF Mono', monospace; font-size: 11px; color: var(--gold); background: rgba(211,193,130,0.1); padding: 2px 8px; border-radius: 4px; }
+    code { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--blue); background: rgba(190,220,228,0.08); padding: 1px 5px; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Catalyst</span>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="tickets.html">Tickets</a>
+    <a href="design-system.html">Design System</a>
+    <a href="specs/index.html">Specs</a>
+    <a href="context.html">Context</a>
+    <a href="guide.html" class="active">Guide</a>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside>
+    <div class="aside-label">Foundation</div>
+    <a class="aside-link active" href="#rules">Golden Rules</a>
+    <a class="aside-link" href="#daily">Daily Workflow</a>
+
+    <div class="aside-label">Working with LLMs</div>
+    <a class="aside-link" href="#llm-ops">LLM Operations</a>
+    <a class="aside-link" href="#chat-prompts">Chat Prompts</a>
+
+    <div class="aside-label">Integrations</div>
+    <a class="aside-link" href="#notion">Notion Sync</a>
+
+    <div class="aside-label">Building Out</div>
+    <a class="aside-link" href="#handoff">Designer Handoff</a>
+    <a class="aside-link" href="#adding">Adding Things</a>
+    <a class="aside-link" href="#context">Context Transfer</a>
+
+    <div class="aside-label">Reference</div>
+    <a class="aside-link" href="#file-ref">File Map</a>
+    <a class="aside-link" href="#anchor-ref">All Anchors</a>
+    <a class="aside-link" href="#schema-ref">Ticket Schema</a>
+  </aside>
+
+  <main>
+    <div style="margin-bottom:52px">
+      <div class="eyebrow">Catalyst</div>
+      <h1 style="font-size:36px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px">How to Use This System</h1>
+      <p style="font-size:15px;max-width:600px">A complete operational guide — from daily ticket management to Notion sync, designer handoff, and multi-session context transfer.</p>
+    </div>
+
+    <!-- ══ GOLDEN RULES ══════════════════════════════════════════ -->
+    <section class="sec" id="rules">
+      <div class="eyebrow">Foundation</div>
+      <h2>Golden Rules</h2>
+      <p>Before everything else. These four rules make the system reliable.</p>
+      <div class="rules-grid">
+        <div class="rule">
+          <div class="rule-num">RULE 01</div>
+          <div class="rule-title">HTML is the database</div>
+          <div class="rule-body">The JSON inside <code>tickets.html</code> is your canonical ticket store. Notion, spreadsheets, and chat messages are inputs — not sources of truth. The HTML wins.</div>
+        </div>
+        <div class="rule">
+          <div class="rule-num">RULE 02</div>
+          <div class="rule-title">Edit only at anchors</div>
+          <div class="rule-body">Every editable section has a <code>CATALYST:ANCHOR</code> comment. LLMs must target these and only these. Never modify raw HTML outside an anchor — it will break the renderer.</div>
+        </div>
+        <div class="rule">
+          <div class="rule-num">RULE 03</div>
+          <div class="rule-title">One file per domain</div>
+          <div class="rule-body">Ticket data in <code>tickets.html</code>. Design tokens in <code>design-system.html</code>. Specs in <code>specs/</code>. Never duplicate data across files — you'll end up with drift.</div>
+        </div>
+        <div class="rule">
+          <div class="rule-num">RULE 04</div>
+          <div class="rule-title">context.html first</div>
+          <div class="rule-body">Start every new session by sharing <code>context.html</code>. This gives any LLM the full project map without reading all files. Then share only the specific file needed for the task.</div>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ DAILY WORKFLOW ════════════════════════════════════════ -->
+    <section class="sec" id="daily">
+      <div class="eyebrow">Foundation</div>
+      <h2>Daily Workflow</h2>
+      <p>What a typical working day looks like with this system.</p>
+
+      <h3>Morning: Review the dashboard</h3>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-body"><div class="step-title">Open index.html</div><div class="step-desc">Check current ticket counts and recent activity. This tells you where things stand without reading every ticket.</div></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-body"><div class="step-title">Open tickets.html</div><div class="step-desc">Filter to your area of focus for the day. Use the area dropdown or URL param: <code>tickets.html?area=backend</code></div></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-body"><div class="step-title">Pick your tickets</div><div class="step-desc">Move 1–3 tickets from Backlog to In Progress. Ask Claude to do this — paste the LLM ticket-update prompt below.</div></div></div>
+      </div>
+
+      <h3>During the day: Capture work</h3>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-body"><div class="step-title">New task comes in from Notion / Slack / meeting</div><div class="step-desc">Use the "Add ticket from Notion" or "Add new ticket" prompt. Claude formats it and updates tickets.html + index.html.</div></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-body"><div class="step-title">Ticket moves to review</div><div class="step-desc">Use "Update ticket status" prompt. Takes 10 seconds — just paste the ticket ID and new status.</div></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-body"><div class="step-title">Designer needs a spec</div><div class="step-desc">Open a new chat, share <code>specs/_template.html</code> + <code>design-system.html</code>. Claude builds the spec. You hand off the single HTML file.</div></div></div>
+      </div>
+
+      <h3>End of day: Sync</h3>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-body"><div class="step-title">Bring in any new Notion tasks</div><div class="step-desc">Copy tasks from Notion, paste into Claude with tickets.html attached, let Claude format and add them. Takes one chat turn.</div></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-body"><div class="step-title">Update index.html</div><div class="step-desc">Use the "Sync dashboard" prompt to recalculate stats and activity. Takes one chat turn.</div></div></div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ LLM OPERATIONS ════════════════════════════════════════ -->
+    <section class="sec" id="llm-ops">
+      <div class="eyebrow">Working with LLMs</div>
+      <h2>LLM Operations</h2>
+      <p>How any LLM — Claude, GPT, Gemini — can modify this system. The key is the <strong>CATALYST:LLM-OPERATIONS</strong> comment block inside <code>tickets.html</code>. Any LLM that reads the file reads those instructions automatically and knows what it can and cannot change.</p>
+
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <span>You never need to explain the system to a new LLM. Just paste <code>context.html</code> and the relevant file. The manifest comments do the briefing automatically.</span>
+      </div>
+
+      <h3>What LLMs can do to this system</h3>
+      <div class="steps">
+        <div class="step"><div class="step-n">✓</div><div class="step-body"><div class="step-title">Add new tickets</div><div class="step-desc">LLM appends a new JSON object to the ticket array in <code>CATALYST:TICKETS:DATA</code> and bumps the next ID counter in the manifest.</div></div></div>
+        <div class="step"><div class="step-n">✓</div><div class="step-body"><div class="step-title">Update ticket status, priority, or description</div><div class="step-desc">LLM finds the ticket by ID and edits the relevant field. Always updates the "updated" date.</div></div></div>
+        <div class="step"><div class="step-n">✓</div><div class="step-body"><div class="step-title">Sync stats to index.html</div><div class="step-desc">LLM updates the number values inside <code>CATALYST:STATS</code> and rewrites <code>CATALYST:ACTIVITY</code>.</div></div></div>
+        <div class="step"><div class="step-n">✓</div><div class="step-body"><div class="step-title">Create designer specs</div><div class="step-desc">LLM copies the template, fills all SPEC: sections, generates phone frame mockups in HTML/CSS, and registers the spec in <code>specs/index.html</code>.</div></div></div>
+        <div class="step"><div class="step-n">✓</div><div class="step-body"><div class="step-title">Extend the design system</div><div class="step-desc">LLM adds new components or tokens inside the appropriate <code>CATALYST:DS:*</code> section.</div></div></div>
+        <div class="step"><div class="step-n">✗</div><div class="step-body"><div class="step-title">LLMs must NOT touch</div><div class="step-desc">Any HTML outside anchor tags. CSS styles. JavaScript. The nav bar. Layout. These are read-only to LLMs.</div></div></div>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠️</span>
+        <span><strong>After any ticket edit:</strong> always ask the LLM to also sync <code>index.html</code>. The dashboard doesn't auto-update — the LLM needs to manually recount and update <code>CATALYST:STATS</code> and <code>CATALYST:ACTIVITY</code>.</span>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ CHAT PROMPTS ════════════════════════════════════════════ -->
+    <section class="sec" id="chat-prompts">
+      <div class="eyebrow">Working with LLMs</div>
+      <h2>Chat Prompts</h2>
+      <p>Copy these into any LLM chat. Replace the <span style="color:#E8847A;font-family:monospace">red parts</span>. Always attach the files mentioned in "Files to share."</p>
+
+      <div class="prompt-card">
+        <div class="prompt-head">
+          <span class="prompt-title">Start a new focused session</span>
+          <span class="prompt-tag">Any area</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-code" id="p-focused"><span style="color:var(--muted)"># Files to share: context.html + tickets.html</span>
+
+Read the CATALYST:MANIFEST comment at the top of each file.
+Focus this session on area: <span style="color:#E8847A">"backend"</span>  <span style="color:var(--muted)"># ← change to your area</span>
+Relevant tickets from the manifest: <span style="color:#E8847A">CAT-007, CAT-008</span>
+
+<span style="color:var(--muted)"># Only read those two ticket objects in the JSON — skip the rest.</span>
+Task: <span style="color:#E8847A">describe what you need today</span></div>
+        </div>
+        <div class="prompt-foot"><button class="copy-prompt-btn" onclick="copyPre('p-focused')">Copy prompt</button></div>
+      </div>
+
+      <div class="prompt-card">
+        <div class="prompt-head">
+          <span class="prompt-title">Add a new ticket</span>
+          <span class="prompt-tag">Ticket</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-code" id="p-add"><span style="color:var(--muted)"># Files to share: tickets.html + index.html</span>
+
+Read CATALYST:LLM-OPERATIONS in tickets.html (it's a comment block before the JSON).
+Then read CATALYST:MANIFEST at the top to find the next ticket ID.
+
+Add this ticket to CATALYST:TICKETS:DATA:
+  title:       <span style="color:#E8847A">"Your ticket title"</span>
+  area:        <span style="color:#E8847A">backend</span>  <span style="color:var(--muted)"># pitch-deck | ai-agents | mobile | backend</span>
+  priority:    <span style="color:#E8847A">high</span>     <span style="color:var(--muted)"># low | medium | high | critical</span>
+  description: <span style="color:#E8847A">"What needs to be done."</span>
+
+After adding, also update index.html:
+  - CATALYST:STATS: increment the relevant counts
+  - CATALYST:ACTIVITY: prepend this ticket, keep max 5 items</div>
+        </div>
+        <div class="prompt-foot"><button class="copy-prompt-btn" onclick="copyPre('p-add')">Copy prompt</button></div>
+      </div>
+
+      <div class="prompt-card">
+        <div class="prompt-head">
+          <span class="prompt-title">Update ticket status</span>
+          <span class="prompt-tag">Ticket</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-code" id="p-status"><span style="color:var(--muted)"># Files to share: tickets.html + index.html</span>
+
+Read CATALYST:LLM-OPERATIONS in tickets.html for the rules.
+Find ticket <span style="color:#E8847A">CAT-003</span> in CATALYST:TICKETS:DATA.
+Change status from <span style="color:#E8847A">in-progress</span> → <span style="color:#E8847A">review</span>.
+Update "updated" to today's date.
+
+Then sync index.html:
+  - CATALYST:STATS: recount all statuses
+  - CATALYST:ACTIVITY: update this ticket's entry if it's in the list</div>
+        </div>
+        <div class="prompt-foot"><button class="copy-prompt-btn" onclick="copyPre('p-status')">Copy prompt</button></div>
+      </div>
+
+      <div class="prompt-card">
+        <div class="prompt-head">
+          <span class="prompt-title">Add tickets from Notion (manual LLM bridge)</span>
+          <span class="prompt-tag">Notion</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-code" id="p-notion"><span style="color:var(--muted)"># Files to share: tickets.html + index.html
+# Also paste your Notion tasks below the prompt</span>
+
+Read CATALYST:LLM-OPERATIONS in tickets.html.
+I'm pasting Notion tasks below. For each one:
+  1. Check if a ticket with the same title already exists in CATALYST:TICKETS:DATA
+     - If yes: update its status/priority if they differ
+     - If no: add it as a new ticket with the next available CAT-XXX ID
+  2. Map Notion fields to Catalyst schema:
+     Notion "Status: In progress" → "in-progress"
+     Notion "Status: Done"        → "done"
+     Notion area names            → lowercase-hyphenated
+
+After syncing all tasks, update index.html CATALYST:STATS and CATALYST:ACTIVITY.
+
+<span style="color:var(--muted)"># ── Paste your Notion tasks below this line ──────────</span>
+<span style="color:#E8847A">[paste Notion page content or CSV export here]</span></div>
+        </div>
+        <div class="prompt-foot"><button class="copy-prompt-btn" onclick="copyPre('p-notion')">Copy prompt</button></div>
+      </div>
+
+      <div class="prompt-card">
+        <div class="prompt-head">
+          <span class="prompt-title">Sync dashboard after ticket changes</span>
+          <span class="prompt-tag">Dashboard</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-code" id="p-sync"><span style="color:var(--muted)"># Files to share: tickets.html + index.html</span>
+
+Read CATALYST:TICKETS:DATA in tickets.html.
+Count tickets by status and area.
+
+Update index.html:
+  CATALYST:STATS: set total, backlog, in-progress, review, done counts
+  CATALYST:WORKSTREAMS: for each area card, recalculate open, done, progress %
+  CATALYST:ACTIVITY: rebuild the list — 5 most recently-updated tickets, newest first</div>
+        </div>
+        <div class="prompt-foot"><button class="copy-prompt-btn" onclick="copyPre('p-sync')">Copy prompt</button></div>
+      </div>
+
+      <div class="prompt-card">
+        <div class="prompt-head">
+          <span class="prompt-title">Create a designer spec</span>
+          <span class="prompt-tag">Spec</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-code" id="p-spec"><span style="color:var(--muted)"># Files to share: specs/_template.html + design-system.html</span>
+
+Using specs/_template.html as the base structure, create:
+  File: <span style="color:#E8847A">specs/feature-name-v1.html</span>
+  Ticket: <span style="color:#E8847A">CAT-00X</span>
+  Status: Draft
+
+Spec for: <span style="color:#E8847A">Screen or component name</span>
+
+Screens to spec:
+<span style="color:#E8847A">  - Screen 1: [name + what it does]
+  - Screen 2: [name + what it does]</span>
+
+For each screen:
+  - Build a phone frame mockup using HTML/CSS (375px wide, dark theme)
+  - Add a spec panel with exact pixel measurements, typography, colors
+  - Reference design-system.html CATALYST:DS:COLORS for token values
+
+Also register the new spec in specs/index.html at CATALYST:SPECS:REGISTRY.</div>
+        </div>
+        <div class="prompt-foot"><button class="copy-prompt-btn" onclick="copyPre('p-spec')">Copy prompt</button></div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ NOTION ════════════════════════════════════════════════ -->
+    <section class="sec" id="notion">
+      <div class="eyebrow">Integrations</div>
+      <h2>Notion → Catalyst</h2>
+      <p>Claude handles this. Copy tasks from Notion, paste them into a chat with <code>tickets.html</code> attached, and Claude maps them to the ticket schema and updates the file. No scripts, no setup.</p>
+
+      <h3>How to do it</h3>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-body"><div class="step-title">In Notion, copy the tasks you want to bring across</div><div class="step-desc">Select rows in your database view, or copy the page content. Plain text is fine — Claude can read Notion's copy format.</div></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-body"><div class="step-title">Open a Claude chat and share tickets.html + index.html</div><div class="step-desc">Attach both files. Claude reads <code>CATALYST:LLM-OPERATIONS</code> automatically and knows the schema and rules.</div></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-body"><div class="step-title">Paste the "Add tickets from Notion" prompt, then paste your Notion content below it</div><div class="step-desc">The prompt is in the Chat Prompts section above — it tells Claude exactly how to map Notion fields to Catalyst fields and how to handle duplicates.</div></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-body"><div class="step-title">Claude returns updated file content — save it</div><div class="step-desc">Copy the output and overwrite tickets.html. If index.html was also updated, save that too.</div></div></div>
+      </div>
+
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <span><strong>Tip:</strong> you don't need to copy every Notion task every time. Just copy the ones that changed or are new. Claude will check for duplicates by title and update existing tickets rather than creating doubles.</span>
+      </div>
+
+      <h3>Status mapping Claude uses</h3>
+      <div class="copy-wrap">
+        <div class="code-block">Notion "Not started"  →  Catalyst "backlog"
+Notion "In progress"  →  Catalyst "in-progress"
+Notion "In review"    →  Catalyst "review"
+Notion "Done"         →  Catalyst "done"</div>
+      </div>
+      <p>If your Notion uses different status names, just tell Claude in the prompt: <em>"My Notion calls it 'Active' — map that to 'in-progress'."</em></p>
+    </section>
+
+    <hr>
+
+    <!-- ══ DESIGNER HANDOFF ══════════════════════════════════════ -->
+    <section class="sec" id="handoff">
+      <div class="eyebrow">Building Out</div>
+      <h2>Designer Handoff</h2>
+      <p>The spec workflow — from ticket to a file your designer can open in any browser.</p>
+
+      <h3>When to create a spec</h3>
+      <p>Create a spec when a ticket moves from <strong>Backlog → In Progress</strong> and involves UI work. The spec replaces docx briefs, Figma links, and scattered Slack messages.</p>
+
+      <h3>Full spec workflow</h3>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-body"><div class="step-title">Open a new Claude chat</div><div class="step-desc">Separate from your PM chat — specs get their own focused session.</div></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-body"><div class="step-title">Share: specs/_template.html + design-system.html</div><div class="step-desc">These two files are all Claude needs. design-system.html provides the token reference; the template provides the structure.</div></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-body"><div class="step-title">Paste the "Create a designer spec" prompt</div><div class="step-desc">Fill in the ticket ID, screen names, and description. The more detail you give, the more accurate the spec.</div></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-body"><div class="step-title">Review the output</div><div class="step-desc">Claude returns a complete HTML file. Check: phone frame mockups render correctly, measurements match your intent, interaction descriptions are clear.</div></div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-body"><div class="step-title">Save as specs/[name]-v1.html</div><div class="step-desc">Save the file in the specs/ folder. Update specs/index.html — use the "Register spec" prompt or manually add a row to <span class="anchor-pill">CATALYST:SPECS:REGISTRY</span>.</div></div></div>
+        <div class="step"><div class="step-n">6</div><div class="step-body"><div class="step-title">Send the single file to your designer</div><div class="step-desc">Email or message them the .html file. They open it in any browser. No Figma, no login, no external links.</div></div></div>
+        <div class="step"><div class="step-n">7</div><div class="step-body"><div class="step-title">Mark ticket as "review"</div><div class="step-desc">Update CAT-XXX status to "review" in tickets.html. The spec IS the review artifact.</div></div></div>
+      </div>
+
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <span><strong>Versioning:</strong> when a spec needs significant changes, create <code>v2.html</code> rather than overwriting v1. Keep v1 in the registry marked "Deprecated" — you'll want the history later.</span>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ ADDING THINGS ════════════════════════════════════════ -->
+    <section class="sec" id="adding">
+      <div class="eyebrow">Building Out</div>
+      <h2>Adding Things</h2>
+
+      <h3>Add a new workstream</h3>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-body"><div class="step-title">Pick an accent color</div><div class="step-desc">One of the 5 Catalyst tokens, or an additional neutral (use sparingly). Document it in design-system.html.</div></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-body"><div class="step-title">Update tickets.html manifest</div><div class="step-desc">Add the new area slug to the TICKET SCHEMA and AREA TICKET GROUPS in the CATALYST:MANIFEST comment at the top.</div></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-body"><div class="step-title">Add to the area filter dropdown</div><div class="step-desc">In tickets.html, find the <code>&lt;select id="f-area"&gt;</code> element and add a new <code>&lt;option&gt;</code>.</div></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-body"><div class="step-title">Add a workstream card in index.html</div><div class="step-desc">Add a new <code>&lt;a&gt;</code> card inside <span class="anchor-pill">CATALYST:WORKSTREAMS</span>. Match the pattern of existing cards.</div></div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-body"><div class="step-title">Update context.html</div><div class="step-desc">Add the new area to the FULL FILE MAP section and the Current State area list.</div></div></div>
+      </div>
+
+      <h3>Add a design system component</h3>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-body"><div class="step-title">Share design-system.html with Claude</div><div class="step-desc">Read the CATALYST:MANIFEST to find the right section anchor.</div></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-body"><div class="step-title">Target the correct anchor</div><div class="step-desc">Add inside e.g. <span class="anchor-pill">CATALYST:DS:BUTTONS</span> or create a new section with its own anchor.</div></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-body"><div class="step-title">Include: visual demo + code spec</div><div class="step-desc">Every component needs a live rendered example (using inline HTML/CSS) and a code block showing the key CSS values.</div></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-body"><div class="step-title">Add to sidebar nav</div><div class="step-desc">Add an <code>.aside-link</code> entry for the new section in the <code>&lt;aside&gt;</code>.</div></div></div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ CONTEXT TRANSFER ════════════════════════════════════ -->
+    <section class="sec" id="context">
+      <div class="eyebrow">Building Out</div>
+      <h2>Context Transfer</h2>
+      <p>How to start a new chat with the right context, without loading everything.</p>
+
+      <div class="callout callout-info">
+        <span class="callout-icon">📌</span>
+        <span><strong>The core principle:</strong> CATALYST:MANIFEST comments are at the top of every file. Any LLM reads them in seconds and understands the full picture without reading the file body. This is what makes targeted loading work.</span>
+      </div>
+
+      <h3>Starting a new session (any LLM)</h3>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-body"><div class="step-title">Share context.html only</div><div class="step-desc">This is the briefing doc. The LLM reads the CATALYST:MANIFEST comment at the top and knows every file, every anchor, and the current state.</div></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-body"><div class="step-title">State your task, then share one targeted file</div><div class="step-desc">"Backend sprint today — here's tickets.html." The LLM reads that file's manifest and targets only the backend ticket IDs.</div></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-body"><div class="step-title">Never share all files at once</div><div class="step-desc">You'll burn context tokens on irrelevant content. Rule: one task = one file (plus context.html).</div></div></div>
+      </div>
+
+      <h3>Passing context between chats</h3>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-body"><div class="step-title">Chat A does work, returns updated HTML</div><div class="step-desc">E.g. a spec session. Save the returned spec file.</div></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-body"><div class="step-title">Chat B picks up with updated files</div><div class="step-desc">The spec file now contains all the decisions Chat A made. Share it with Chat B. No summary needed — the file IS the context.</div></div></div>
+      </div>
+
+      <div class="callout callout-tip">
+        <span class="callout-icon">💡</span>
+        <span><strong>HTML files as memory:</strong> because files are edited in place, each new session inherits the complete history of all previous sessions. The HTML isn't a report — it's a living record.</span>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ FILE REFERENCE ════════════════════════════════════════ -->
+    <section class="sec" id="file-ref">
+      <div class="eyebrow">Reference</div>
+      <h2>File Map</h2>
+      <table class="file-table">
+        <thead><tr><th style="width:180px">File</th><th>Purpose</th><th style="width:120px">Load when…</th></tr></thead>
+        <tbody>
+          <tr><td><a href="index.html">index.html</a></td><td style="color:var(--muted);font-size:12px">Dashboard. Stats, workstream cards, activity. Sync here after ticket changes.</td><td style="color:var(--muted);font-size:11px">Morning review, post-sync</td></tr>
+          <tr><td><a href="tickets.html">tickets.html</a></td><td style="color:var(--muted);font-size:12px">Canonical ticket data. All ticket CRUD happens here. Contains LLM-OPS and Notion sync instructions as comments.</td><td style="color:var(--muted);font-size:11px">Any ticket work</td></tr>
+          <tr><td><a href="design-system.html">design-system.html</a></td><td style="color:var(--muted);font-size:12px">Design tokens, components, and patterns. Shared with spec sessions.</td><td style="color:var(--muted);font-size:11px">Design / spec work</td></tr>
+          <tr><td><a href="context.html">context.html</a></td><td style="color:var(--muted);font-size:12px">Master briefing. File map, task recipes, prompt templates, state snapshot.</td><td style="color:var(--muted);font-size:11px">Starting any session</td></tr>
+          <tr><td><a href="guide.html">guide.html</a></td><td style="color:var(--muted);font-size:12px">This file. Operational how-to guide.</td><td style="color:var(--muted);font-size:11px">When you forget something</td></tr>
+          <tr><td><a href="specs/index.html">specs/index.html</a></td><td style="color:var(--muted);font-size:12px">Spec registry. Lists all handoff files with status and links.</td><td style="color:var(--muted);font-size:11px">Before creating a spec</td></tr>
+          <tr><td><a href="specs/_template.html">specs/_template.html</a></td><td style="color:var(--muted);font-size:12px">Blank spec template. Copy this — never edit it.</td><td style="color:var(--muted);font-size:11px">Creating a new spec</td></tr>
+          <tr><td><a href="specs/onboarding-flow-v1.html">specs/onboarding-flow-v1.html</a></td><td style="color:var(--muted);font-size:12px">Onboarding flow spec (CAT-005). Approved. Example of a complete handoff.</td><td style="color:var(--muted);font-size:11px">Designer handoff ref</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr>
+
+    <!-- ══ ANCHOR REFERENCE ════════════════════════════════════ -->
+    <section class="sec" id="anchor-ref">
+      <div class="eyebrow">Reference</div>
+      <h2>All Anchors</h2>
+      <p>Every editable section. LLMs target these. Never modify HTML outside them.</p>
+      <table class="schema-table">
+        <thead><tr><th style="width:240px">Anchor</th><th style="width:120px">File</th><th>What to edit</th></tr></thead>
+        <tbody>
+          <tr><td>CATALYST:TICKETS:DATA</td><td>tickets.html</td><td style="color:var(--muted)">JSON array — add/update/close ticket objects here only</td></tr>
+          <tr><td>CATALYST:LLM-OPERATIONS</td><td>tickets.html</td><td style="color:var(--muted)">Read-only instruction set for LLMs — do not edit</td></tr>
+          <tr><td>CATALYST:STATS</td><td>index.html</td><td style="color:var(--muted)">5 count numbers: total, backlog, in-progress, review, done</td></tr>
+          <tr><td>CATALYST:WORKSTREAMS</td><td>index.html</td><td style="color:var(--muted)">Area cards — open/done counts and progress percentage per area</td></tr>
+          <tr><td>CATALYST:ACTIVITY</td><td>index.html</td><td style="color:var(--muted)">Recent activity list — 5 items max, sorted newest first</td></tr>
+          <tr><td>CATALYST:CONTEXT:STATE</td><td>context.html</td><td style="color:var(--muted)">State snapshot — 5 counts + area ticket IDs</td></tr>
+          <tr><td>CATALYST:SPECS:REGISTRY</td><td>specs/index.html</td><td style="color:var(--muted)">Spec table — one &lt;tr&gt; row per spec file</td></tr>
+          <tr><td>CATALYST:DS:COLORS</td><td>design-system.html</td><td style="color:var(--muted)">Color palette section — add swatches here</td></tr>
+          <tr><td>CATALYST:DS:TYPOGRAPHY</td><td>design-system.html</td><td style="color:var(--muted)">Type scale rows</td></tr>
+          <tr><td>CATALYST:DS:SPACING</td><td>design-system.html</td><td style="color:var(--muted)">Spacing scale entries</td></tr>
+          <tr><td>CATALYST:DS:BUTTONS</td><td>design-system.html</td><td style="color:var(--muted)">Button variant demos + code spec</td></tr>
+          <tr><td>CATALYST:DS:BADGES</td><td>design-system.html</td><td style="color:var(--muted)">Status and priority badge variants</td></tr>
+          <tr><td>CATALYST:DS:CARDS</td><td>design-system.html</td><td style="color:var(--muted)">Card surface variants</td></tr>
+          <tr><td>CATALYST:DS:INPUTS</td><td>design-system.html</td><td style="color:var(--muted)">Input and select specs</td></tr>
+          <tr><td>CATALYST:DS:BENTO</td><td>design-system.html</td><td style="color:var(--muted)">Bento grid pattern examples</td></tr>
+          <tr><td>CATALYST:DS:HEATMAP</td><td>design-system.html</td><td style="color:var(--muted)">Heatmap intensity scale</td></tr>
+          <tr><td>SPEC:META</td><td>specs/*.html</td><td style="color:var(--muted)">Spec title, ticket, designer, dates, status</td></tr>
+          <tr><td>SPEC:SCREENS</td><td>specs/*.html</td><td style="color:var(--muted)">Phone frame mockups, one per screen/state</td></tr>
+          <tr><td>SPEC:TOKENS</td><td>specs/*.html</td><td style="color:var(--muted)">Design tokens used in this spec</td></tr>
+          <tr><td>SPEC:INTERACTIONS</td><td>specs/*.html</td><td style="color:var(--muted)">Tap targets, transitions, gestures</td></tr>
+          <tr><td>SPEC:A11Y</td><td>specs/*.html</td><td style="color:var(--muted)">Accessibility requirements</td></tr>
+          <tr><td>SPEC:DEVNOTES</td><td>specs/*.html</td><td style="color:var(--muted)">Implementation notes for engineers</td></tr>
+          <tr><td>SPEC:HISTORY</td><td>specs/*.html</td><td style="color:var(--muted)">Version changelog — prepend new entries</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr>
+
+    <!-- ══ SCHEMA REFERENCE ════════════════════════════════════ -->
+    <section class="sec" id="schema-ref">
+      <div class="eyebrow">Reference</div>
+      <h2>Ticket Schema</h2>
+      <table class="schema-table">
+        <thead><tr><th style="width:120px">Field</th><th style="width:180px">Type / Values</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>id</td><td>"CAT-001"</td><td style="color:var(--muted)">3-digit zero-padded. Never change after creation. Check manifest for next available.</td></tr>
+          <tr><td>title</td><td>string</td><td style="color:var(--muted)">3–8 words. Imperative verb + subject. E.g. "Add push notification service."</td></tr>
+          <tr><td>description</td><td>string</td><td style="color:var(--muted)">One sentence. What needs to be done, not why.</td></tr>
+          <tr><td>area</td><td>"pitch-deck" | "ai-agents" | "mobile" | "backend"</td><td style="color:var(--muted)">Lowercase hyphenated. Must match exactly — controls kanban column color.</td></tr>
+          <tr><td>status</td><td>"backlog" | "in-progress" | "review" | "done"</td><td style="color:var(--muted)">Flow is one direction: backlog → in-progress → review → done. Never set backward.</td></tr>
+          <tr><td>priority</td><td>"low" | "medium" | "high" | "critical"</td><td style="color:var(--muted)">Use critical sparingly. If everything is critical, nothing is.</td></tr>
+          <tr><td>created</td><td>"YYYY-MM-DD"</td><td style="color:var(--muted)">Set once on creation. Never change.</td></tr>
+          <tr><td>updated</td><td>"YYYY-MM-DD"</td><td style="color:var(--muted)">Update every time any field changes. Today's date.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-wrap" style="margin-top:20px">
+        <div class="code-label">Full example ticket object</div>
+        <div class="copy-wrap">
+          <div class="code-block" id="schema-ex">{
+  <span class="ck">"id"</span>:          <span class="cv">"CAT-009"</span>,
+  <span class="ck">"title"</span>:       <span class="cv">"Add push notification service"</span>,
+  <span class="ck">"description"</span>: <span class="cv">"Integrate APNs and FCM for iOS and Android push alerts."</span>,
+  <span class="ck">"area"</span>:        <span class="cv">"mobile"</span>,
+  <span class="ck">"status"</span>:      <span class="cv">"backlog"</span>,
+  <span class="ck">"priority"</span>:    <span class="cv">"medium"</span>,
+  <span class="ck">"created"</span>:     <span class="cv">"2026-05-25"</span>,
+  <span class="ck">"updated"</span>:     <span class="cv">"2026-05-25"</span>
+}</div>
+          <button class="copy-btn" onclick="copyId('schema-ex')">Copy</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  function copyId(id) {
+    const el = document.getElementById(id);
+    navigator.clipboard.writeText(el.innerText || el.textContent).then(() => {
+      const btn = el.parentElement?.querySelector('.copy-btn') || el.nextElementSibling;
+      if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
+    });
+  }
+  function copyPre(id) {
+    const el = document.getElementById(id);
+    navigator.clipboard.writeText(el.innerText || el.textContent).then(() => {
+      const btn = el.closest('.prompt-card').querySelector('.copy-prompt-btn');
+      btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy prompt', 2000);
+    });
+  }
+  const secs = document.querySelectorAll('.sec');
+  const links = document.querySelectorAll('.aside-link');
+  secs.forEach(s => new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const l = document.querySelector(`.aside-link[href="#${e.target.id}"]`);
+        if (l) l.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' }).observe(s));
+</script>
+
+</body>
+</html>

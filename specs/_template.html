@@ -1,0 +1,473 @@
+<!--
+CATALYST:MANIFEST — specs/_template.html
+════════════════════════════════════════════════════════
+PURPOSE   Blank spec template. COPY this file — never edit it directly.
+          Rename to: specs/[feature-name]-v1.html
+
+SECTIONS TO FILL IN (search for SPEC: anchors)
+  SPEC:META          — title, ticket, designer, dates, status
+  SPEC:SCREENS       — phone frame mockups, one per screen/state
+  SPEC:TOKENS        — which design tokens this spec uses
+  SPEC:INTERACTIONS  — tap targets, transitions, gestures
+  SPEC:A11Y          — contrast, touch targets, screen reader
+  SPEC:DEVNOTES      — implementation guidance for engineers
+  SPEC:HISTORY       — version log
+
+HOW TO USE
+  1. Copy this file to specs/[name]-v1.html
+  2. Find every <!-- FILL: ... --> comment and replace the placeholder
+  3. Build phone frame mockups in SPEC:SCREENS using HTML/CSS
+  4. Register the new file in specs/index.html (CATALYST:SPECS:REGISTRY)
+  5. Share the single HTML file with your designer
+
+SELF-CONTAINED RULE
+  This file must work with zero external dependencies.
+  All styles are inline. No imports. No fonts. No images unless base64.
+════════════════════════════════════════════════════════
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- FILL: update title -->
+  <title>Catalyst Spec — [Feature Name]</title>
+  <style>
+    /* ── TOKENS (mirror design-system.html — do not change) ── */
+    :root {
+      --bg: #1F1F1F; --card: #2F2F2F; --card2: #353535;
+      --green: #46675D; --blue: #BEDCE4; --gold: #D3C182;
+      --text: #E8E8E8; --muted: #787878; --border: rgba(255,255,255,0.07);
+      --danger: #E8847A; --r: 12px; --r-sm: 8px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(31,31,31,0.96); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px;
+    }
+    .logo { font-size: 13px; font-weight: 800; letter-spacing: 3px; color: var(--green); }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-right a { color: var(--muted); text-decoration: none; font-size: 13px; }
+    .nav-right a:hover { color: var(--text); }
+    .status-pill {
+      padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .pill-draft    { background: rgba(211,193,130,0.15); color: var(--gold); }
+    .pill-approved { background: rgba(70,103,93,0.25);   color: #7ABFAE; }
+
+    /* ── LAYOUT ── */
+    .page { display: flex; min-height: calc(100vh - 56px); }
+    aside {
+      width: 220px; flex-shrink: 0; border-right: 1px solid var(--border);
+      padding: 32px 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto;
+    }
+    .aside-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); padding: 0 24px; margin-bottom: 8px; margin-top: 24px; }
+    .aside-label:first-child { margin-top: 0; }
+    .aside-link { display: block; padding: 7px 24px; font-size: 13px; color: var(--muted); text-decoration: none; border-left: 2px solid transparent; transition: color 0.15s; }
+    .aside-link:hover { color: var(--text); }
+    .aside-link.active { color: var(--text); border-left-color: var(--green); }
+
+    main { flex: 1; padding: 48px 52px 100px; max-width: 960px; overflow-x: hidden; }
+
+    /* ── SECTIONS ── */
+    .ds-section { margin-bottom: 64px; scroll-margin-top: 72px; }
+    .section-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--green); margin-bottom: 8px; }
+    h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.2px; margin-bottom: 6px; }
+    .section-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 28px; max-width: 580px; }
+    h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+    /* ── META TABLE ── */
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    .meta-cell { background: var(--card); padding: 16px 20px; }
+    .meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 4px; }
+    .meta-val { font-size: 14px; font-weight: 600; }
+    .meta-val.mono { font-family: 'SF Mono', monospace; font-size: 12px; color: var(--blue); font-weight: 400; }
+
+    /* ── SCREEN TABS ── */
+    .tabs { display: flex; gap: 2px; margin-bottom: 28px; background: var(--card); border-radius: var(--r-sm); padding: 4px; width: fit-content; }
+    .tab { padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--muted); border: none; background: none; transition: color 0.15s, background 0.15s; }
+    .tab.active { background: var(--green); color: white; }
+    .screen-panel { display: none; }
+    .screen-panel.active { display: grid; grid-template-columns: auto 1fr; gap: 40px; align-items: start; }
+
+    /* ── PHONE FRAME ── */
+    .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; flex-shrink: 0; }
+    .phone-label { font-size: 11px; color: var(--muted); text-align: center; }
+    .phone {
+      width: 300px; background: #0A0A0A; border-radius: 36px;
+      border: 7px solid #3A3A3A; overflow: hidden;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.08);
+      position: relative;
+    }
+    .phone-status {
+      height: 44px; background: #0A0A0A; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 20px;
+      font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.9);
+    }
+    .status-icons { display: flex; gap: 4px; align-items: center; }
+    .phone-screen { background: #121212; min-height: 580px; }
+    .phone-bar { height: 28px; background: #0A0A0A; display: flex; align-items: center; justify-content: center; }
+    .home-bar { width: 100px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; }
+
+    /* ── SPEC PANEL ── */
+    .spec-panel { display: flex; flex-direction: column; gap: 20px; }
+    .spec-block { background: var(--card); border-radius: var(--r-sm); border: 1px solid var(--border); overflow: hidden; }
+    .spec-block-head { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); font-weight: 600; }
+    .spec-block-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .spec-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; font-size: 12px; }
+    .spec-key { color: var(--muted); flex-shrink: 0; }
+    .spec-val { text-align: right; font-weight: 500; }
+    .spec-val.mono { font-family: 'SF Mono', monospace; color: var(--blue); }
+    .spec-val.green { color: var(--green); }
+    .spec-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* ── TOKEN SWATCHES ── */
+    .token-list { display: flex; flex-direction: column; gap: 8px; }
+    .token-row { display: flex; align-items: center; gap: 12px; }
+    .token-swatch { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); }
+    .token-info { flex: 1; }
+    .token-name { font-size: 12px; font-weight: 600; font-family: 'SF Mono', monospace; color: var(--blue); }
+    .token-use { font-size: 11px; color: var(--muted); }
+
+    /* ── INTERACTION LIST ── */
+    .interaction-list { display: flex; flex-direction: column; gap: 10px; }
+    .interaction { background: var(--card); border-radius: var(--r-sm); padding: 14px 16px; border: 1px solid var(--border); }
+    .interaction-trigger { font-size: 12px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .gesture-tag { font-size: 10px; background: rgba(255,255,255,0.07); padding: 2px 7px; border-radius: 4px; color: var(--muted); font-weight: 400; }
+    .interaction-result { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* ── A11Y ── */
+    .a11y-list { display: flex; flex-direction: column; gap: 8px; }
+    .a11y-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .a11y-check { color: var(--green); flex-shrink: 0; margin-top: 1px; }
+
+    /* ── DEV NOTES ── */
+    .dev-notes { display: flex; flex-direction: column; gap: 12px; }
+    .dev-note { background: var(--card); border-radius: var(--r-sm); padding: 14px 16px; border-left: 3px solid var(--green); }
+    .dev-note-title { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+    .dev-note-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    code { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--blue); background: rgba(190,220,228,0.08); padding: 1px 5px; border-radius: 3px; }
+
+    /* ── HISTORY ── */
+    .history-list { display: flex; flex-direction: column; gap: 0; }
+    .history-item { display: flex; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .history-item:last-child { border-bottom: none; }
+    .history-ver { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--blue); width: 40px; flex-shrink: 0; margin-top: 2px; }
+    .history-date { color: var(--muted); width: 100px; flex-shrink: 0; font-size: 12px; margin-top: 2px; }
+    .history-body { flex: 1; color: var(--muted); font-size: 12px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Catalyst</span>
+  <div class="nav-right">
+    <a href="../specs/index.html">← All Specs</a>
+    <!-- FILL: change pill class to pill-approved when signed off -->
+    <span class="status-pill pill-draft">Draft</span>
+  </div>
+</nav>
+
+<div class="page">
+  <aside>
+    <div class="aside-label">Spec</div>
+    <a class="aside-link active" href="#meta">Overview</a>
+    <a class="aside-link" href="#screens">Screens</a>
+    <a class="aside-link" href="#tokens">Tokens</a>
+
+    <div class="aside-label">Handoff</div>
+    <a class="aside-link" href="#interactions">Interactions</a>
+    <a class="aside-link" href="#a11y">Accessibility</a>
+    <a class="aside-link" href="#devnotes">Dev Notes</a>
+    <a class="aside-link" href="#history">History</a>
+  </aside>
+
+  <main>
+
+    <!-- ══ SPEC:META ══════════════════════════════════════════ -->
+    <section class="ds-section" id="meta">
+      <div class="section-eyebrow">Spec</div>
+      <!-- FILL: feature name -->
+      <h2>[Feature Name]</h2>
+      <!-- FILL: one-line description of what this spec covers -->
+      <p class="section-desc">[Brief description of the screen or component being specced. What it does, where it appears, who sees it.]</p>
+
+      <!-- FILL: all meta values -->
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Ticket</div>
+          <div class="meta-val mono">CAT-XXX</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Status</div>
+          <div class="meta-val">Draft</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Version</div>
+          <div class="meta-val">v1.0</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Platform</div>
+          <div class="meta-val">iOS · Android</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Designer</div>
+          <div class="meta-val">[Name]</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Created</div>
+          <div class="meta-val">YYYY-MM-DD</div>
+        </div>
+      </div>
+    </section>
+    <!-- /SPEC:META -->
+
+    <hr>
+
+    <!-- ══ SPEC:SCREENS ════════════════════════════════════════
+         Add one tab per screen or state.
+         Each .screen-panel should have:
+           - a .phone with the rendered screen content
+           - a .spec-panel with measurements and notes
+    ═══════════════════════════════════════════════════════════ -->
+    <section class="ds-section" id="screens">
+      <div class="section-eyebrow">Screens</div>
+      <h2>Screen Specs</h2>
+
+      <!-- FILL: update tab labels to match your screen names -->
+      <div class="tabs" id="screen-tabs">
+        <button class="tab active" onclick="showScreen(0)">Screen 1</button>
+        <button class="tab" onclick="showScreen(1)">Screen 2</button>
+        <!-- Add more tab buttons as needed -->
+      </div>
+
+      <!-- SCREEN 1 — FILL: build the phone mockup and spec panel -->
+      <div class="screen-panel active" id="screen-0">
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="phone-status">
+              <span>9:41</span>
+              <div class="status-icons">
+                <span>●●●</span><span>WiFi</span><span>█</span>
+              </div>
+            </div>
+            <div class="phone-screen" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px">
+              <!-- FILL: build the screen content here using HTML/CSS -->
+              [Screen 1 mockup]
+            </div>
+            <div class="phone-bar"><div class="home-bar"></div></div>
+          </div>
+          <div class="phone-label">Screen 1 — [Name]</div>
+        </div>
+
+        <div class="spec-panel">
+          <!-- FILL: fill in measurements for this screen -->
+          <div class="spec-block">
+            <div class="spec-block-head">Typography</div>
+            <div class="spec-block-body">
+              <div class="spec-row"><span class="spec-key">Heading</span><span class="spec-val">28px / 800 / #E8E8E8</span></div>
+              <div class="spec-row"><span class="spec-key">Body</span><span class="spec-val">14px / 400 / #787878</span></div>
+              <div class="spec-row"><span class="spec-key">CTA</span><span class="spec-val">13px / 600 / white</span></div>
+            </div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-block-head">Spacing</div>
+            <div class="spec-block-body">
+              <div class="spec-row"><span class="spec-key">Horizontal padding</span><span class="spec-val mono">24px</span></div>
+              <div class="spec-row"><span class="spec-key">Element gap</span><span class="spec-val mono">16px</span></div>
+              <div class="spec-row"><span class="spec-key">Button height</span><span class="spec-val mono">52px</span></div>
+            </div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-block-head">Notes</div>
+            <div class="spec-block-body">
+              <!-- FILL: any notes specific to this screen -->
+              <p class="spec-note">[Add any screen-specific notes, edge cases, or constraints here.]</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 2 — copy this block for each additional screen -->
+      <div class="screen-panel" id="screen-1">
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="phone-status">
+              <span>9:41</span>
+              <div class="status-icons"><span>●●●</span><span>WiFi</span><span>█</span></div>
+            </div>
+            <div class="phone-screen" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px">
+              [Screen 2 mockup]
+            </div>
+            <div class="phone-bar"><div class="home-bar"></div></div>
+          </div>
+          <div class="phone-label">Screen 2 — [Name]</div>
+        </div>
+        <div class="spec-panel">
+          <div class="spec-block">
+            <div class="spec-block-head">Measurements</div>
+            <div class="spec-block-body">
+              <div class="spec-row"><span class="spec-key">Example</span><span class="spec-val mono">[value]</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /SPEC:SCREENS -->
+
+    <hr>
+
+    <!-- ══ SPEC:TOKENS ══════════════════════════════════════════ -->
+    <section class="ds-section" id="tokens">
+      <div class="section-eyebrow">Design Tokens</div>
+      <h2>Tokens Used</h2>
+      <p class="section-desc">Only these tokens from the Catalyst design system appear in this spec. Reference <a href="../design-system.html" style="color:var(--blue)">design-system.html</a> for full definitions.</p>
+
+      <!-- FILL: list only the tokens this spec actually uses -->
+      <div class="token-list">
+        <div class="token-row">
+          <div class="token-swatch" style="background:#46675D"></div>
+          <div class="token-info">
+            <div class="token-name">--green · #46675D</div>
+            <div class="token-use">Primary CTA button, active states</div>
+          </div>
+        </div>
+        <div class="token-row">
+          <div class="token-swatch" style="background:#1F1F1F"></div>
+          <div class="token-info">
+            <div class="token-name">--bg · #1F1F1F</div>
+            <div class="token-use">Screen background</div>
+          </div>
+        </div>
+        <!-- FILL: add or remove token rows as needed -->
+      </div>
+    </section>
+    <!-- /SPEC:TOKENS -->
+
+    <hr>
+
+    <!-- ══ SPEC:INTERACTIONS ═══════════════════════════════════ -->
+    <section class="ds-section" id="interactions">
+      <div class="section-eyebrow">Handoff</div>
+      <h2>Interactions</h2>
+
+      <!-- FILL: list every interactive element and what it does -->
+      <div class="interaction-list">
+        <div class="interaction">
+          <div class="interaction-trigger">
+            [Element name]
+            <span class="gesture-tag">Tap</span>
+          </div>
+          <div class="interaction-result">[Describe what happens — navigation, state change, animation, API call, etc.]</div>
+        </div>
+        <div class="interaction">
+          <div class="interaction-trigger">
+            [Element name]
+            <span class="gesture-tag">Swipe</span>
+          </div>
+          <div class="interaction-result">[Describe result]</div>
+        </div>
+      </div>
+    </section>
+    <!-- /SPEC:INTERACTIONS -->
+
+    <hr>
+
+    <!-- ══ SPEC:A11Y ════════════════════════════════════════════ -->
+    <section class="ds-section" id="a11y">
+      <div class="section-eyebrow">Handoff</div>
+      <h2>Accessibility</h2>
+
+      <!-- FILL: list accessibility requirements for this screen -->
+      <div class="a11y-list">
+        <div class="a11y-item"><span class="a11y-check">✓</span><span>All tap targets minimum 44 × 44pt</span></div>
+        <div class="a11y-item"><span class="a11y-check">✓</span><span>Heading contrast: #E8E8E8 on #1F1F1F — 13.5:1 (AAA)</span></div>
+        <div class="a11y-item"><span class="a11y-check">✓</span><span>Muted text #787878 on #1F1F1F — 4.6:1 (AA)</span></div>
+        <div class="a11y-item"><span class="a11y-check">✓</span><span>All interactive elements have accessibilityLabel set</span></div>
+        <!-- FILL: add screen-specific a11y requirements -->
+      </div>
+    </section>
+    <!-- /SPEC:A11Y -->
+
+    <hr>
+
+    <!-- ══ SPEC:DEVNOTES ═══════════════════════════════════════ -->
+    <section class="ds-section" id="devnotes">
+      <div class="section-eyebrow">Handoff</div>
+      <h2>Dev Notes</h2>
+
+      <!-- FILL: implementation guidance for engineers -->
+      <div class="dev-notes">
+        <div class="dev-note">
+          <div class="dev-note-title">[Note title]</div>
+          <div class="dev-note-body">[Implementation detail, constraint, or decision that engineers need to know. Include component names, API endpoints, or state management notes if relevant.]</div>
+        </div>
+        <div class="dev-note">
+          <div class="dev-note-title">Component mapping</div>
+          <div class="dev-note-body"><!-- FILL: map screen elements to code components -->
+            <code>[UIElement]</code> → <code>[ComponentName]</code> with props: <code>[propName]="[value]"</code>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /SPEC:DEVNOTES -->
+
+    <hr>
+
+    <!-- ══ SPEC:HISTORY ════════════════════════════════════════ -->
+    <section class="ds-section" id="history">
+      <div class="section-eyebrow">Changelog</div>
+      <h2>Version History</h2>
+
+      <!-- FILL: prepend new entries, keep all old ones -->
+      <div class="history-list">
+        <div class="history-item">
+          <span class="history-ver">v1.0</span>
+          <span class="history-date">YYYY-MM-DD</span>
+          <span class="history-body">Initial spec. [Summary of what's covered.]</span>
+        </div>
+      </div>
+    </section>
+    <!-- /SPEC:HISTORY -->
+
+  </main>
+</div>
+
+<script>
+  function showScreen(index) {
+    document.querySelectorAll('.screen-panel').forEach((p, i) => p.classList.toggle('active', i === index));
+    document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === index));
+  }
+  // Sidebar scroll highlighting
+  const sections = document.querySelectorAll('.ds-section');
+  const links = document.querySelectorAll('.aside-link');
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const l = document.querySelector(`.aside-link[href="#${e.target.id}"]`);
+        if (l) l.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' }).observe && sections.forEach(s =>
+    new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          links.forEach(l => l.classList.remove('active'));
+          const l = document.querySelector(`.aside-link[href="#${e.target.id}"]`);
+          if (l) l.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' }).observe(s)
+  );
+</script>
+
+</body>
+</html>

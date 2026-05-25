@@ -1,0 +1,818 @@
+<!--
+CATALYST:MANIFEST — tickets.html
+════════════════════════════════════════════════════════
+PURPOSE   Canonical ticket store + Kanban board.
+          ALL ticket data lives here. Edit here first, then sync index.html.
+UPDATED   2026-05-25
+NEXT ID   CAT-009
+
+FEATURE   Code Snippet Ingestion
+          End-to-end pipeline for ingesting, enriching, storing, and
+          rendering code snippet-based MCQ questions across backend,
+          AI pipeline, and mobile.
+
+EDITABLE SECTIONS (Claude: target these anchors directly)
+  CATALYST:TICKETS:DATA  ~L22  — JSON array inside <script type="application/json">
+                                  Add/update/close tickets here ONLY.
+
+TICKET SCHEMA
+  id          "CAT-XXX"
+  title       string
+  description string
+  area        "pipeline" | "ai-agents" | "mobile" | "backend"
+  status      "backlog" | "in-progress" | "review" | "done"
+  priority    "low" | "medium" | "high" | "critical"
+  created     "YYYY-MM-DD"
+  updated     "YYYY-MM-DD"
+
+CURRENT TICKET INDEX (update this block when tickets change)
+  CAT-001  backend    in-progress  critical  Design code snippet schema
+  CAT-002  backend    backlog      high      Build snippet ingestion endpoint
+  CAT-003  backend    backlog      high      Adapt Qdrant for code embeddings
+  CAT-004  backend    backlog      medium    Snippet ingestion admin CLI
+  CAT-005  ai-agents  backlog      critical  Code-aware Groq enrichment prompts
+  CAT-006  ai-agents  backlog      high      Auto-detect programming language
+  CAT-007  mobile     backlog      high      Code block renderer component
+  CAT-008  mobile     backlog      medium    Snippet MCQ card layout
+
+AREA TICKET GROUPS (for targeted context loading)
+  backend   → CAT-001, CAT-002, CAT-003, CAT-004
+  ai-agents → CAT-005, CAT-006
+  mobile    → CAT-007, CAT-008
+
+AFTER EDITING
+  Sync index.html: update CATALYST:STATS counts + CATALYST:ACTIVITY list
+════════════════════════════════════════════════════════
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalyst — Tickets</title>
+  <style>
+    :root {
+      --bg: #1F1F1F;
+      --card: #2F2F2F;
+      --card2: #353535;
+      --green: #46675D;
+      --blue: #BEDCE4;
+      --gold: #D3C182;
+      --text: #E8E8E8;
+      --muted: #787878;
+      --border: rgba(255,255,255,0.07);
+      --r: 12px;
+      --r-sm: 8px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px; line-height: 1.6; min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(31,31,31,0.96); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      height: 56px; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 40px;
+    }
+    .logo { font-size: 13px; font-weight: 800; letter-spacing: 3px; color: var(--green); }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 13px;
+      padding: 6px 14px; border-radius: 6px; transition: color 0.15s, background 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-links a.active { color: var(--text); background: rgba(255,255,255,0.08); }
+
+    /* PAGE HEADER */
+    .page-head {
+      max-width: 1400px; margin: 0 auto; padding: 36px 40px 0;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--green); margin-bottom: 6px; }
+    h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.3px; }
+
+    /* ADD BUTTON */
+    .btn-primary {
+      background: var(--green); color: white; border: none;
+      padding: 10px 20px; border-radius: var(--r-sm);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* FILTER BAR */
+    .filters {
+      max-width: 1400px; margin: 0 auto; padding: 0 40px 24px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .filter-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-right: 4px; }
+    select, .filter-btn {
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--text); padding: 7px 12px; border-radius: var(--r-sm);
+      font-size: 12px; cursor: pointer; outline: none;
+      transition: border-color 0.15s;
+    }
+    select:hover, .filter-btn:hover { border-color: rgba(255,255,255,0.15); }
+    select option { background: var(--card); }
+    .filter-btn.active { border-color: var(--green); color: var(--green); }
+    .filter-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+    .search-wrap { position: relative; flex: 1; max-width: 280px; }
+    .search-wrap input {
+      width: 100%; background: var(--card); border: 1px solid var(--border);
+      color: var(--text); padding: 7px 12px 7px 32px;
+      border-radius: var(--r-sm); font-size: 12px; outline: none;
+      transition: border-color 0.15s;
+    }
+    .search-wrap input:focus { border-color: rgba(255,255,255,0.15); }
+    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; }
+    .count-badge {
+      margin-left: auto; font-size: 11px; color: var(--muted);
+      background: var(--card); border: 1px solid var(--border);
+      padding: 6px 12px; border-radius: var(--r-sm);
+    }
+
+    /* KANBAN */
+    .kanban-wrap { max-width: 1400px; margin: 0 auto; padding: 0 40px 60px; overflow-x: auto; }
+    .kanban {
+      display: grid; grid-template-columns: repeat(4, minmax(280px, 1fr));
+      gap: 12px; min-width: 900px;
+    }
+    .col {
+      background: rgba(47,47,47,0.5); border-radius: var(--r);
+      border: 1px solid var(--border); display: flex; flex-direction: column; min-height: 200px;
+    }
+    .col-head {
+      padding: 16px 18px 14px; display: flex; align-items: center;
+      justify-content: space-between; border-bottom: 1px solid var(--border);
+      position: sticky; top: 57px; background: rgba(40,40,40,0.97);
+      backdrop-filter: blur(8px); border-radius: var(--r) var(--r) 0 0; z-index: 10;
+    }
+    .col-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+    .col-count {
+      font-size: 11px; color: var(--muted);
+      background: rgba(255,255,255,0.07); padding: 2px 8px; border-radius: 10px;
+    }
+    .col-cards { padding: 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .col-empty { padding: 24px 12px; text-align: center; color: var(--muted); font-size: 12px; }
+
+    /* TICKET CARD */
+    .ticket {
+      background: var(--card); border-radius: var(--r-sm); padding: 14px 16px;
+      border: 1px solid var(--border); cursor: pointer;
+      transition: border-color 0.15s, transform 0.1s;
+      position: relative;
+    }
+    .ticket:hover { border-color: rgba(255,255,255,0.13); transform: translateY(-1px); }
+    .ticket-area-bar {
+      position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+      border-radius: var(--r-sm) 0 0 var(--r-sm);
+    }
+    .ticket-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .ticket-id { font-size: 10px; color: var(--muted); font-family: 'SF Mono', monospace; }
+    .ticket-title { font-size: 13px; font-weight: 600; line-height: 1.4; flex: 1; }
+    .ticket-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+    .ticket-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .ticket-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* BADGES */
+    .badge {
+      padding: 3px 7px; border-radius: 4px;
+      font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .b-done     { background: rgba(70,103,93,0.3);   color: #7ABFAE; }
+    .b-progress { background: rgba(190,220,228,0.13); color: var(--blue); }
+    .b-review   { background: rgba(211,193,130,0.15); color: var(--gold); }
+    .b-backlog  { background: rgba(255,255,255,0.07); color: var(--muted); }
+    .b-critical { background: rgba(220,80,80,0.15);   color: #E8847A; }
+    .b-high     { background: rgba(211,193,130,0.12); color: var(--gold); }
+    .b-medium   { background: rgba(190,220,228,0.1);  color: var(--blue); }
+    .b-low      { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+    .ticket-date { font-size: 10px; color: var(--muted); white-space: nowrap; }
+
+    /* AREA COLORS */
+    .ac-pitch   { background: #D3C182; }
+    .ac-ai      { background: #46675D; }
+    .ac-mobile  { background: #BEDCE4; }
+    .ac-backend { background: #888; }
+
+    /* DETAIL PANEL */
+    .panel-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 300; display: none; align-items: flex-start; justify-content: flex-end;
+    }
+    .panel-overlay.open { display: flex; }
+    .panel {
+      background: #252525; width: 420px; height: 100vh;
+      border-left: 1px solid var(--border); overflow-y: auto;
+      animation: slideIn 0.2s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .panel-head {
+      padding: 24px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; justify-content: space-between;
+      position: sticky; top: 0; background: #252525; z-index: 10;
+    }
+    .panel-close {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 20px; line-height: 1; padding: 2px; transition: color 0.15s;
+    }
+    .panel-close:hover { color: var(--text); }
+    .panel-body { padding: 24px; }
+    .panel-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 6px; margin-top: 20px; }
+    .panel-label:first-child { margin-top: 0; }
+    .panel-val { font-size: 14px; }
+    .panel-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .panel-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .panel-actions { padding: 20px 24px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+    .btn-sec {
+      background: var(--card2); border: 1px solid var(--border); color: var(--text);
+      padding: 8px 14px; border-radius: var(--r-sm); font-size: 12px; cursor: pointer;
+      transition: background 0.15s; flex: 1; text-align: center;
+    }
+    .btn-sec:hover { background: rgba(255,255,255,0.1); }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      z-index: 400; display: none; align-items: center; justify-content: center; padding: 40px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #252525; border-radius: var(--r); border: 1px solid var(--border);
+      width: 100%; max-width: 520px; animation: fadeUp 0.2s ease;
+    }
+    @keyframes fadeUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-head {
+      padding: 24px 24px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-head h2 { font-size: 17px; font-weight: 700; }
+    .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+    .field input, .field textarea, .field select {
+      background: var(--card); border: 1px solid var(--border); color: var(--text);
+      padding: 10px 12px; border-radius: var(--r-sm); font-size: 13px; outline: none;
+      font-family: inherit; transition: border-color 0.15s; width: 100%;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--green); }
+    .field textarea { resize: vertical; min-height: 80px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-foot { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-ghost {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      padding: 9px 18px; border-radius: var(--r-sm); font-size: 13px; cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.15); color: var(--text); }
+
+    /* JSON EXPORT BOX */
+    .export-box {
+      background: #1A1A1A; border: 1px solid var(--border); border-radius: var(--r-sm);
+      padding: 16px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11px;
+      color: var(--blue); line-height: 1.6; overflow-x: auto; white-space: pre;
+      max-height: 220px; overflow-y: auto;
+    }
+    .export-note {
+      font-size: 12px; color: var(--muted); line-height: 1.5;
+      background: rgba(70,103,93,0.08); border: 1px solid rgba(70,103,93,0.2);
+      border-radius: var(--r-sm); padding: 12px; margin-bottom: 12px;
+    }
+    .export-note strong { color: var(--green); }
+
+    /* HIDDEN */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Catalyst</span>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="tickets.html" class="active">Tickets</a>
+    <a href="design-system.html">Design System</a>
+    <a href="specs/index.html">Specs</a>
+    <a href="context.html">Context</a>
+    <a href="guide.html">Guide</a>
+  </div>
+</nav>
+
+<!--
+CATALYST:LLM-OPERATIONS
+═══════════════════════════════════════════════════════════════════════
+This block is an instruction set for any LLM modifying this file.
+An LLM that reads this comment can perform all operations below
+without touching any HTML — only the JSON in CATALYST:TICKETS:DATA.
+
+CARDINAL RULES (any LLM must follow these)
+  ✓  Only ever edit the JSON inside <script type="application/json" id="tickets-data">
+  ✓  Always update "updated" to today's date when changing a ticket
+  ✓  Never delete ticket objects — set status to "done" instead
+  ✓  Preserve all existing ticket IDs exactly as-is
+  ✗  Never touch any HTML, CSS, or JS outside the data script tag
+  ✗  Never add fields that aren't in the schema below
+
+TICKET SCHEMA (all fields required)
+  "id"          string  "CAT-XXX"    — 3-digit zero-padded number
+  "title"       string               — 3–8 words, imperative verb + subject
+  "description" string               — one sentence, what needs to be done
+  "area"        enum    "backend" | "ai-agents" | "mobile"
+  "status"      enum    "backlog" | "in-progress" | "review" | "done"
+  "priority"    enum    "low" | "medium" | "high" | "critical"
+  "created"     string  "YYYY-MM-DD" — set once, never change
+  "updated"     string  "YYYY-MM-DD" — update every time the ticket changes
+
+─── OP: ADD NEW TICKET ────────────────────────────────────────────────
+  Step 1  Check "NEXT ID" in the manifest comment at the top of this file
+  Step 2  Add a new JSON object at the END of the array, before the final ]
+  Step 3  Add a trailing comma after the previous last object
+  Step 4  Set "created" and "updated" to today's date
+  Step 5  Bump the NEXT ID in the manifest by 1
+  Step 6  Remind user to sync index.html (CATALYST:STATS + CATALYST:ACTIVITY)
+
+  EXAMPLE — adding CAT-009:
+  ...previous ticket },
+  {
+    "id": "CAT-009",
+    "title": "Add push notification service",
+    "description": "Integrate APNs + FCM for iOS and Android alerts.",
+    "area": "mobile",
+    "status": "backlog",
+    "priority": "medium",
+    "created": "2026-05-25",
+    "updated": "2026-05-25"
+  }
+  ]  ← closing bracket stays here
+
+─── OP: UPDATE TICKET STATUS ──────────────────────────────────────────
+  Step 1  Find the ticket object with the matching "id"
+  Step 2  Change the "status" field to the new value
+  Step 3  Update "updated" to today's date
+  Step 4  Remind user to sync index.html if the status change affects counts
+
+  STATUS FLOW: backlog → in-progress → review → done
+
+─── OP: EDIT TICKET DETAILS ───────────────────────────────────────────
+  Change any field except "id" and "created"
+  Always update "updated" to today's date
+
+─── OP: SYNC FROM NOTION (manual) ─────────────────────────────────────
+  User provides Notion task data (paste, CSV, or API response).
+  For each Notion task, map to Catalyst schema:
+    Notion "Name"        → "title"
+    Notion "Description" → "description"
+    Notion "Area"        → "area"  (map to enum, e.g. "AI Agents" → "ai-agents")
+    Notion "Status"      → "status" (map to enum, e.g. "In progress" → "in-progress")
+    Notion "Priority"    → "priority" (lowercase)
+  Check if a ticket with the same title already exists — if so, update it.
+  If new, assign the next available CAT-XXX ID.
+  Paste Notion task data into the chat and Claude maps it to the schema above.
+
+─── OP: BULK STATUS UPDATE ────────────────────────────────────────────
+  User says e.g. "mark all mobile tickets as done"
+  → Find all tickets where "area" == "mobile"
+  → Set "status": "done" on each
+  → Update "updated" on each
+  → Remind to sync index.html
+
+─── AFTER ANY EDIT ─────────────────────────────────────────────────────
+  Always remind the user:
+  "Sync index.html — update CATALYST:STATS counts and add this ticket
+   to CATALYST:ACTIVITY (newest first, keep max 5 entries)."
+═══════════════════════════════════════════════════════════════════════
+-->
+
+<!-- =============================================
+     CATALYST:TICKETS:DATA
+     Claude: add/update/close tickets in this JSON.
+     Status values: "backlog" | "in-progress" | "review" | "done"
+     Priority values: "low" | "medium" | "high" | "critical"
+     Area values: "backend" | "ai-agents" | "mobile"
+     Next ticket ID: CAT-009
+     ============================================= -->
+<script type="application/json" id="tickets-data">
+[
+  {
+    "id": "CAT-001",
+    "title": "Design code snippet schema",
+    "description": "Add snippet_language, snippet_body, and snippet_line_range fields to the question schema; write and test the Supabase/Postgres migration.",
+    "area": "backend",
+    "status": "in-progress",
+    "priority": "critical",
+    "created": "2026-05-25",
+    "updated": "2026-05-25"
+  },
+  {
+    "id": "CAT-002",
+    "title": "Build snippet ingestion endpoint",
+    "description": "POST /api/questions/snippet — accepts raw code, language tag, and MCQ metadata; validates input, writes to questions table, triggers enrichment job.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "high",
+    "created": "2026-05-25",
+    "updated": "2026-05-25"
+  },
+  {
+    "id": "CAT-003",
+    "title": "Adapt Qdrant for code embeddings",
+    "description": "Switch snippet questions to a code-aware embedding strategy (text-embedding-3-small with code-optimised prompt) and re-index the affected Qdrant collection.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "high",
+    "created": "2026-05-25",
+    "updated": "2026-05-25"
+  },
+  {
+    "id": "CAT-004",
+    "title": "Snippet bulk ingestion CLI",
+    "description": "Django management command that reads a JSON/CSV of snippet-based questions and bulk-ingests them; useful for initial content seeding before the API is live.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "medium",
+    "created": "2026-05-25",
+    "updated": "2026-05-25"
+  },
+  {
+    "id": "CAT-005",
+    "title": "Code-aware Groq enrichment prompts",
+    "description": "Update Bloom's taxonomy classifier and distractor explanation prompts to handle code-body questions without hallucinating syntax or logic errors.",
+    "area": "ai-agents",
+    "status": "backlog",
+    "priority": "critical",
+    "created": "2026-05-25",
+    "updated": "2026-05-25"
+  },
+  {
+    "id": "CAT-006",
+    "title": "Auto-detect programming language",
+    "description": "Add a language detection step to the enrichment pipeline that tags each snippet with its programming language before vectorisation and enrichment.",
+    "area": "ai-agents",
+    "status": "backlog",
+    "priority": "high",
+    "created": "2026-05-25",
+    "updated": "2026-05-25"
+  },
+  {
+    "id": "CAT-007",
+    "title": "Code block renderer component",
+    "description": "Build a syntax-highlighted code block component for Android (and stub for iOS) using a WebView-based highlighter; support at minimum Python, Java, C++, SQL.",
+    "area": "mobile",
+    "status": "backlog",
+    "priority": "high",
+    "created": "2026-05-25",
+    "updated": "2026-05-25"
+  },
+  {
+    "id": "CAT-008",
+    "title": "Snippet MCQ card layout",
+    "description": "Design and implement the question card variant that renders a code snippet body above the answer options, with correct scroll and font-size behaviour at mobile viewports.",
+    "area": "mobile",
+    "status": "backlog",
+    "priority": "medium",
+    "created": "2026-05-25",
+    "updated": "2026-05-25"
+  }
+]
+</script>
+<!-- /CATALYST:TICKETS:DATA -->
+
+
+<div class="page-head">
+  <div>
+    <div class="label">Catalyst</div>
+    <h1>Tickets</h1>
+  </div>
+  <button class="btn-primary" id="add-btn">+ New Ticket</button>
+</div>
+
+<div class="filters">
+  <span class="filter-label">Filter</span>
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="search" placeholder="Search tickets…">
+  </div>
+  <div class="filter-sep"></div>
+  <select id="f-area">
+    <option value="">All Areas</option>
+    <option value="backend">Backend</option>
+    <option value="ai-agents">AI Agents</option>
+    <option value="mobile">Mobile</option>
+  </select>
+  <select id="f-priority">
+    <option value="">All Priorities</option>
+    <option value="critical">Critical</option>
+    <option value="high">High</option>
+    <option value="medium">Medium</option>
+    <option value="low">Low</option>
+  </select>
+  <span class="count-badge" id="count-badge">8 tickets</span>
+</div>
+
+<div class="kanban-wrap">
+  <div class="kanban" id="kanban">
+    <div class="col" id="col-backlog">
+      <div class="col-head">
+        <span class="col-title">Backlog</span>
+        <span class="col-count" id="cnt-backlog">0</span>
+      </div>
+      <div class="col-cards" id="cards-backlog"></div>
+    </div>
+    <div class="col" id="col-in-progress">
+      <div class="col-head">
+        <span class="col-title" style="color:var(--blue)">In Progress</span>
+        <span class="col-count" id="cnt-in-progress">0</span>
+      </div>
+      <div class="col-cards" id="cards-in-progress"></div>
+    </div>
+    <div class="col" id="col-review">
+      <div class="col-head">
+        <span class="col-title" style="color:var(--gold)">Review</span>
+        <span class="col-count" id="cnt-review">0</span>
+      </div>
+      <div class="col-cards" id="cards-review"></div>
+    </div>
+    <div class="col" id="col-done">
+      <div class="col-head">
+        <span class="col-title" style="color:#7ABFAE">Done</span>
+        <span class="col-count" id="cnt-done">0</span>
+      </div>
+      <div class="col-cards" id="cards-done"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="panel-overlay" id="panel-overlay">
+  <div class="panel" id="panel">
+    <div class="panel-head">
+      <div>
+        <div class="label" id="p-id" style="margin-bottom:4px"></div>
+        <div id="p-title" style="font-size:16px;font-weight:700;line-height:1.4;max-width:320px"></div>
+      </div>
+      <button class="panel-close" id="panel-close">×</button>
+    </div>
+    <div class="panel-body">
+      <div class="panel-label">Description</div>
+      <div class="panel-desc" id="p-desc"></div>
+      <div class="panel-label">Area</div>
+      <div class="panel-val" id="p-area"></div>
+      <div class="panel-label">Status &amp; Priority</div>
+      <div class="panel-tags" id="p-tags"></div>
+      <div class="panel-label">Dates</div>
+      <div class="panel-val" id="p-dates" style="font-size:12px;color:var(--muted)"></div>
+    </div>
+    <div class="panel-actions">
+      <button class="btn-sec" id="p-copy">Copy as JSON</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD TICKET MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modal-title">New Ticket</h2>
+      <button class="panel-close" id="modal-close">×</button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <div class="field">
+        <label>Title</label>
+        <input type="text" id="f-title" placeholder="Short, descriptive title">
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea id="f-desc" placeholder="What needs to be done?"></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Area</label>
+          <select id="f-area-new">
+            <option value="backend">Backend</option>
+            <option value="ai-agents">AI Agents</option>
+            <option value="mobile">Mobile</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Priority</label>
+          <select id="f-priority-new">
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" id="modal-cancel">Cancel</button>
+      <button class="btn-primary" id="modal-submit">Generate Ticket JSON</button>
+    </div>
+  </div>
+</div>
+
+<!-- JSON EXPORT MODAL -->
+<div class="modal-overlay" id="export-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Save Ticket to File</h2>
+      <button class="panel-close" id="export-close">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="export-note">
+        <strong>Paste this to Claude:</strong> "Add this ticket to the tickets JSON in tickets.html" — or give Claude the full block and say which field to update.
+      </div>
+      <div class="export-box" id="export-json"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-primary" id="export-copy">Copy to Clipboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const raw = JSON.parse(document.getElementById('tickets-data').textContent);
+  let tickets = [...raw];
+
+  const AREA_COLORS = {
+    'backend':    '#888888',
+    'ai-agents':  '#46675D',
+    'mobile':     '#BEDCE4'
+  };
+  const AREA_LABELS = {
+    'backend':    'Backend',
+    'ai-agents':  'AI Agents',
+    'mobile':     'Mobile'
+  };
+
+  function formatDate(d) {
+    if (!d) return '';
+    const [y, m, day] = d.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${months[+m-1]} ${+day}`;
+  }
+
+  function statusClass(s) {
+    return { 'backlog': 'b-backlog', 'in-progress': 'b-progress', 'review': 'b-review', 'done': 'b-done' }[s] || 'b-backlog';
+  }
+  function statusLabel(s) {
+    return { 'backlog': 'Backlog', 'in-progress': 'In Progress', 'review': 'Review', 'done': 'Done' }[s] || s;
+  }
+  function priorityClass(p) {
+    return { 'low': 'b-low', 'medium': 'b-medium', 'high': 'b-high', 'critical': 'b-critical' }[p] || 'b-low';
+  }
+
+  function buildCard(t) {
+    const el = document.createElement('div');
+    el.className = 'ticket';
+    el.dataset.id = t.id;
+    const color = AREA_COLORS[t.area] || '#888';
+    el.innerHTML = `
+      <div class="ticket-area-bar" style="background:${color}"></div>
+      <div class="ticket-top" style="padding-left:8px">
+        <span class="ticket-id">${t.id}</span>
+      </div>
+      <div class="ticket-title" style="padding-left:8px;margin-bottom:6px">${t.title}</div>
+      <div class="ticket-desc" style="padding-left:8px">${t.description}</div>
+      <div class="ticket-foot" style="padding-left:8px">
+        <div class="ticket-tags">
+          <span class="badge ${priorityClass(t.priority)}">${t.priority}</span>
+          <span class="badge" style="background:rgba(255,255,255,0.06);color:var(--muted)">${AREA_LABELS[t.area] || t.area}</span>
+        </div>
+        <span class="ticket-date">${formatDate(t.updated)}</span>
+      </div>`;
+    el.addEventListener('click', () => openPanel(t));
+    return el;
+  }
+
+  function render(list) {
+    const cols = { 'backlog': [], 'in-progress': [], 'review': [], 'done': [] };
+    list.forEach(t => { if (cols[t.status] !== undefined) cols[t.status].push(t); });
+
+    Object.keys(cols).forEach(status => {
+      const container = document.getElementById(`cards-${status}`);
+      const cnt = document.getElementById(`cnt-${status}`);
+      container.innerHTML = '';
+      cnt.textContent = cols[status].length;
+      if (cols[status].length === 0) {
+        container.innerHTML = '<div class="col-empty">No tickets</div>';
+      } else {
+        cols[status].forEach(t => container.appendChild(buildCard(t)));
+      }
+    });
+
+    document.getElementById('count-badge').textContent = `${list.length} ticket${list.length !== 1 ? 's' : ''}`;
+  }
+
+  function getFiltered() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const area = document.getElementById('f-area').value;
+    const priority = document.getElementById('f-priority').value;
+    return tickets.filter(t => {
+      if (area && t.area !== area) return false;
+      if (priority && t.priority !== priority) return false;
+      if (q && !t.title.toLowerCase().includes(q) && !t.id.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }
+
+  ['search','f-area','f-priority'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => render(getFiltered()));
+    document.getElementById(id).addEventListener('change', () => render(getFiltered()));
+  });
+
+  // Check URL param on load
+  const urlArea = new URLSearchParams(location.search).get('area');
+  if (urlArea) document.getElementById('f-area').value = urlArea;
+  render(getFiltered());
+
+  // PANEL
+  let activeTicket = null;
+  function openPanel(t) {
+    activeTicket = t;
+    document.getElementById('p-id').textContent = t.id;
+    document.getElementById('p-title').textContent = t.title;
+    document.getElementById('p-desc').textContent = t.description || '—';
+    document.getElementById('p-area').textContent = AREA_LABELS[t.area] || t.area;
+    document.getElementById('p-tags').innerHTML = `
+      <span class="badge ${statusClass(t.status)}">${statusLabel(t.status)}</span>
+      <span class="badge ${priorityClass(t.priority)}">${t.priority}</span>`;
+    document.getElementById('p-dates').textContent = `Created ${formatDate(t.created)} · Updated ${formatDate(t.updated)}`;
+    document.getElementById('panel-overlay').classList.add('open');
+  }
+  document.getElementById('panel-close').addEventListener('click', () => {
+    document.getElementById('panel-overlay').classList.remove('open');
+  });
+  document.getElementById('panel-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('panel-overlay'))
+      document.getElementById('panel-overlay').classList.remove('open');
+  });
+  document.getElementById('p-copy').addEventListener('click', () => {
+    if (!activeTicket) return;
+    navigator.clipboard.writeText(JSON.stringify(activeTicket, null, 2)).then(() => {
+      document.getElementById('p-copy').textContent = 'Copied!';
+      setTimeout(() => document.getElementById('p-copy').textContent = 'Copy as JSON', 1800);
+    });
+  });
+
+  // ADD MODAL
+  document.getElementById('add-btn').addEventListener('click', () => {
+    document.getElementById('f-title').value = '';
+    document.getElementById('f-desc').value = '';
+    document.getElementById('modal').classList.add('open');
+    document.getElementById('f-title').focus();
+  });
+  function closeModal() { document.getElementById('modal').classList.remove('open'); }
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('modal-cancel').addEventListener('click', closeModal);
+  document.getElementById('modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal')) closeModal();
+  });
+
+  document.getElementById('modal-submit').addEventListener('click', () => {
+    const title = document.getElementById('f-title').value.trim();
+    if (!title) { document.getElementById('f-title').focus(); return; }
+    const existing = tickets.map(t => parseInt(t.id.replace('CAT-',''))).filter(Boolean);
+    const nextNum = (Math.max(0, ...existing) + 1).toString().padStart(3, '0');
+    const today = new Date().toISOString().split('T')[0];
+    const newTicket = {
+      id: `CAT-${nextNum}`,
+      title,
+      description: document.getElementById('f-desc').value.trim(),
+      area: document.getElementById('f-area-new').value,
+      status: 'backlog',
+      priority: document.getElementById('f-priority-new').value,
+      created: today,
+      updated: today
+    };
+    closeModal();
+    document.getElementById('export-json').textContent = JSON.stringify(newTicket, null, 2);
+    document.getElementById('export-modal').classList.add('open');
+  });
+
+  document.getElementById('export-close').addEventListener('click', () => {
+    document.getElementById('export-modal').classList.remove('open');
+  });
+  document.getElementById('export-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('export-modal'))
+      document.getElementById('export-modal').classList.remove('open');
+  });
+  document.getElementById('export-copy').addEventListener('click', () => {
+    navigator.clipboard.writeText(document.getElementById('export-json').textContent).then(() => {
+      document.getElementById('export-copy').textContent = 'Copied!';
+      setTimeout(() => document.getElementById('export-copy').textContent = 'Copy to Clipboard', 1800);
+    });
+  });
+</script>
+
+</body>
+</html>

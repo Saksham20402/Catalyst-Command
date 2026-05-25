@@ -1,0 +1,525 @@
+<!--
+CATALYST:MANIFEST — context.html
+════════════════════════════════════════════════════════
+PURPOSE   Master briefing document. Share ONLY this file at the
+          start of any new chat session. Claude reads the manifest,
+          then targets only the specific files/sections it needs.
+UPDATED   2026-05-25
+
+WHAT THIS FILE CONTAINS
+  - Complete file map with exact anchor locations
+  - Task recipes: what to load for each type of work
+  - Copy-paste prompt templates for new chat sessions
+  - Project state snapshot
+
+RULE: Never edit tickets or tokens here — use the source files.
+Update this file when: new files added, anchors move, state changes.
+
+FULL FILE MAP
+  index.html           Dashboard. CATALYST:STATS ~L95, CATALYST:WORKSTREAMS ~L111,
+                       CATALYST:ACTIVITY ~L163. Update after any ticket change.
+
+  tickets.html         Canonical data. CATALYST:TICKETS:DATA ~L65 (JSON array).
+                       Next ticket ID: CAT-009. Edit here first, sync index.html after.
+
+  design-system.html   Design tokens. Sections: DS:COLORS ~L240, DS:TYPOGRAPHY ~L330,
+                       DS:SPACING ~L390, DS:BUTTONS ~L485, DS:BADGES ~L520,
+                       DS:CARDS ~L560, DS:INPUTS ~L610, DS:BENTO ~L675, DS:HEATMAP ~L730.
+
+  context.html         This file. Share to start any session.
+
+  specs/index.html     Spec registry. All designer handoff specs listed here.
+  specs/_template.html Blank spec template. Copy this for new specs.
+  specs/*.html         Individual component/screen specs. Self-contained — share
+                       directly with designers, no other files needed.
+════════════════════════════════════════════════════════
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalyst — Context Brief</title>
+  <style>
+    :root {
+      --bg: #1F1F1F; --card: #2F2F2F; --card2: #353535;
+      --green: #46675D; --blue: #BEDCE4; --gold: #D3C182;
+      --text: #E8E8E8; --muted: #787878; --border: rgba(255,255,255,0.07);
+      --r: 12px; --r-sm: 8px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(31,31,31,0.96); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px;
+    }
+    .logo { font-size: 13px; font-weight: 800; letter-spacing: 3px; color: var(--green); }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; padding: 6px 14px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-links a.active { color: var(--text); background: rgba(255,255,255,0.08); }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 48px 40px 100px; }
+
+    .hero { margin-bottom: 48px; }
+    .label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--green); margin-bottom: 8px; }
+    h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+    .subtitle { color: var(--muted); font-size: 15px; max-width: 580px; line-height: 1.7; }
+
+    .system-note {
+      background: rgba(70,103,93,0.08); border: 1px solid rgba(70,103,93,0.2);
+      border-radius: var(--r); padding: 20px 24px; margin-bottom: 48px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;
+    }
+    .system-rule { }
+    .system-rule-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--green); margin-bottom: 6px; }
+    .system-rule-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+    .sec { margin-bottom: 56px; }
+    .sec-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 12px; }
+
+    /* FILE MAP TABLE */
+    .file-table { width: 100%; border-collapse: collapse; }
+    .file-table th {
+      text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--muted); padding: 0 16px 10px; font-weight: 600;
+    }
+    .file-table td {
+      padding: 14px 16px; border-top: 1px solid var(--border);
+      vertical-align: top; font-size: 13px;
+    }
+    .file-table tr:last-child td { border-bottom: 1px solid var(--border); }
+    .file-name { font-family: 'SF Mono', monospace; font-size: 12px; color: var(--blue); white-space: nowrap; }
+    .file-name a { color: var(--blue); text-decoration: none; }
+    .file-name a:hover { text-decoration: underline; }
+    .anchor-list { display: flex; flex-direction: column; gap: 4px; }
+    .anchor { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--gold); }
+    .anchor-desc { font-size: 11px; color: var(--muted); }
+    .when-tag {
+      display: inline-block; font-size: 10px; background: rgba(255,255,255,0.06);
+      border-radius: 4px; padding: 2px 7px; color: var(--muted); white-space: nowrap;
+    }
+    .file-table tr:hover td { background: rgba(255,255,255,0.015); }
+
+    /* TASK RECIPE GRID */
+    .recipe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .recipe {
+      background: var(--card); border-radius: var(--r); border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .recipe-head { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); }
+    .recipe-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .recipe-desc { font-size: 12px; color: var(--muted); }
+    .recipe-body { padding: 16px 20px; }
+    .recipe-step { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
+    .recipe-step:last-child { margin-bottom: 0; }
+    .step-num {
+      width: 18px; height: 18px; border-radius: 50%; background: var(--green);
+      color: white; font-size: 10px; font-weight: 700; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0; margin-top: 1px;
+    }
+    .step-text { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .step-text code { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--blue); background: rgba(190,220,228,0.08); padding: 1px 5px; border-radius: 3px; }
+
+    /* PROMPT TEMPLATES */
+    .template-grid { display: flex; flex-direction: column; gap: 16px; }
+    .template {
+      background: var(--card); border-radius: var(--r); border: 1px solid var(--border); overflow: hidden;
+    }
+    .template-head {
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .template-name { font-size: 13px; font-weight: 700; }
+    .copy-btn {
+      background: rgba(70,103,93,0.15); border: 1px solid rgba(70,103,93,0.25);
+      color: var(--green); font-size: 11px; font-weight: 600; padding: 5px 12px;
+      border-radius: 6px; cursor: pointer; transition: background 0.15s;
+    }
+    .copy-btn:hover { background: rgba(70,103,93,0.25); }
+    .template-body {
+      padding: 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px;
+      color: #C8D8CC; line-height: 1.8; background: #1A1A1A;
+    }
+    .template-body pre { padding: 16px 20px; overflow-x: auto; white-space: pre-wrap; }
+    .t-comment { color: var(--muted); }
+    .t-key { color: var(--blue); }
+    .t-val { color: var(--gold); }
+    .t-replace { color: #E8847A; font-style: italic; }
+
+    /* STATE SNAPSHOT */
+    .state-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 20px; }
+    .state-cell { background: var(--card); padding: 18px; text-align: center; }
+    .state-n { font-size: 26px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+    .state-l { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+
+    .area-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .area-row {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--r-sm);
+      padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+    }
+    .area-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .area-info { flex: 1; }
+    .area-name-s { font-size: 13px; font-weight: 600; }
+    .area-ids { font-size: 11px; color: var(--muted); font-family: 'SF Mono', monospace; }
+    .area-open { font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Catalyst</span>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="tickets.html">Tickets</a>
+    <a href="design-system.html">Design System</a>
+    <a href="specs/index.html">Specs</a>
+    <a href="context.html" class="active">Context</a>
+  </div>
+</nav>
+
+<main>
+  <div class="hero">
+    <div class="label">Project Catalyst</div>
+    <h1>Context Brief</h1>
+    <p class="subtitle">Share this file at the start of any new chat session. It tells Claude exactly which files exist, what each section contains, and how to navigate without reading everything.</p>
+  </div>
+
+  <div class="system-note">
+    <div class="system-rule">
+      <div class="system-rule-title">How it works</div>
+      <div class="system-rule-body">Each file has a CATALYST:MANIFEST comment at the very top. Any new chat reads it in the first 20 lines and knows the full map — no scanning.</div>
+    </div>
+    <div class="system-rule">
+      <div class="system-rule-title">Context isolation</div>
+      <div class="system-rule-body">Backend chat? Load tickets.html + area filter. Designer? Load the spec file only — self-contained. New session? Load this file first, nothing else.</div>
+    </div>
+    <div class="system-rule">
+      <div class="system-rule-title">Source of truth</div>
+      <div class="system-rule-body">Ticket data lives only in tickets.html (CATALYST:TICKETS:DATA). Design tokens live only in design-system.html. Never duplicate between files.</div>
+    </div>
+  </div>
+
+  <!-- FILE MAP -->
+  <div class="sec">
+    <div class="sec-label">Navigation</div>
+    <h2>File Map</h2>
+    <table class="file-table">
+      <thead>
+        <tr>
+          <th style="width:180px">File</th>
+          <th style="width:220px">Purpose</th>
+          <th>Key Anchors</th>
+          <th style="width:140px">When to Load</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="file-name"><a href="index.html">index.html</a></span></td>
+          <td style="color:var(--muted);font-size:12px">Dashboard overview. Not a data store — sync here after ticket changes.</td>
+          <td>
+            <div class="anchor-list">
+              <div><span class="anchor">CATALYST:STATS</span> <span class="anchor-desc">— 5 count numbers</span></div>
+              <div><span class="anchor">CATALYST:WORKSTREAMS</span> <span class="anchor-desc">— area card open/done/progress</span></div>
+              <div><span class="anchor">CATALYST:ACTIVITY</span> <span class="anchor-desc">— recent 5 tickets, sorted newest first</span></div>
+            </div>
+          </td>
+          <td><span class="when-tag">Post-ticket sync</span></td>
+        </tr>
+        <tr>
+          <td><span class="file-name"><a href="tickets.html">tickets.html</a></span></td>
+          <td style="color:var(--muted);font-size:12px">Canonical ticket data. Edit here first. Next ID: <span style="color:var(--blue);font-family:monospace">CAT-009</span></td>
+          <td>
+            <div class="anchor-list">
+              <div><span class="anchor">CATALYST:TICKETS:DATA</span> <span class="anchor-desc">— JSON array, the only data to edit</span></div>
+              <div><span class="anchor-desc">Top manifest lists all tickets by area for quick targeting</span></div>
+            </div>
+          </td>
+          <td><span class="when-tag">Any ticket work</span></td>
+        </tr>
+        <tr>
+          <td><span class="file-name"><a href="design-system.html">design-system.html</a></span></td>
+          <td style="color:var(--muted);font-size:12px">Design tokens, components, and patterns. Share alongside specs for designer context.</td>
+          <td>
+            <div class="anchor-list">
+              <div><span class="anchor">CATALYST:DS:COLORS</span> <span class="anchor-desc">— palette + semantic colors</span></div>
+              <div><span class="anchor">CATALYST:DS:BUTTONS</span> <span class="anchor-desc">— button variants + CSS spec</span></div>
+              <div><span class="anchor">CATALYST:DS:BADGES</span> <span class="anchor-desc">— status + priority badges</span></div>
+              <div><span class="anchor-desc">+ 8 more sections — see file manifest for all</span></div>
+            </div>
+          </td>
+          <td><span class="when-tag">Design / spec work</span></td>
+        </tr>
+        <tr>
+          <td><span class="file-name"><a href="specs/index.html">specs/index.html</a></span></td>
+          <td style="color:var(--muted);font-size:12px">Spec registry. Lists all designer handoff files with status and links.</td>
+          <td>
+            <div class="anchor-list">
+              <div><span class="anchor">CATALYST:SPECS:REGISTRY</span> <span class="anchor-desc">— spec table rows to append</span></div>
+            </div>
+          </td>
+          <td><span class="when-tag">Before creating spec</span></td>
+        </tr>
+        <tr>
+          <td><span class="file-name"><a href="specs/_template.html">specs/_template.html</a></span></td>
+          <td style="color:var(--muted);font-size:12px">Blank spec template. Copy this file, rename, fill in. Never edit the template itself.</td>
+          <td>
+            <div class="anchor-list">
+              <div><span class="anchor-desc">Sections: SPEC:META, SPEC:SCREENS, SPEC:TOKENS, SPEC:INTERACTIONS, SPEC:DEVNOTES, SPEC:HISTORY</span></div>
+            </div>
+          </td>
+          <td><span class="when-tag">Creating new spec</span></td>
+        </tr>
+        <tr>
+          <td><span class="file-name"><a href="specs/onboarding-flow-v1.html">specs/onboarding-flow-v1.html</a></span></td>
+          <td style="color:var(--muted);font-size:12px">Onboarding flow spec (CAT-005). 5 screens. Status: Approved. Self-contained — share directly with designer.</td>
+          <td>
+            <div class="anchor-list">
+              <div><span class="anchor-desc">Phone frame mockups + annotation panels for each screen</span></div>
+            </div>
+          </td>
+          <td><span class="when-tag">Designer handoff</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TASK RECIPES -->
+  <div class="sec">
+    <div class="sec-label">Workflow</div>
+    <h2>Task Recipes</h2>
+    <div class="recipe-grid">
+      <div class="recipe">
+        <div class="recipe-head">
+          <div class="recipe-title">Add or update a ticket</div>
+          <div class="recipe-desc">New work, status change, close out</div>
+        </div>
+        <div class="recipe-body">
+          <div class="recipe-step"><div class="step-num">1</div><div class="step-text">Load <code>tickets.html</code> — read manifest, go to <code>CATALYST:TICKETS:DATA</code></div></div>
+          <div class="recipe-step"><div class="step-num">2</div><div class="step-text">Edit the JSON array. Add new ticket or change <code>"status"</code> field. Bump <code>"updated"</code> date.</div></div>
+          <div class="recipe-step"><div class="step-num">3</div><div class="step-text">Sync <code>index.html</code>: update <code>CATALYST:STATS</code> counts + <code>CATALYST:ACTIVITY</code> list.</div></div>
+        </div>
+      </div>
+
+      <div class="recipe">
+        <div class="recipe-head">
+          <div class="recipe-title">Focus session on one area</div>
+          <div class="recipe-desc">Backend, mobile, AI agents, or pitch deck</div>
+        </div>
+        <div class="recipe-body">
+          <div class="recipe-step"><div class="step-num">1</div><div class="step-text">Load <code>context.html</code> (this file) — Claude reads the manifest at the top.</div></div>
+          <div class="recipe-step"><div class="step-num">2</div><div class="step-text">Load <code>tickets.html</code> — the manifest lists ticket IDs by area at the top.</div></div>
+          <div class="recipe-step"><div class="step-num">3</div><div class="step-text">Tell Claude: "Focus on area <code>'backend'</code> only — CAT-007, CAT-008".</div></div>
+        </div>
+      </div>
+
+      <div class="recipe">
+        <div class="recipe-head">
+          <div class="recipe-title">Designer handoff</div>
+          <div class="recipe-desc">Create a spec and hand it off</div>
+        </div>
+        <div class="recipe-body">
+          <div class="recipe-step"><div class="step-num">1</div><div class="step-text">Load <code>specs/_template.html</code> as base. Load <code>design-system.html</code> for tokens.</div></div>
+          <div class="recipe-step"><div class="step-num">2</div><div class="step-text">Create <code>specs/[name]-v1.html</code>. Fill all SPEC: sections. Link the ticket ID.</div></div>
+          <div class="recipe-step"><div class="step-num">3</div><div class="step-text">Register in <code>specs/index.html</code> at <code>CATALYST:SPECS:REGISTRY</code>. Hand off the single file.</div></div>
+        </div>
+      </div>
+
+      <div class="recipe">
+        <div class="recipe-head">
+          <div class="recipe-title">Update design system</div>
+          <div class="recipe-desc">New token, component, or pattern</div>
+        </div>
+        <div class="recipe-body">
+          <div class="recipe-step"><div class="step-num">1</div><div class="step-text">Load <code>design-system.html</code> — read the manifest to find the exact section anchor.</div></div>
+          <div class="recipe-step"><div class="step-num">2</div><div class="step-text">Target the anchor, e.g. <code>CATALYST:DS:COLORS</code>. Add the new entry inside.</div></div>
+          <div class="recipe-step"><div class="step-num">3</div><div class="step-text">If a new token, also update the CORE TOKENS block in the <code>design-system.html</code> manifest.</div></div>
+        </div>
+      </div>
+
+      <div class="recipe">
+        <div class="recipe-head">
+          <div class="recipe-title">Add a new workstream</div>
+          <div class="recipe-desc">New area beyond the current 4</div>
+        </div>
+        <div class="recipe-body">
+          <div class="recipe-step"><div class="step-num">1</div><div class="step-text">Update <code>tickets.html</code> manifest: add new area value to TICKET SCHEMA and AREA TICKET GROUPS.</div></div>
+          <div class="recipe-step"><div class="step-num">2</div><div class="step-text">Add area card to <code>index.html</code> <code>CATALYST:WORKSTREAMS</code>. Choose an accent color.</div></div>
+          <div class="recipe-step"><div class="step-num">3</div><div class="step-text">Update the AREA filter <code>&lt;select&gt;</code> in <code>tickets.html</code> UI with the new option.</div></div>
+        </div>
+      </div>
+
+      <div class="recipe">
+        <div class="recipe-head">
+          <div class="recipe-title">Transfer context to new chat</div>
+          <div class="recipe-desc">Starting fresh with full project awareness</div>
+        </div>
+        <div class="recipe-body">
+          <div class="recipe-step"><div class="step-num">1</div><div class="step-text">Share <code>context.html</code> — Claude reads the CATALYST:MANIFEST comment at the top.</div></div>
+          <div class="recipe-step"><div class="step-num">2</div><div class="step-text">Share only the specific files needed for the task. Don't share everything.</div></div>
+          <div class="recipe-step"><div class="step-num">3</div><div class="step-text">Use a prompt template (see below) to tell Claude exactly what to do.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROMPT TEMPLATES -->
+  <div class="sec">
+    <div class="sec-label">Copy-Paste</div>
+    <h2>Prompt Templates</h2>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:24px">Paste one of these into a new chat session along with the relevant file(s). Replace the <span style="color:#E8847A;font-family:monospace">red italic</span> parts.</p>
+
+    <div class="template-grid">
+
+      <div class="template">
+        <div class="template-head">
+          <span class="template-name">Focused workstream session</span>
+          <button class="copy-btn" onclick="copyTemplate('tpl-focused')">Copy</button>
+        </div>
+        <div class="template-body">
+<pre id="tpl-focused"><span class="t-comment"># Project: Catalyst — focused session</span>
+<span class="t-key">Files shared:</span> <span class="t-val">context.html, tickets.html</span>
+
+Read the CATALYST:MANIFEST comment at the top of each file.
+Then go to CATALYST:TICKETS:DATA in tickets.html.
+Focus <span class="t-key">only</span> on area: <span class="t-replace">"backend"</span>  <span class="t-comment"># ← change to your area</span>
+Relevant ticket IDs: <span class="t-replace">CAT-007, CAT-008</span>  <span class="t-comment"># ← from manifest</span>
+
+<span class="t-key">Task:</span> <span class="t-replace">Describe what you need done today</span></pre>
+        </div>
+      </div>
+
+      <div class="template">
+        <div class="template-head">
+          <span class="template-name">Add / update tickets</span>
+          <button class="copy-btn" onclick="copyTemplate('tpl-tickets')">Copy</button>
+        </div>
+        <div class="template-body">
+<pre id="tpl-tickets"><span class="t-comment"># Project: Catalyst — ticket update</span>
+<span class="t-key">Files shared:</span> <span class="t-val">tickets.html, index.html</span>
+
+1. Read the manifest at the top of tickets.html.
+2. Go to CATALYST:TICKETS:DATA and make this change:
+   <span class="t-replace">Add a new ticket / Change CAT-00X status to "done"</span>
+   Next ID if adding: <span class="t-replace">CAT-009</span>  <span class="t-comment"># ← check manifest</span>
+
+3. After editing tickets.html, sync index.html:
+   - Update CATALYST:STATS counts
+   - Prepend to CATALYST:ACTIVITY list, keep max 5 items</pre>
+        </div>
+      </div>
+
+      <div class="template">
+        <div class="template-head">
+          <span class="template-name">Create a designer spec</span>
+          <button class="copy-btn" onclick="copyTemplate('tpl-spec')">Copy</button>
+        </div>
+        <div class="template-body">
+<pre id="tpl-spec"><span class="t-comment"># Project: Catalyst — new spec</span>
+<span class="t-key">Files shared:</span> <span class="t-val">specs/_template.html, design-system.html</span>
+
+Create: <span class="t-replace">specs/feature-name-v1.html</span>
+Ticket: <span class="t-replace">CAT-00X</span>
+Spec for: <span class="t-replace">Screen or component name</span>
+Designer: <span class="t-replace">Name</span>
+
+<span class="t-replace">Describe what needs to be specced — screens, flows,
+states, interactions, edge cases.</span>
+
+After creating the spec file, add a row to
+specs/index.html at CATALYST:SPECS:REGISTRY.</pre>
+        </div>
+      </div>
+
+      <div class="template">
+        <div class="template-head">
+          <span class="template-name">Update design system</span>
+          <button class="copy-btn" onclick="copyTemplate('tpl-ds')">Copy</button>
+        </div>
+        <div class="template-body">
+<pre id="tpl-ds"><span class="t-comment"># Project: Catalyst — design system update</span>
+<span class="t-key">Files shared:</span> <span class="t-val">design-system.html</span>
+
+Read the CATALYST:MANIFEST at the top of the file.
+Target section: <span class="t-replace">CATALYST:DS:COLORS</span>  <span class="t-comment"># ← see manifest for all anchors</span>
+
+Change: <span class="t-replace">Describe what to add or update</span>
+
+Core token palette (do not change these):
+  --green: #46675D  --blue: #BEDCE4  --gold: #D3C182
+  --bg: #1F1F1F    --card: #2F2F2F</pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CURRENT STATE -->
+  <div class="sec">
+    <div class="sec-label">Snapshot · May 25, 2026</div>
+    <h2>Current State</h2>
+
+    <!-- CATALYST:CONTEXT:STATE — Update this block when project state changes -->
+    <div class="state-grid" style="margin-bottom:20px">
+      <div class="state-cell"><div class="state-n">8</div><div class="state-l">Total</div></div>
+      <div class="state-cell"><div class="state-n" style="color:var(--muted)">1</div><div class="state-l">Backlog</div></div>
+      <div class="state-cell"><div class="state-n" style="color:var(--blue)">4</div><div class="state-l">In Progress</div></div>
+      <div class="state-cell"><div class="state-n" style="color:var(--gold)">1</div><div class="state-l">Review</div></div>
+      <div class="state-cell"><div class="state-n" style="color:var(--green)">2</div><div class="state-l">Done</div></div>
+    </div>
+    <div class="area-list">
+      <div class="area-row">
+        <div class="area-dot" style="background:#D3C182"></div>
+        <div class="area-info">
+          <div class="area-name-s">Pitch Deck</div>
+          <div class="area-ids">CAT-001, CAT-002</div>
+        </div>
+        <div class="area-open">2 open</div>
+      </div>
+      <div class="area-row">
+        <div class="area-dot" style="background:#46675D"></div>
+        <div class="area-info">
+          <div class="area-name-s">AI Agents</div>
+          <div class="area-ids">CAT-003, CAT-004</div>
+        </div>
+        <div class="area-open">2 open</div>
+      </div>
+      <div class="area-row">
+        <div class="area-dot" style="background:#BEDCE4"></div>
+        <div class="area-info">
+          <div class="area-name-s">Mobile App</div>
+          <div class="area-ids">CAT-005 ✓, CAT-006</div>
+        </div>
+        <div class="area-open">1 open</div>
+      </div>
+      <div class="area-row">
+        <div class="area-dot" style="background:#888"></div>
+        <div class="area-info">
+          <div class="area-name-s">Backend</div>
+          <div class="area-ids">CAT-007 ✓, CAT-008</div>
+        </div>
+        <div class="area-open">1 open</div>
+      </div>
+    </div>
+    <!-- /CATALYST:CONTEXT:STATE -->
+  </div>
+</main>
+
+<script>
+  function copyTemplate(id) {
+    const el = document.getElementById(id);
+    const text = el.innerText || el.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = el.closest('.template').querySelector('.copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  }
+</script>
+
+</body>
+</html>

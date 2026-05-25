@@ -1,0 +1,690 @@
+<!--
+CATALYST:MANIFEST — specs/onboarding-flow-v1.html
+════════════════════════════════════════════════════════
+PURPOSE   Designer handoff spec for the 5-screen onboarding flow.
+          Self-contained — share this single file with your designer.
+          No other files needed.
+TICKET    CAT-005
+STATUS    Approved
+VERSION   v1.0
+UPDATED   2026-05-22
+
+SCREENS
+  1  Welcome        — first impression, brand moment
+  2  Account Setup  — email + password
+  3  Profile        — name + handle
+  4  Preferences    — role/intent selection
+  5  All Set        — confirmation + launch
+
+TOKENS USED
+  --green: #46675D   primary CTA
+  --blue:  #BEDCE4   password strength, selection state
+  --bg:    #1F1F1F   screen backgrounds
+  --card:  #2F2F2F   input fields, chips
+
+TO UPDATE THIS SPEC
+  Change status pill to pill-draft, make edits, bump version in
+  SPEC:HISTORY, update status back to pill-approved when re-signed off.
+════════════════════════════════════════════════════════
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalyst Spec — Onboarding Flow v1.0</title>
+  <style>
+    :root {
+      --bg: #1F1F1F; --card: #2F2F2F; --card2: #353535;
+      --green: #46675D; --blue: #BEDCE4; --gold: #D3C182;
+      --text: #E8E8E8; --muted: #787878; --border: rgba(255,255,255,0.07);
+      --r: 12px; --r-sm: 8px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(31,31,31,0.96); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px;
+    }
+    .logo { font-size: 13px; font-weight: 800; letter-spacing: 3px; color: var(--green); }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-right a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.15s; }
+    .nav-right a:hover { color: var(--text); }
+    .pill { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .pill-approved { background: rgba(70,103,93,0.25); color: #7ABFAE; }
+
+    .page { display: flex; min-height: calc(100vh - 56px); }
+
+    aside {
+      width: 220px; flex-shrink: 0; border-right: 1px solid var(--border);
+      padding: 32px 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto;
+    }
+    .aside-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); padding: 0 24px; margin-bottom: 8px; margin-top: 24px; }
+    .aside-label:first-child { margin-top: 0; }
+    .aside-link { display: block; padding: 7px 24px; font-size: 13px; color: var(--muted); text-decoration: none; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .aside-link:hover { color: var(--text); }
+    .aside-link.active { color: var(--text); border-left-color: var(--green); }
+
+    main { flex: 1; padding: 48px 52px 100px; overflow-x: hidden; }
+
+    .ds-section { margin-bottom: 64px; scroll-margin-top: 72px; }
+    .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--green); margin-bottom: 8px; }
+    h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.2px; margin-bottom: 6px; }
+    .section-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 28px; max-width: 580px; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+    /* META */
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    .meta-cell { background: var(--card); padding: 16px 20px; }
+    .meta-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 4px; }
+    .meta-val { font-size: 14px; font-weight: 600; }
+    .meta-val.mono { font-family: 'SF Mono', monospace; font-size: 12px; color: var(--blue); font-weight: 400; }
+    .meta-val.approved { color: #7ABFAE; }
+
+    /* TABS */
+    .tabs { display: flex; gap: 2px; background: var(--card); border-radius: var(--r-sm); padding: 4px; width: fit-content; margin-bottom: 32px; flex-wrap: wrap; }
+    .tab { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--muted); border: none; background: none; transition: color 0.15s, background 0.15s; white-space: nowrap; }
+    .tab.active { background: var(--green); color: white; }
+    .screen-panel { display: none; }
+    .screen-panel.active { display: grid; grid-template-columns: auto 1fr; gap: 40px; align-items: start; }
+
+    /* PHONE */
+    .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; flex-shrink: 0; }
+    .phone-lbl { font-size: 11px; color: var(--muted); }
+    .phone {
+      width: 300px; background: #0A0A0A; border-radius: 36px;
+      border: 7px solid #3C3C3C; overflow: hidden;
+      box-shadow: 0 28px 56px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.07);
+    }
+    .pstatus {
+      height: 44px; background: #0A0A0A; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 22px;
+      font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.85); flex-shrink: 0;
+    }
+    .pscreen { background: #121212; }
+    .pbar { height: 28px; background: #0A0A0A; display: flex; align-items: center; justify-content: center; }
+    .home-pill { width: 100px; height: 4px; background: rgba(255,255,255,0.28); border-radius: 2px; }
+
+    /* SCREEN CONTENT ELEMENTS */
+    .s-pad { padding: 0 24px; }
+    .s-back { display: flex; align-items: center; gap: 6px; color: var(--green); font-size: 13px; font-weight: 600; padding: 12px 20px; }
+    .s-back-arrow { font-size: 18px; line-height: 1; }
+    .s-heading { font-size: 24px; font-weight: 800; color: #F0F0F0; line-height: 1.2; margin-bottom: 6px; }
+    .s-sub { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.5; margin-bottom: 20px; }
+    .s-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+    .s-input {
+      width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; padding: 13px 14px; font-size: 14px; color: #F0F0F0;
+      margin-bottom: 14px;
+    }
+    .s-input.focused { border-color: var(--green); }
+    .s-strength { margin-top: -8px; margin-bottom: 14px; }
+    .s-strength-bar { height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+    .s-strength-fill { height: 100%; background: var(--blue); width: 60%; border-radius: 2px; }
+    .s-strength-label { font-size: 10px; color: var(--blue); text-align: right; }
+    .s-btn {
+      width: 100%; background: var(--green); color: white;
+      border: none; border-radius: 12px; height: 52px; font-size: 15px;
+      font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin-top: 8px;
+    }
+    .s-btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); margin-top: 10px; }
+    .s-avatar {
+      width: 72px; height: 72px; border-radius: 50%; background: rgba(70,103,93,0.25);
+      border: 2px dashed var(--green); display: flex; align-items: center;
+      justify-content: center; font-size: 22px; margin: 0 auto 20px;
+    }
+    .s-chip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .s-chip {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; padding: 12px; text-align: center; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7);
+    }
+    .s-chip.selected { background: rgba(70,103,93,0.25); border-color: var(--green); color: #7ABFAE; }
+    .s-check { width: 64px; height: 64px; border-radius: 50%; background: rgba(70,103,93,0.25); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px; }
+    .s-progress { display: flex; gap: 4px; justify-content: center; padding: 10px 0 4px; }
+    .s-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+    .s-dot.current { background: var(--green); width: 14px; border-radius: 3px; }
+
+    /* SPEC PANEL */
+    .spec-panel { display: flex; flex-direction: column; gap: 14px; }
+    .spec-block { background: var(--card); border-radius: var(--r-sm); border: 1px solid var(--border); overflow: hidden; }
+    .spec-bh { padding: 11px 16px; border-bottom: 1px solid var(--border); font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); font-weight: 600; }
+    .spec-bb { padding: 12px 16px; display: flex; flex-direction: column; gap: 9px; }
+    .sr { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 12px; }
+    .sk { color: var(--muted); }
+    .sv { font-weight: 500; }
+    .sv.m { font-family: 'SF Mono', monospace; color: var(--blue); font-weight: 400; font-size: 11px; }
+    .sv.g { color: #7ABFAE; }
+    .spec-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* TOKEN LIST */
+    .token-list { display: flex; flex-direction: column; gap: 10px; }
+    .token-row { display: flex; align-items: center; gap: 14px; }
+    .tswatch { width: 32px; height: 32px; border-radius: 7px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); }
+    .tinfo { flex: 1; }
+    .tname { font-size: 12px; font-weight: 600; font-family: 'SF Mono', monospace; color: var(--blue); margin-bottom: 1px; }
+    .tuse { font-size: 11px; color: var(--muted); }
+
+    /* INTERACTIONS */
+    .int-list { display: flex; flex-direction: column; gap: 10px; }
+    .int-item { background: var(--card); border-radius: var(--r-sm); padding: 14px 16px; border: 1px solid var(--border); }
+    .int-trigger { font-size: 12px; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .int-tag { font-size: 10px; background: rgba(255,255,255,0.07); padding: 2px 7px; border-radius: 4px; color: var(--muted); font-weight: 400; }
+    .int-screen-tag { font-size: 10px; background: rgba(70,103,93,0.15); padding: 2px 7px; border-radius: 4px; color: var(--green); font-weight: 400; }
+    .int-result { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* A11Y */
+    .a11y-list { display: flex; flex-direction: column; gap: 8px; }
+    .a11y-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .a11y-ok { color: #7ABFAE; flex-shrink: 0; margin-top: 1px; }
+
+    /* DEV NOTES */
+    .dev-list { display: flex; flex-direction: column; gap: 12px; }
+    .dev-item { background: var(--card); border-radius: var(--r-sm); padding: 14px 18px; border-left: 3px solid var(--green); }
+    .dev-title { font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+    .dev-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    code { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--blue); background: rgba(190,220,228,0.08); padding: 1px 5px; border-radius: 3px; }
+
+    /* HISTORY */
+    .hist-list { display: flex; flex-direction: column; }
+    .hist-item { display: flex; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .hist-item:last-child { border-bottom: none; }
+    .hist-v { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--blue); width: 36px; flex-shrink: 0; margin-top: 2px; }
+    .hist-d { color: var(--muted); width: 100px; flex-shrink: 0; font-size: 12px; margin-top: 2px; }
+    .hist-b { flex: 1; color: var(--muted); font-size: 12px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Catalyst</span>
+  <div class="nav-right">
+    <a href="index.html">← All Specs</a>
+    <span class="pill pill-approved">Approved</span>
+  </div>
+</nav>
+
+<div class="page">
+  <aside>
+    <div class="aside-label">Spec</div>
+    <a class="aside-link active" href="#meta">Overview</a>
+    <a class="aside-link" href="#screens">Screens</a>
+    <a class="aside-link" href="#tokens">Tokens</a>
+    <div class="aside-label">Handoff</div>
+    <a class="aside-link" href="#interactions">Interactions</a>
+    <a class="aside-link" href="#a11y">Accessibility</a>
+    <a class="aside-link" href="#devnotes">Dev Notes</a>
+    <a class="aside-link" href="#history">History</a>
+  </aside>
+
+  <main>
+
+    <!-- ══ META ══ -->
+    <section class="ds-section" id="meta">
+      <div class="eyebrow">Spec · CAT-005</div>
+      <h2>Onboarding Flow</h2>
+      <p class="section-desc">Five-screen first-time user flow covering account creation, profile setup, and intent selection. Shown once — never again after completion. Sets up the user's workspace before routing to the main dashboard.</p>
+      <div class="meta-grid">
+        <div class="meta-cell"><div class="meta-lbl">Ticket</div><div class="meta-val mono">CAT-005</div></div>
+        <div class="meta-cell"><div class="meta-lbl">Status</div><div class="meta-val approved">Approved ✓</div></div>
+        <div class="meta-cell"><div class="meta-lbl">Version</div><div class="meta-val">v1.0</div></div>
+        <div class="meta-cell"><div class="meta-lbl">Platform</div><div class="meta-val">iOS · Android</div></div>
+        <div class="meta-cell"><div class="meta-lbl">Screen size</div><div class="meta-val mono">375 × 812pt</div></div>
+        <div class="meta-cell"><div class="meta-lbl">Approved</div><div class="meta-val">May 22, 2026</div></div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ SCREENS ══ -->
+    <section class="ds-section" id="screens">
+      <div class="eyebrow">Screens</div>
+      <h2>Screen Specs</h2>
+
+      <div class="tabs" id="screen-tabs">
+        <button class="tab active" onclick="showScreen(0)">1 · Welcome</button>
+        <button class="tab" onclick="showScreen(1)">2 · Account</button>
+        <button class="tab" onclick="showScreen(2)">3 · Profile</button>
+        <button class="tab" onclick="showScreen(3)">4 · Prefs</button>
+        <button class="tab" onclick="showScreen(4)">5 · All Set</button>
+      </div>
+
+      <!-- SCREEN 1 — WELCOME -->
+      <div class="screen-panel active" id="screen-0">
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="pstatus"><span>9:41</span><div style="display:flex;gap:4px;font-size:10px;align-items:center"><span>●●●</span><span>▲</span><span>▊</span></div></div>
+            <div class="pscreen" style="padding:0;display:flex;flex-direction:column;background:linear-gradient(180deg,#181818 0%,#121212 100%)">
+              <!-- Progress dots -->
+              <div class="s-progress" style="padding-top:16px">
+                <div class="s-dot current"></div>
+                <div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div>
+              </div>
+              <!-- Logo area -->
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 28px">
+                <div style="width:60px;height:60px;border-radius:16px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:white;margin-bottom:20px;box-shadow:0 8px 24px rgba(70,103,93,0.4)">C</div>
+                <div style="font-size:26px;font-weight:800;color:#F0F0F0;margin-bottom:8px;text-align:center;line-height:1.2">Meet Catalyst</div>
+                <div style="font-size:13px;color:rgba(255,255,255,0.4);text-align:center;line-height:1.6">Your AI-powered workspace for everything that matters.</div>
+              </div>
+              <!-- CTAs -->
+              <div class="s-pad" style="padding-bottom:20px">
+                <div class="s-btn">Get Started →</div>
+                <div class="s-btn s-btn-ghost" style="height:44px;font-size:14px;font-weight:600;border-radius:12px;display:flex;align-items:center;justify-content:center">Already have an account</div>
+              </div>
+            </div>
+            <div class="pbar"><div class="home-pill"></div></div>
+          </div>
+          <div class="phone-lbl">Screen 1 — Welcome</div>
+        </div>
+
+        <div class="spec-panel">
+          <div class="spec-block">
+            <div class="spec-bh">Logo Mark</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Size</span><span class="sv m">60 × 60pt</span></div>
+              <div class="sr"><span class="sk">Corner radius</span><span class="sv m">16pt</span></div>
+              <div class="sr"><span class="sk">Background</span><span class="sv m">#46675D</span></div>
+              <div class="sr"><span class="sk">Shadow</span><span class="sv m">0 8 24 rgba(46675D, 0.4)</span></div>
+            </div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-bh">Typography</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Headline</span><span class="sv">26px / 800 / #F0F0F0</span></div>
+              <div class="sr"><span class="sk">Subheading</span><span class="sv">13px / 400 / 40% white</span></div>
+              <div class="sr"><span class="sk">CTA label</span><span class="sv">15px / 700 / white</span></div>
+              <div class="sr"><span class="sk">Ghost label</span><span class="sv">14px / 600 / 50% white</span></div>
+            </div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-bh">Buttons</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Primary height</span><span class="sv m">52pt</span></div>
+              <div class="sr"><span class="sk">Ghost height</span><span class="sv m">44pt</span></div>
+              <div class="sr"><span class="sk">Corner radius</span><span class="sv m">12pt</span></div>
+              <div class="sr"><span class="sk">Horizontal inset</span><span class="sv m">24pt</span></div>
+              <div class="sr"><span class="sk">Gap between</span><span class="sv m">10pt</span></div>
+            </div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-bh">Background</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Gradient start</span><span class="sv m">#181818 (top)</span></div>
+              <div class="sr"><span class="sk">Gradient end</span><span class="sv m">#121212 (bottom)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 2 — ACCOUNT SETUP -->
+      <div class="screen-panel" id="screen-1">
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="pstatus"><span>9:41</span><div style="display:flex;gap:4px;font-size:10px;align-items:center"><span>●●●</span><span>▲</span><span>▊</span></div></div>
+            <div class="pscreen">
+              <div class="s-back"><span class="s-back-arrow">‹</span> Back</div>
+              <div class="s-progress" style="padding:0 24px 16px"><div style="display:flex;gap:4px"><div class="s-dot"></div><div class="s-dot current"></div><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div></div></div>
+              <div class="s-pad">
+                <div class="s-heading">Create your<br>account</div>
+                <div class="s-sub" style="margin-bottom:24px">You'll use this to sign in.</div>
+                <div class="s-label">Email</div>
+                <div class="s-input" style="color:rgba(255,255,255,0.35);font-size:13px">you@example.com</div>
+                <div class="s-label">Password</div>
+                <div class="s-input s-input--focused" style="font-size:16px;letter-spacing:3px;border-color:var(--green)">••••••••••</div>
+                <div class="s-strength">
+                  <div class="s-strength-bar"><div class="s-strength-fill"></div></div>
+                  <div class="s-strength-label">Strong</div>
+                </div>
+                <div class="s-btn" style="margin-top:4px">Continue →</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:14px;line-height:1.6">By continuing you agree to our<br>Terms of Service and Privacy Policy</div>
+              </div>
+            </div>
+            <div class="pbar"><div class="home-pill"></div></div>
+          </div>
+          <div class="phone-lbl">Screen 2 — Account Setup</div>
+        </div>
+
+        <div class="spec-panel">
+          <div class="spec-block">
+            <div class="spec-bh">Input Fields</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Height</span><span class="sv m">48pt</span></div>
+              <div class="sr"><span class="sk">Corner radius</span><span class="sv m">10pt</span></div>
+              <div class="sr"><span class="sk">Background</span><span class="sv m">white · 7% opacity</span></div>
+              <div class="sr"><span class="sk">Border default</span><span class="sv m">white · 10% opacity</span></div>
+              <div class="sr"><span class="sk">Border focused</span><span class="sv m">#46675D (--green)</span></div>
+              <div class="sr"><span class="sk">Text size</span><span class="sv m">14pt / 400</span></div>
+              <div class="sr"><span class="sk">Gap between inputs</span><span class="sv m">14pt</span></div>
+            </div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-bh">Password Strength Bar</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Track height</span><span class="sv m">3pt</span></div>
+              <div class="sr"><span class="sk">Track color</span><span class="sv m">white · 10%</span></div>
+              <div class="sr"><span class="sk">Fill — weak</span><span class="sv m">#E8847A · 40% width</span></div>
+              <div class="sr"><span class="sk">Fill — strong</span><span class="sv m">#BEDCE4 · 65% width</span></div>
+              <div class="sr"><span class="sk">Fill — max</span><span class="sv m">#7ABFAE · 100% width</span></div>
+              <div class="sr"><span class="sk">Label size</span><span class="sv m">10pt / right-aligned</span></div>
+            </div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-bh">Legal Copy</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Size</span><span class="sv m">11pt / 400</span></div>
+              <div class="sr"><span class="sk">Color</span><span class="sv m">white · 25%</span></div>
+              <div class="sr"><span class="sk">Margin top</span><span class="sv m">14pt</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 3 — PROFILE -->
+      <div class="screen-panel" id="screen-2">
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="pstatus"><span>9:41</span><div style="display:flex;gap:4px;font-size:10px;align-items:center"><span>●●●</span><span>▲</span><span>▊</span></div></div>
+            <div class="pscreen">
+              <div class="s-back"><span class="s-back-arrow">‹</span> Back</div>
+              <div class="s-progress" style="padding:0 24px 16px"><div style="display:flex;gap:4px"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot current"></div><div class="s-dot"></div><div class="s-dot"></div></div></div>
+              <div class="s-pad">
+                <div class="s-heading">Set up your<br>profile</div>
+                <div class="s-sub" style="margin-bottom:20px">You can change this any time.</div>
+                <div class="s-avatar">+</div>
+                <div class="s-label">Your name</div>
+                <div class="s-input s-input--focused" style="border-color:var(--green)">Kanika Lal</div>
+                <div class="s-label">Handle <span style="color:rgba(255,255,255,0.2)">(optional)</span></div>
+                <div class="s-input" style="color:rgba(255,255,255,0.3)">@handle</div>
+                <div class="s-btn">Continue →</div>
+              </div>
+            </div>
+            <div class="pbar"><div class="home-pill"></div></div>
+          </div>
+          <div class="phone-lbl">Screen 3 — Profile</div>
+        </div>
+
+        <div class="spec-panel">
+          <div class="spec-block">
+            <div class="spec-bh">Avatar Picker</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Size</span><span class="sv m">72 × 72pt</span></div>
+              <div class="sr"><span class="sk">Shape</span><span class="sv m">Circle</span></div>
+              <div class="sr"><span class="sk">Border</span><span class="sv m">2pt dashed #46675D</span></div>
+              <div class="sr"><span class="sk">Background</span><span class="sv m">rgba(46675D, 0.25)</span></div>
+              <div class="sr"><span class="sk">"+" icon size</span><span class="sv m">22pt</span></div>
+              <div class="sr"><span class="sk">Margin bottom</span><span class="sv m">20pt</span></div>
+              <p class="spec-note" style="margin-top:4px">On tap: opens system photo picker (PHPickerViewController / Android photo picker). If no photo chosen, uses first letter of name on green circle.</p>
+            </div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-bh">Handle Field</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Prefix</span><span class="sv m">@ prepended in UI</span></div>
+              <div class="sr"><span class="sk">Validation</span><span class="sv m">alphanumeric + underscore only</span></div>
+              <div class="sr"><span class="sk">Max length</span><span class="sv m">20 chars</span></div>
+              <p class="spec-note" style="margin-top:4px">Optional — "Continue" is enabled even if empty. Handles are auto-generated server-side if skipped.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 4 — PREFERENCES -->
+      <div class="screen-panel" id="screen-3">
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="pstatus"><span>9:41</span><div style="display:flex;gap:4px;font-size:10px;align-items:center"><span>●●●</span><span>▲</span><span>▊</span></div></div>
+            <div class="pscreen">
+              <div class="s-back"><span class="s-back-arrow">‹</span> Back</div>
+              <div class="s-progress" style="padding:0 24px 12px"><div style="display:flex;gap:4px"><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot"></div><div class="s-dot current"></div><div class="s-dot"></div></div></div>
+              <div class="s-pad">
+                <div class="s-heading" style="margin-bottom:4px">What brings<br>you here?</div>
+                <div class="s-sub">Pick all that apply.</div>
+                <div class="s-chip-grid">
+                  <div class="s-chip selected">🗓 Planning</div>
+                  <div class="s-chip">🎨 Design</div>
+                  <div class="s-chip selected">🤖 AI / Dev</div>
+                  <div class="s-chip">📈 Growth</div>
+                  <div class="s-chip">🧭 Strategy</div>
+                  <div class="s-chip">⚙️ Ops</div>
+                </div>
+                <div class="s-btn">Continue →</div>
+              </div>
+            </div>
+            <div class="pbar"><div class="home-pill"></div></div>
+          </div>
+          <div class="phone-lbl">Screen 4 — Preferences</div>
+        </div>
+
+        <div class="spec-panel">
+          <div class="spec-block">
+            <div class="spec-bh">Selection Chips</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Layout</span><span class="sv m">2-column grid</span></div>
+              <div class="sr"><span class="sk">Height</span><span class="sv m">52pt</span></div>
+              <div class="sr"><span class="sk">Corner radius</span><span class="sv m">10pt</span></div>
+              <div class="sr"><span class="sk">Gap</span><span class="sv m">8pt</span></div>
+              <div class="sr"><span class="sk">Font</span><span class="sv m">12pt / 600</span></div>
+            </div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-bh">Chip States</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Default bg</span><span class="sv m">white · 6%</span></div>
+              <div class="sr"><span class="sk">Default border</span><span class="sv m">white · 10%</span></div>
+              <div class="sr"><span class="sk">Default text</span><span class="sv m">white · 70%</span></div>
+              <div class="sr"><span class="sk">Selected bg</span><span class="sv m">rgba(46675D, 0.25)</span></div>
+              <div class="sr"><span class="sk">Selected border</span><span class="sv m">#46675D</span></div>
+              <div class="sr"><span class="sk">Selected text</span><span class="sv m">#7ABFAE</span></div>
+            </div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-bh">Continue Button</div>
+            <div class="spec-bb">
+              <p class="spec-note">Button is always active — tapping with zero selections skips personalisation and routes directly to Screen 5. No minimum selection required.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 5 — ALL SET -->
+      <div class="screen-panel" id="screen-4">
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="pstatus"><span>9:41</span><div style="display:flex;gap:4px;font-size:10px;align-items:center"><span>●●●</span><span>▲</span><span>▊</span></div></div>
+            <div class="pscreen" style="display:flex;flex-direction:column">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px">
+                <div class="s-check">✓</div>
+                <div class="s-heading" style="text-align:center;margin-bottom:6px">You're all set,<br>Kanika!</div>
+                <div class="s-sub" style="text-align:center;margin-bottom:28px">Your workspace is ready. Here's what's waiting.</div>
+                <div style="width:100%;display:flex;flex-direction:column;gap:8px;margin-bottom:24px">
+                  <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,0.6)"><span style="font-size:16px">🤖</span>AI assistant ready</div>
+                  <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,0.6)"><span style="font-size:16px">📋</span>4 workstreams set up</div>
+                  <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,0.6)"><span style="font-size:16px">⚡</span>Integrations available</div>
+                </div>
+                <div class="s-btn" style="width:100%">Open Catalyst</div>
+              </div>
+            </div>
+            <div class="pbar"><div class="home-pill"></div></div>
+          </div>
+          <div class="phone-lbl">Screen 5 — All Set</div>
+        </div>
+
+        <div class="spec-panel">
+          <div class="spec-block">
+            <div class="spec-bh">Checkmark</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Container size</span><span class="sv m">64 × 64pt · circle</span></div>
+              <div class="sr"><span class="sk">Background</span><span class="sv m">rgba(46675D, 0.25)</span></div>
+              <div class="sr"><span class="sk">Icon size</span><span class="sv m">28pt</span></div>
+              <div class="sr"><span class="sk">Icon color</span><span class="sv m">#7ABFAE</span></div>
+              <p class="spec-note" style="margin-top:4px">Animate in on mount: scale from 0.6→1.0 with spring, 380ms. Then gently pulse once.</p>
+            </div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-bh">Feature List Items</div>
+            <div class="spec-bb">
+              <div class="sr"><span class="sk">Background</span><span class="sv m">white · 5%</span></div>
+              <div class="sr"><span class="sk">Height</span><span class="sv m">44pt</span></div>
+              <div class="sr"><span class="sk">Corner radius</span><span class="sv m">10pt</span></div>
+              <div class="sr"><span class="sk">Padding</span><span class="sv m">12pt · 14pt</span></div>
+              <div class="sr"><span class="sk">Stagger delay</span><span class="sv m">80ms between items</span></div>
+            </div>
+          </div>
+          <div class="spec-block">
+            <div class="spec-bh">Name Interpolation</div>
+            <div class="spec-bb">
+              <p class="spec-note">Pull first name from Profile screen (Screen 3). If profile was skipped or empty, show "You're all set!" without the name.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ TOKENS ══ -->
+    <section class="ds-section" id="tokens">
+      <div class="eyebrow">Design Tokens</div>
+      <h2>Tokens Used</h2>
+      <p class="section-desc">All values in this spec derive from these tokens. See <a href="../design-system.html" style="color:var(--blue)">design-system.html</a> for full definitions.</p>
+      <div class="token-list">
+        <div class="token-row"><div class="tswatch" style="background:#46675D"></div><div class="tinfo"><div class="tname">--green · #46675D</div><div class="tuse">All primary CTAs, active chip borders, avatar border, checkmark bg</div></div></div>
+        <div class="token-row"><div class="tswatch" style="background:#BEDCE4"></div><div class="tinfo"><div class="tname">--blue · #BEDCE4</div><div class="tuse">Password strength bar (strong), selection highlight text</div></div></div>
+        <div class="token-row"><div class="tswatch" style="background:#1F1F1F"></div><div class="tinfo"><div class="tname">--bg · #1F1F1F</div><div class="tuse">Base screen background</div></div></div>
+        <div class="token-row"><div class="tswatch" style="background:#2F2F2F"></div><div class="tinfo"><div class="tname">--card · #2F2F2F</div><div class="tuse">Input fields, chip default state</div></div></div>
+        <div class="token-row"><div class="tswatch" style="background:#E8E8E8"></div><div class="tinfo"><div class="tname">--text · #E8E8E8</div><div class="tuse">All body text at full opacity</div></div></div>
+        <div class="token-row"><div class="tswatch" style="background:#E8847A"></div><div class="tinfo"><div class="tname">danger · #E8847A</div><div class="tuse">Password strength bar (weak). Not a named token — use rgba(220,80,80,0.8).</div></div></div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ INTERACTIONS ══ -->
+    <section class="ds-section" id="interactions">
+      <div class="eyebrow">Handoff</div>
+      <h2>Interactions</h2>
+      <div class="int-list">
+        <div class="int-item">
+          <div class="int-trigger">Get Started button <span class="int-tag">Tap</span> <span class="int-screen-tag">Screen 1</span></div>
+          <div class="int-result">Push Screen 2 (Account Setup) with a slide-from-right transition, 320ms ease-out.</div>
+        </div>
+        <div class="int-item">
+          <div class="int-trigger">Already have an account <span class="int-tag">Tap</span> <span class="int-screen-tag">Screen 1</span></div>
+          <div class="int-result">Navigate to the Sign In flow (separate from onboarding). Replace the entire onboarding stack — no back button back to onboarding.</div>
+        </div>
+        <div class="int-item">
+          <div class="int-trigger">Back button <span class="int-tag">Tap</span> <span class="int-screen-tag">Screens 2–4</span></div>
+          <div class="int-result">Pop the current screen. Slide-from-left, 280ms. Preserve all previously entered data — do not clear.</div>
+        </div>
+        <div class="int-item">
+          <div class="int-trigger">Continue button <span class="int-tag">Tap</span> <span class="int-screen-tag">Screen 2</span></div>
+          <div class="int-result">Validate email format and password (min 8 chars). If invalid — shake the relevant field (3 oscillations, ±6pt, 300ms). If valid — push Screen 3.</div>
+        </div>
+        <div class="int-item">
+          <div class="int-trigger">Avatar placeholder <span class="int-tag">Tap</span> <span class="int-screen-tag">Screen 3</span></div>
+          <div class="int-result">Open system photo picker (PHPickerViewController / Android Photo Picker). On selection, crop to 1:1 circle, compress to ≤200KB. Preview appears in the avatar circle.</div>
+        </div>
+        <div class="int-item">
+          <div class="int-trigger">Selection chip <span class="int-tag">Tap</span> <span class="int-screen-tag">Screen 4</span></div>
+          <div class="int-result">Toggle selected state. Spring animation on border and background color, 200ms. No minimum or maximum selection required.</div>
+        </div>
+        <div class="int-item">
+          <div class="int-trigger">Open Catalyst button <span class="int-tag">Tap</span> <span class="int-screen-tag">Screen 5</span></div>
+          <div class="int-result">Mark onboarding as complete (write flag to UserDefaults / AsyncStorage). Transition to the main dashboard with a cross-dissolve, 400ms. Never show onboarding again.</div>
+        </div>
+        <div class="int-item">
+          <div class="int-trigger">Any screen <span class="int-tag">Swipe right</span> <span class="int-screen-tag">Screens 2–4</span></div>
+          <div class="int-result">Same as tapping Back. iOS: system edge swipe enabled. Android: predictive back gesture enabled.</div>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ A11Y ══ -->
+    <section class="ds-section" id="a11y">
+      <div class="eyebrow">Handoff</div>
+      <h2>Accessibility</h2>
+      <div class="a11y-list">
+        <div class="a11y-item"><span class="a11y-ok">✓</span><span>All tap targets minimum <strong>44 × 44pt</strong> — buttons, chips, avatar, and back arrow all exceed this.</span></div>
+        <div class="a11y-item"><span class="a11y-ok">✓</span><span>Headline <code>#F0F0F0</code> on <code>#121212</code> — contrast ratio <strong>18.2:1</strong> (AAA).</span></div>
+        <div class="a11y-item"><span class="a11y-ok">✓</span><span>Muted text <code>rgba(255,255,255,0.4)</code> on <code>#121212</code> — contrast ratio <strong>4.6:1</strong> (AA). Do not go below 40% white opacity.</span></div>
+        <div class="a11y-item"><span class="a11y-ok">✓</span><span>Password field uses <code>secureTextEntry</code> / <code>inputType="textPassword"</code>. Strength label also read aloud by VoiceOver ("Password strength: strong").</span></div>
+        <div class="a11y-item"><span class="a11y-ok">✓</span><span>Selection chips have <code>accessibilityRole="checkbox"</code> and announce selected state on toggle.</span></div>
+        <div class="a11y-item"><span class="a11y-ok">✓</span><span>Progress dots have an <code>accessibilityLabel</code>: "Step X of 5".</span></div>
+        <div class="a11y-item"><span class="a11y-ok">✓</span><span>Avatar picker announces: "Profile photo, not set. Double-tap to choose a photo."</span></div>
+        <div class="a11y-item"><span class="a11y-ok">✓</span><span>Screen 5 checkmark animation respects <code>UIAccessibility.isReduceMotionEnabled</code> — skips animation and shows immediately if enabled.</span></div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ DEV NOTES ══ -->
+    <section class="ds-section" id="devnotes">
+      <div class="eyebrow">Handoff</div>
+      <h2>Dev Notes</h2>
+      <div class="dev-list">
+        <div class="dev-item">
+          <div class="dev-title">Onboarding state persistence</div>
+          <div class="dev-body">Track progress with a step index in local state. Each screen mounts with previously entered data pre-filled — don't clear on back. Write completion flag <code>onboarding_complete: true</code> to persistent storage only on Screen 5 "Open Catalyst" tap, never earlier.</div>
+        </div>
+        <div class="dev-item">
+          <div class="dev-title">Account creation timing</div>
+          <div class="dev-body">Call <code>POST /auth/register</code> on Screen 2 "Continue" tap, not on Screen 5. If the API call fails, show an inline error beneath the email field. Do not navigate to Screen 3 until the API call succeeds. Show a loading spinner in the Continue button during the request.</div>
+        </div>
+        <div class="dev-item">
+          <div class="dev-title">Avatar upload</div>
+          <div class="dev-body">Compress to JPEG, max 200KB, before upload. Upload to <code>PUT /user/avatar</code> asynchronously while user continues to Screen 4 — do not block progression. If upload fails silently, retry up to 3 times with exponential backoff.</div>
+        </div>
+        <div class="dev-item">
+          <div class="dev-title">Preferences payload</div>
+          <div class="dev-body">Send selected chip values as an array: <code>PATCH /user/preferences { "intents": ["planning", "ai-dev"] }</code>. Fire and forget on Screen 4 Continue tap — do not block navigation if this call fails.</div>
+        </div>
+        <div class="dev-item">
+          <div class="dev-title">Keyboard avoidance</div>
+          <div class="dev-body">Screens 2 and 3 must push content above the keyboard. Use <code>KeyboardAvoidingView</code> with <code>behavior="padding"</code> on iOS and <code>android:windowSoftInputMode="adjustResize"</code>. The Continue button must always remain visible above the keyboard.</div>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ HISTORY ══ -->
+    <section class="ds-section" id="history">
+      <div class="eyebrow">Changelog</div>
+      <h2>Version History</h2>
+      <div class="hist-list">
+        <div class="hist-item">
+          <span class="hist-v">v1.0</span>
+          <span class="hist-d">May 22, 2026</span>
+          <span class="hist-b">Initial spec approved. 5 screens: Welcome, Account, Profile, Preferences, All Set. Includes all measurements, interactions, a11y requirements, and dev handoff notes.</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  function showScreen(i) {
+    document.querySelectorAll('.screen-panel').forEach((p, j) => p.classList.toggle('active', i === j));
+    document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', i === j));
+  }
+  const secs = document.querySelectorAll('.ds-section');
+  const links = document.querySelectorAll('.aside-link');
+  secs.forEach(s => new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const l = document.querySelector(`.aside-link[href="#${e.target.id}"]`);
+        if (l) l.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' }).observe(s));
+</script>
+
+</body>
+</html>

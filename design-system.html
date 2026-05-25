@@ -1,0 +1,901 @@
+<!--
+CATALYST:MANIFEST — design-system.html
+════════════════════════════════════════════════════════
+PURPOSE   Living design system reference. Single source of truth for
+          all visual tokens, components, and patterns.
+UPDATED   2026-05-25
+VERSION   1.0
+
+EDITABLE SECTIONS (Claude: target these anchors directly)
+  CATALYST:DS:COLORS      ~L220  — Color palette swatches + usage notes
+  CATALYST:DS:TYPOGRAPHY  ~L310  — Type scale rows
+  CATALYST:DS:SPACING     ~L370  — Spacing scale + border radius
+  CATALYST:DS:ICONS       ~L430  — Workstream + UI icon sets
+  CATALYST:DS:BUTTONS     ~L465  — Button variants + code spec
+  CATALYST:DS:BADGES      ~L500  — Status + priority badge variants
+  CATALYST:DS:CARDS       ~L540  — Card surface variants
+  CATALYST:DS:INPUTS      ~L590  — Input + select specs
+  CATALYST:DS:LAYOUT      ~L630  — Page structure diagram
+  CATALYST:DS:BENTO       ~L655  — Bento grid pattern
+  CATALYST:DS:HEATMAP     ~L710  — Heatmap intensity scale
+
+CORE TOKENS (copy these into any spec file)
+  --bg:    #1F1F1F   page background
+  --card:  #2F2F2F   card / raised surface
+  --green: #46675D   Catalyst brand (primary actions, identity)
+  --blue:  #BEDCE4   Mist (heatmaps, info, high frequency)
+  --gold:  #D3C182   Gold (accent, review status, rare)
+  --text:  #E8E8E8   primary text
+  --muted: #787878   secondary / metadata text
+  --border: rgba(255,255,255,0.07)  dividers
+
+WHEN TO LOAD THIS FILE
+  - Reviewing or extending design tokens
+  - Building or critiquing UI components
+  - Designer handoff context (share alongside a spec file)
+  - Checking correct color/spacing usage
+
+RELATED
+  specs/*.html  → component specs that reference these tokens
+  context.html  → full project briefing
+════════════════════════════════════════════════════════
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalyst — Design System</title>
+  <style>
+    :root {
+      --bg: #1F1F1F;
+      --card: #2F2F2F;
+      --card2: #353535;
+      --green: #46675D;
+      --blue: #BEDCE4;
+      --gold: #D3C182;
+      --text: #E8E8E8;
+      --muted: #787878;
+      --border: rgba(255,255,255,0.07);
+      --r: 12px;
+      --r-sm: 8px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px; line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(31,31,31,0.96); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      height: 56px; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 40px;
+    }
+    .logo { font-size: 13px; font-weight: 800; letter-spacing: 3px; color: var(--green); }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 13px;
+      padding: 6px 14px; border-radius: 6px; transition: color 0.15s, background 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-links a.active { color: var(--text); background: rgba(255,255,255,0.08); }
+
+    /* LAYOUT */
+    .layout { display: flex; min-height: calc(100vh - 56px); }
+
+    /* SIDEBAR */
+    aside {
+      width: 220px; flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      padding: 32px 0; position: sticky;
+      top: 56px; height: calc(100vh - 56px); overflow-y: auto;
+    }
+    .aside-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
+      color: var(--muted); padding: 0 24px; margin-bottom: 8px; margin-top: 24px;
+    }
+    .aside-label:first-child { margin-top: 0; }
+    .aside-link {
+      display: block; padding: 7px 24px; font-size: 13px;
+      color: var(--muted); text-decoration: none; transition: color 0.15s, background 0.15s;
+      border-left: 2px solid transparent;
+    }
+    .aside-link:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+    .aside-link.active { color: var(--text); border-left-color: var(--green); }
+
+    /* MAIN */
+    main { flex: 1; padding: 48px 60px 100px; max-width: 900px; overflow-x: hidden; }
+
+    /* SECTION */
+    .ds-section { margin-bottom: 72px; scroll-margin-top: 80px; }
+    .section-label {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+      color: var(--green); margin-bottom: 8px;
+    }
+    h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 8px; }
+    .section-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 32px; max-width: 600px; }
+
+    /* SUBSECTION */
+    h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+    .subsection { margin-bottom: 36px; }
+
+    /* DIVIDER */
+    hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+    /* COLOR PALETTE */
+    .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .color-swatch {
+      border-radius: var(--r); overflow: hidden; border: 1px solid var(--border);
+    }
+    .swatch-color { height: 80px; }
+    .swatch-info { background: var(--card); padding: 14px; }
+    .swatch-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .swatch-hex { font-size: 11px; color: var(--muted); font-family: 'SF Mono', monospace; margin-bottom: 6px; }
+    .swatch-use { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+    /* HEATMAP DEMO */
+    .heatmap-demo { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 12px; }
+    .hm-cell {
+      width: 28px; height: 28px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 600;
+    }
+
+    /* TYPOGRAPHY */
+    .type-row {
+      display: flex; align-items: baseline; gap: 24px; padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .type-row:last-child { border-bottom: none; }
+    .type-meta { width: 120px; flex-shrink: 0; }
+    .type-name { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .type-spec { font-size: 10px; color: var(--muted); font-family: 'SF Mono', monospace; margin-top: 2px; }
+
+    /* SPACING */
+    .space-grid { display: flex; flex-direction: column; gap: 12px; }
+    .space-row { display: flex; align-items: center; gap: 16px; }
+    .space-bar { background: var(--green); height: 8px; border-radius: 2px; flex-shrink: 0; }
+    .space-label { font-size: 12px; color: var(--muted); width: 60px; flex-shrink: 0; font-family: 'SF Mono', monospace; }
+    .space-val { font-size: 12px; color: var(--muted); }
+
+    /* COMPONENTS */
+    .component-row { margin-bottom: 28px; }
+    .component-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 12px; }
+    .demo-area {
+      background: var(--card); border-radius: var(--r); padding: 28px;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .demo-area.col { flex-direction: column; align-items: flex-start; }
+    .demo-area.dark { background: #1A1A1A; }
+
+    /* BUTTONS */
+    .btn { padding: 10px 20px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+    .btn-primary { background: var(--green); color: white; }
+    .btn-secondary { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .btn-danger { background: rgba(220,80,80,0.15); color: #E8847A; border: 1px solid rgba(220,80,80,0.2); }
+    .btn-sm { padding: 6px 12px; font-size: 11px; border-radius: 6px; }
+
+    /* BADGES */
+    .badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .b-done     { background: rgba(70,103,93,0.3);   color: #7ABFAE; }
+    .b-progress { background: rgba(190,220,228,0.13); color: var(--blue); }
+    .b-review   { background: rgba(211,193,130,0.15); color: var(--gold); }
+    .b-backlog  { background: rgba(255,255,255,0.07); color: var(--muted); }
+    .b-critical { background: rgba(220,80,80,0.15);   color: #E8847A; }
+    .b-high     { background: rgba(211,193,130,0.12); color: var(--gold); }
+    .b-medium   { background: rgba(190,220,228,0.1);  color: var(--blue); }
+    .b-low      { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+    /* CARDS */
+    .demo-card {
+      background: var(--card); border-radius: var(--r); padding: 20px;
+      border: 1px solid var(--border); width: 200px;
+    }
+    .demo-card-green {
+      background: var(--green); border-radius: var(--r); padding: 20px;
+      color: white; width: 200px;
+    }
+    .demo-card-blue {
+      background: var(--blue); border-radius: var(--r); padding: 20px;
+      color: #1F1F1F; width: 200px;
+    }
+
+    /* INPUTS */
+    .demo-input {
+      background: var(--card); border: 1px solid var(--border); color: var(--text);
+      padding: 10px 14px; border-radius: var(--r-sm); font-size: 13px; outline: none;
+      font-family: inherit; width: 240px; transition: border-color 0.15s;
+    }
+    .demo-input:focus { border-color: var(--green); }
+    .demo-input.error { border-color: rgba(220,80,80,0.5); }
+
+    /* BENTO */
+    .bento-demo {
+      display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: auto auto;
+      gap: 8px;
+    }
+    .bento-demo .bc {
+      background: var(--card); border-radius: var(--r-sm); border: 1px solid var(--border);
+      padding: 16px;
+    }
+    .bento-demo .bc.span2 { grid-column: 1 / -1; }
+    .bento-demo .bc.tall { grid-row: 1 / 3; }
+    .bc-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+    /* CODE */
+    .code-block {
+      background: #181818; border: 1px solid var(--border); border-radius: var(--r-sm);
+      padding: 16px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px;
+      color: var(--blue); line-height: 1.7; overflow-x: auto; white-space: pre;
+      margin-top: 12px;
+    }
+
+    /* ICON GRID */
+    .icon-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+    .icon-item {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--r-sm);
+      padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px;
+      width: 76px;
+    }
+    .icon-item span { font-size: 22px; }
+    .icon-item small { font-size: 10px; color: var(--muted); text-align: center; }
+
+    /* EDIT NOTE */
+    .edit-note {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: rgba(70,103,93,0.08); border: 1px solid rgba(70,103,93,0.2);
+      border-radius: var(--r-sm); padding: 14px 16px; margin-bottom: 24px;
+      font-size: 12px; color: var(--muted); line-height: 1.5;
+    }
+    .edit-note strong { color: var(--green); }
+
+    /* VERSION */
+    .version-tag {
+      display: inline-block; background: rgba(70,103,93,0.15); color: var(--green);
+      font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px;
+      letter-spacing: 1px; text-transform: uppercase; margin-left: 12px; vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">Catalyst</span>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="tickets.html">Tickets</a>
+    <a href="design-system.html" class="active">Design System</a>
+    <a href="specs/index.html">Specs</a>
+    <a href="context.html">Context</a>
+    <a href="guide.html">Guide</a>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside>
+    <div class="aside-label">Foundations</div>
+    <a class="aside-link active" href="#colors">Colors</a>
+    <a class="aside-link" href="#typography">Typography</a>
+    <a class="aside-link" href="#spacing">Spacing</a>
+    <a class="aside-link" href="#icons">Icons</a>
+
+    <div class="aside-label">Components</div>
+    <a class="aside-link" href="#buttons">Buttons</a>
+    <a class="aside-link" href="#badges">Badges</a>
+    <a class="aside-link" href="#cards">Cards</a>
+    <a class="aside-link" href="#inputs">Inputs</a>
+    <a class="aside-link" href="#layout">Layout</a>
+
+    <div class="aside-label">Patterns</div>
+    <a class="aside-link" href="#bento">Bento Grid</a>
+    <a class="aside-link" href="#kanban">Kanban</a>
+    <a class="aside-link" href="#heatmap">Heatmap</a>
+  </aside>
+
+  <main>
+    <div style="margin-bottom:48px">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--green);margin-bottom:8px">Catalyst</div>
+      <h1 style="font-size:36px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px">
+        Design System
+        <span class="version-tag">v1.0</span>
+      </h1>
+      <p style="color:var(--muted);font-size:15px;max-width:560px">
+        The single source of truth for Catalyst's visual language. Reference this when building interfaces, prompting Claude, or reviewing designs.
+      </p>
+    </div>
+
+    <div class="edit-note">
+      <span>📌</span>
+      <span><strong>Claude note:</strong> To add components or update tokens, ask Claude to append to the relevant section in this file. Each section is marked with an HTML comment anchor for easy targeting.</span>
+    </div>
+
+    <!-- ==================== COLORS ==================== -->
+    <!-- CATALYST:DS:COLORS -->
+    <section class="ds-section" id="colors">
+      <div class="section-label">Foundations</div>
+      <h2>Colors</h2>
+      <p class="section-desc">Five tokens make up the entire Catalyst palette. Each has a specific role — resist the urge to reach for outside colors.</p>
+
+      <div class="subsection">
+        <h3>Core Palette</h3>
+        <div class="color-grid">
+          <div class="color-swatch">
+            <div class="swatch-color" style="background:#1F1F1F"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Background</div>
+              <div class="swatch-hex">#1F1F1F</div>
+              <div class="swatch-use">Page background, deepest layer. Never use on elements.</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-color" style="background:#2F2F2F"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Card</div>
+              <div class="swatch-hex">#2F2F2F</div>
+              <div class="swatch-use">Bento cards, panels, any raised surface.</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-color" style="background:#46675D"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Catalyst Green</div>
+              <div class="swatch-hex">#46675D</div>
+              <div class="swatch-use">Brand color. Primary actions, links, active states. Our identity.</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-color" style="background:#BEDCE4;border-bottom:1px solid var(--border)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Mist</div>
+              <div class="swatch-hex">#BEDCE4</div>
+              <div class="swatch-use">Heatmaps, info states, secondary highlights. High frequency.</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-color" style="background:#D3C182;border-bottom:1px solid var(--border)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Gold</div>
+              <div class="swatch-hex">#D3C182</div>
+              <div class="swatch-use">Accent only. Warning states, "review" status, rare highlights.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>Semantic Colors</h3>
+        <div class="color-grid">
+          <div class="color-swatch">
+            <div class="swatch-color" style="background:rgba(70,103,93,0.25)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Success BG</div>
+              <div class="swatch-hex">Green · 25% opacity</div>
+              <div class="swatch-use">Done status, positive states.</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-color" style="background:rgba(211,193,130,0.15)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Warning BG</div>
+              <div class="swatch-hex">Gold · 15% opacity</div>
+              <div class="swatch-use">Review status, caution states.</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-color" style="background:rgba(220,80,80,0.15)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Danger BG</div>
+              <div class="swatch-hex">#DC5050 · 15% opacity</div>
+              <div class="swatch-use">Critical priority, errors, destructive actions.</div>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-color" style="background:rgba(255,255,255,0.07)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Border</div>
+              <div class="swatch-hex">White · 7% opacity</div>
+              <div class="swatch-use">Dividers, card borders, subtle separators.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>Text Colors</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:24px;height:24px;border-radius:50%;background:#E8E8E8;flex-shrink:0"></div>
+            <div>
+              <div style="font-size:13px;font-weight:600">#E8E8E8 — Primary text</div>
+              <div style="font-size:12px;color:var(--muted)">Headings, body copy, active labels</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:24px;height:24px;border-radius:50%;background:#787878;flex-shrink:0"></div>
+            <div>
+              <div style="font-size:13px;font-weight:600">#787878 — Muted text</div>
+              <div style="font-size:12px;color:var(--muted)">Metadata, placeholders, secondary labels</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /CATALYST:DS:COLORS -->
+
+    <hr>
+
+    <!-- ==================== TYPOGRAPHY ==================== -->
+    <!-- CATALYST:DS:TYPOGRAPHY -->
+    <section class="ds-section" id="typography">
+      <div class="section-label">Foundations</div>
+      <h2>Typography</h2>
+      <p class="section-desc">System font stack. No custom fonts — performance and legibility over branding. Hierarchy through weight and size, not font family.</p>
+
+      <div class="subsection">
+        <h3>Type Scale</h3>
+        <div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="type-name">Display</div>
+              <div class="type-spec">36px / 800</div>
+            </div>
+            <div style="font-size:36px;font-weight:800;letter-spacing:-0.5px;line-height:1.1">Command Center</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="type-name">Heading 1</div>
+              <div class="type-spec">28px / 800</div>
+            </div>
+            <div style="font-size:28px;font-weight:800;letter-spacing:-0.3px">Ticket Tracker</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="type-name">Heading 2</div>
+              <div class="type-spec">22px / 700</div>
+            </div>
+            <div style="font-size:22px;font-weight:700">AI Agents Workstream</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="type-name">Heading 3</div>
+              <div class="type-spec">17px / 700</div>
+            </div>
+            <div style="font-size:17px;font-weight:700">Define agent architecture</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="type-name">Body</div>
+              <div class="type-spec">14px / 400</div>
+            </div>
+            <div style="font-size:14px">Live overview of all workstreams — pitch, product, engineering.</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="type-name">Small</div>
+              <div class="type-spec">12px / 400</div>
+            </div>
+            <div style="font-size:12px;color:var(--muted)">Created May 20 · Updated May 25</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="type-name">Label</div>
+              <div class="type-spec">11px / 700 caps</div>
+            </div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--green)">Workstream</div>
+          </div>
+          <div class="type-row">
+            <div class="type-meta">
+              <div class="type-name">Mono</div>
+              <div class="type-spec">11–12px / SF Mono</div>
+            </div>
+            <div style="font-size:12px;font-family:'SF Mono','Fira Code',monospace;color:var(--blue)">CAT-003</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /CATALYST:DS:TYPOGRAPHY -->
+
+    <hr>
+
+    <!-- ==================== SPACING ==================== -->
+    <!-- CATALYST:DS:SPACING -->
+    <section class="ds-section" id="spacing">
+      <div class="section-label">Foundations</div>
+      <h2>Spacing</h2>
+      <p class="section-desc">4px base unit. All spacing values are multiples of 4. Stick to this scale.</p>
+
+      <div class="space-grid">
+        <div class="space-row">
+          <div class="space-label">4px</div>
+          <div class="space-bar" style="width:4px"></div>
+          <div class="space-val">xs — icon gaps, tight pairs</div>
+        </div>
+        <div class="space-row">
+          <div class="space-label">8px</div>
+          <div class="space-bar" style="width:8px"></div>
+          <div class="space-val">sm — badge gaps, close siblings</div>
+        </div>
+        <div class="space-row">
+          <div class="space-label">12px</div>
+          <div class="space-bar" style="width:12px"></div>
+          <div class="space-val">md — card inner padding, list gaps</div>
+        </div>
+        <div class="space-row">
+          <div class="space-label">16px</div>
+          <div class="space-bar" style="width:16px"></div>
+          <div class="space-val">lg — card padding, section gaps</div>
+        </div>
+        <div class="space-row">
+          <div class="space-label">24px</div>
+          <div class="space-bar" style="width:24px"></div>
+          <div class="space-val">xl — modal padding, content sections</div>
+        </div>
+        <div class="space-row">
+          <div class="space-label">40px</div>
+          <div class="space-bar" style="width:40px"></div>
+          <div class="space-val">2xl — page horizontal padding</div>
+        </div>
+        <div class="space-row">
+          <div class="space-label">48px</div>
+          <div class="space-bar" style="width:48px"></div>
+          <div class="space-val">3xl — page top padding, major sections</div>
+        </div>
+      </div>
+
+      <div style="margin-top:24px">
+        <h3>Border Radius</h3>
+        <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div style="width:48px;height:48px;background:var(--card);border:1px solid var(--border);border-radius:4px"></div>
+            <span style="font-size:11px;color:var(--muted)">4px</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div style="width:48px;height:48px;background:var(--card);border:1px solid var(--border);border-radius:6px"></div>
+            <span style="font-size:11px;color:var(--muted)">6px</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div style="width:48px;height:48px;background:var(--card);border:1px solid var(--border);border-radius:8px"></div>
+            <span style="font-size:11px;color:var(--muted)">8px — sm</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div style="width:48px;height:48px;background:var(--card);border:1px solid var(--border);border-radius:12px"></div>
+            <span style="font-size:11px;color:var(--muted)">12px — r</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+            <div style="width:48px;height:48px;background:var(--card);border:1px solid var(--border);border-radius:24px"></div>
+            <span style="font-size:11px;color:var(--muted)">24px — pill</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /CATALYST:DS:SPACING -->
+
+    <hr>
+
+    <!-- ==================== ICONS ==================== -->
+    <!-- CATALYST:DS:ICONS -->
+    <section class="ds-section" id="icons">
+      <div class="section-label">Foundations</div>
+      <h2>Icons</h2>
+      <p class="section-desc">Emoji icons for workstream identity. SF Symbols / system icons for UI actions. No icon libraries — keep it native.</p>
+
+      <div class="subsection">
+        <h3>Workstream Icons</h3>
+        <div class="icon-grid">
+          <div class="icon-item"><span>📊</span><small>Pitch Deck</small></div>
+          <div class="icon-item"><span>🤖</span><small>AI Agents</small></div>
+          <div class="icon-item"><span>📱</span><small>Mobile</small></div>
+          <div class="icon-item"><span>⚙️</span><small>Backend</small></div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>UI Icons (Unicode)</h3>
+        <div class="icon-grid">
+          <div class="icon-item"><span style="font-size:18px">×</span><small>Close</small></div>
+          <div class="icon-item"><span style="font-size:18px">⌕</span><small>Search</small></div>
+          <div class="icon-item"><span style="font-size:18px">+</span><small>Add</small></div>
+          <div class="icon-item"><span style="font-size:18px">→</span><small>Link</small></div>
+          <div class="icon-item"><span style="font-size:18px">↗</span><small>External</small></div>
+          <div class="icon-item"><span style="font-size:18px">⋯</span><small>More</small></div>
+        </div>
+      </div>
+    </section>
+    <!-- /CATALYST:DS:ICONS -->
+
+    <hr>
+
+    <!-- ==================== BUTTONS ==================== -->
+    <!-- CATALYST:DS:BUTTONS -->
+    <section class="ds-section" id="buttons">
+      <div class="section-label">Components</div>
+      <h2>Buttons</h2>
+      <p class="section-desc">Four variants. One primary action per view — don't compete for attention.</p>
+
+      <div class="component-row">
+        <div class="component-label">Variants</div>
+        <div class="demo-area">
+          <button class="btn btn-primary">Primary</button>
+          <button class="btn btn-secondary">Secondary</button>
+          <button class="btn btn-ghost">Ghost</button>
+          <button class="btn btn-danger">Danger</button>
+        </div>
+      </div>
+      <div class="component-row">
+        <div class="component-label">Sizes</div>
+        <div class="demo-area" style="align-items:center">
+          <button class="btn btn-primary" style="padding:10px 20px;font-size:13px">Default</button>
+          <button class="btn btn-primary btn-sm">Small</button>
+        </div>
+      </div>
+      <div class="code-block">/* Primary */
+background: #46675D; color: white; padding: 10px 20px;
+border-radius: 8px; font-size: 13px; font-weight: 600;
+
+/* Hover: opacity 0.88 + translateY(-1px) */</div>
+    </section>
+    <!-- /CATALYST:DS:BUTTONS -->
+
+    <hr>
+
+    <!-- ==================== BADGES ==================== -->
+    <!-- CATALYST:DS:BADGES -->
+    <section class="ds-section" id="badges">
+      <div class="section-label">Components</div>
+      <h2>Badges</h2>
+      <p class="section-desc">Status and priority indicators. Small, uppercase, always communicating one thing.</p>
+
+      <div class="component-row">
+        <div class="component-label">Status</div>
+        <div class="demo-area">
+          <span class="badge b-backlog">Backlog</span>
+          <span class="badge b-progress">In Progress</span>
+          <span class="badge b-review">Review</span>
+          <span class="badge b-done">Done</span>
+        </div>
+      </div>
+      <div class="component-row">
+        <div class="component-label">Priority</div>
+        <div class="demo-area">
+          <span class="badge b-critical">Critical</span>
+          <span class="badge b-high">High</span>
+          <span class="badge b-medium">Medium</span>
+          <span class="badge b-low">Low</span>
+        </div>
+      </div>
+      <div class="code-block">/* Badge base */
+padding: 3px 8px; border-radius: 4px;
+font-size: 10px; font-weight: 600;
+text-transform: uppercase; letter-spacing: 0.5px;
+
+/* In Progress: rgba(190,220,228,0.13) bg · #BEDCE4 text */
+/* Done: rgba(70,103,93,0.3) bg · #7ABFAE text */
+/* Review: rgba(211,193,130,0.15) bg · #D3C182 text */
+/* Critical: rgba(220,80,80,0.15) bg · #E8847A text */</div>
+    </section>
+    <!-- /CATALYST:DS:BADGES -->
+
+    <hr>
+
+    <!-- ==================== CARDS ==================== -->
+    <!-- CATALYST:DS:CARDS -->
+    <section class="ds-section" id="cards">
+      <div class="section-label">Components</div>
+      <h2>Cards</h2>
+      <p class="section-desc">Three card surfaces. Default is always #2F2F2F. Brand cards use Catalyst Green. Info cards use Mist.</p>
+
+      <div class="component-row">
+        <div class="component-label">Variants</div>
+        <div class="demo-area">
+          <div class="demo-card">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Default Card</div>
+            <div style="font-size:15px;font-weight:700">Surface #2F2F2F</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:6px">Bento, kanban, panels</div>
+          </div>
+          <div class="demo-card-green">
+            <div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Brand Card</div>
+            <div style="font-size:15px;font-weight:700">Surface #46675D</div>
+            <div style="font-size:12px;opacity:0.7;margin-top:6px">Highlights, CTAs</div>
+          </div>
+          <div class="demo-card-blue">
+            <div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Info Card</div>
+            <div style="font-size:15px;font-weight:700">Surface #BEDCE4</div>
+            <div style="font-size:12px;opacity:0.7;margin-top:6px">Heatmaps, callouts</div>
+          </div>
+        </div>
+      </div>
+      <div class="component-row">
+        <div class="component-label">Hover State</div>
+        <div class="demo-area">
+          <div style="background:var(--card);border-radius:var(--r);padding:20px;border:1px solid rgba(255,255,255,0.07);width:200px">
+            <div style="font-size:12px;color:var(--muted)">Default border</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">rgba(255,255,255,0.07)</div>
+          </div>
+          <div style="background:var(--card);border-radius:var(--r);padding:20px;border:1px solid rgba(255,255,255,0.14);width:200px;transform:translateY(-2px)">
+            <div style="font-size:12px;color:var(--muted)">Hover border</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">rgba(255,255,255,0.14) + -2px Y</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /CATALYST:DS:CARDS -->
+
+    <hr>
+
+    <!-- ==================== INPUTS ==================== -->
+    <!-- CATALYST:DS:INPUTS -->
+    <section class="ds-section" id="inputs">
+      <div class="section-label">Components</div>
+      <h2>Inputs</h2>
+      <p class="section-desc">Form controls. Focus state uses Catalyst Green. Consistent 10px 14px padding.</p>
+
+      <div class="component-row">
+        <div class="component-label">Text Input</div>
+        <div class="demo-area col">
+          <input class="demo-input" placeholder="Placeholder text">
+          <input class="demo-input" value="Filled value" style="margin-top:0">
+          <input class="demo-input error" value="Error state" style="margin-top:0">
+        </div>
+      </div>
+      <div class="component-row">
+        <div class="component-label">Select</div>
+        <div class="demo-area">
+          <select style="background:var(--card);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:var(--r-sm);font-size:13px;outline:none;font-family:inherit;">
+            <option>All Areas</option>
+            <option>Pitch Deck</option>
+            <option>AI Agents</option>
+          </select>
+        </div>
+      </div>
+      <div class="code-block">/* Input base */
+background: #2F2F2F; border: 1px solid rgba(255,255,255,0.07);
+color: #E8E8E8; padding: 10px 14px; border-radius: 8px;
+
+/* Focus: border-color → #46675D */
+/* Error: border-color → rgba(220,80,80,0.5) */</div>
+    </section>
+    <!-- /CATALYST:DS:INPUTS -->
+
+    <hr>
+
+    <!-- ==================== LAYOUT ==================== -->
+    <!-- CATALYST:DS:LAYOUT -->
+    <section class="ds-section" id="layout">
+      <div class="section-label">Components</div>
+      <h2>Layout</h2>
+      <p class="section-desc">Max-width 1200–1400px, centered, 40px horizontal padding. Nav is sticky 56px. Sidebar is 220px.</p>
+
+      <div class="component-row">
+        <div class="component-label">Page Structure</div>
+        <div class="demo-area col dark" style="gap:4px;padding:16px;font-size:11px;color:var(--muted);font-family:'SF Mono',monospace">
+          <div style="background:#333;border-radius:4px;padding:6px 12px;width:100%">nav · 56px sticky</div>
+          <div style="display:flex;gap:4px;width:100%">
+            <div style="background:#2A2A2A;border-radius:4px;padding:6px 12px;width:220px;flex-shrink:0">aside · 220px</div>
+            <div style="background:#2A2A2A;border-radius:4px;padding:6px 12px;flex:1">main · max-width: 900–1400px · 40–60px padding</div>
+          </div>
+          <div style="background:#2A2A2A;border-radius:4px;padding:6px 12px;width:100%">footer · border-top</div>
+        </div>
+      </div>
+    </section>
+    <!-- /CATALYST:DS:LAYOUT -->
+
+    <hr>
+
+    <!-- ==================== BENTO ==================== -->
+    <!-- CATALYST:DS:BENTO -->
+    <section class="ds-section" id="bento">
+      <div class="section-label">Patterns</div>
+      <h2>Bento Grid</h2>
+      <p class="section-desc">CSS Grid-based bento layout. 12px gaps. Cards can span columns with <code style="font-family:monospace;font-size:12px;color:var(--blue)">grid-column: 1 / -1</code>. Always 4-column on desktop.</p>
+
+      <div class="component-row">
+        <div class="component-label">Example Layout</div>
+        <div class="demo-area col" style="padding:16px">
+          <div class="bento-demo" style="width:100%">
+            <div class="bc" style="grid-column:1/2;grid-row:1/3">
+              <div class="bc-label">Wide · 2fr</div>
+              <div style="font-size:22px;font-weight:800;margin-top:8px">42</div>
+            </div>
+            <div class="bc" style="grid-column:2/3;grid-row:1">
+              <div class="bc-label">Narrow · 1fr</div>
+            </div>
+            <div class="bc" style="grid-column:2/3;grid-row:2">
+              <div class="bc-label">Narrow · 1fr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="component-row">
+        <div class="component-label">Area Card Pattern</div>
+        <div class="demo-area">
+          <div style="background:var(--card);border-radius:var(--r);padding:20px;border:1px solid var(--border);width:180px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:#46675D"></div>
+            <div style="width:32px;height:32px;border-radius:7px;background:rgba(70,103,93,0.12);display:flex;align-items:center;justify-content:center;margin-bottom:12px">🤖</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:3px">Workstream</div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:14px">AI Agents</div>
+            <div style="display:flex;gap:14px;margin-bottom:12px">
+              <div><div style="font-size:18px;font-weight:800">2</div><div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Open</div></div>
+              <div><div style="font-size:18px;font-weight:800">0</div><div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Done</div></div>
+            </div>
+            <div style="height:3px;background:rgba(255,255,255,0.07);border-radius:2px">
+              <div style="height:100%;width:0%;background:#46675D;border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /CATALYST:DS:BENTO -->
+
+    <hr>
+
+    <!-- ==================== HEATMAP ==================== -->
+    <!-- CATALYST:DS:HEATMAP -->
+    <section class="ds-section" id="heatmap">
+      <div class="section-label">Patterns</div>
+      <h2>Heatmap</h2>
+      <p class="section-desc">Uses Mist (#BEDCE4) at varying opacity levels to show density or activity. 5 intensity levels.</p>
+
+      <div class="component-row">
+        <div class="component-label">Intensity Scale</div>
+        <div class="demo-area col" style="gap:12px">
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="display:flex;gap:4px">
+              <div class="hm-cell" style="background:rgba(190,220,228,0.06);color:var(--muted)">0</div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.2);color:var(--muted)">1</div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.4);color:#1F1F1F">2</div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.65);color:#1F1F1F">3</div>
+              <div class="hm-cell" style="background:#BEDCE4;color:#1F1F1F">4</div>
+            </div>
+            <div style="font-size:11px;color:var(--muted)">None → Low → Med → High → Max</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Example — weekly activity grid</div>
+            <div class="heatmap-demo">
+              <div class="hm-cell" style="background:rgba(190,220,228,0.06)"></div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.2)"></div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.4)"></div>
+              <div class="hm-cell" style="background:#BEDCE4"></div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.65)"></div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.06)"></div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.2)"></div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.4)"></div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.2)"></div>
+              <div class="hm-cell" style="background:#BEDCE4"></div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.06)"></div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.65)"></div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.4)"></div>
+              <div class="hm-cell" style="background:rgba(190,220,228,0.06)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /CATALYST:DS:HEATMAP -->
+
+  </main>
+</div>
+
+<script>
+  // Sidebar active state on scroll
+  const sections = document.querySelectorAll('.ds-section');
+  const links = document.querySelectorAll('.aside-link');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`.aside-link[href="#${e.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+</script>
+
+</body>
+</html>

@@ -25,7 +25,8 @@ CORE TOKENS (copy these into any spec file)
   --green: #46675D   Catalyst brand (primary actions, identity)
   --blue:  #BEDCE4   Mist (heatmaps, info, high frequency)
   --gold:  #D3C182   Gold (accent, review status, rare)
-  --text:  #E8E8E8   primary text
+  --text:  #EAE9E5   primary text (warm off-white — harmonises with #1F1F1F canvas)
+  --white: #FFFFFF   high-emphasis only (button labels, never body copy)
   --muted: #787878   secondary / metadata text
   --border: rgba(255,255,255,0.07)  dividers
 
@@ -54,7 +55,7 @@ RELATED
       --green: #46675D;
       --blue: #BEDCE4;
       --gold: #D3C182;
-      --text: #E8E8E8;
+      --text: #EAE9E5;
       --muted: #787878;
       --border: rgba(255,255,255,0.07);
       --r: 12px;
@@ -410,10 +411,10 @@ RELATED
         <h3>Text Colors</h3>
         <div style="display:flex;flex-direction:column;gap:8px">
           <div style="display:flex;align-items:center;gap:16px">
-            <div style="width:24px;height:24px;border-radius:50%;background:#E8E8E8;flex-shrink:0"></div>
+            <div style="width:24px;height:24px;border-radius:50%;background:#EAE9E5;flex-shrink:0;border:1px solid rgba(255,255,255,0.1)"></div>
             <div>
-              <div style="font-size:13px;font-weight:600">#E8E8E8 — Primary text</div>
-              <div style="font-size:12px;color:var(--muted)">Headings, body copy, active labels</div>
+              <div style="font-size:13px;font-weight:600">#EAE9E5 — Primary text</div>
+              <div style="font-size:12px;color:var(--muted)">Headings, body copy, active labels. Warm off-white — chosen over #FFFFFF because the canvas (#1F1F1F) has a warm undertone; pure white reads cold and clinical against it. EAE9E5 harmonises with the palette.</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:16px">
@@ -421,6 +422,13 @@ RELATED
             <div>
               <div style="font-size:13px;font-weight:600">#787878 — Muted text</div>
               <div style="font-size:12px;color:var(--muted)">Metadata, placeholders, secondary labels</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:24px;height:24px;border-radius:50%;background:#FFFFFF;flex-shrink:0;border:1px solid rgba(255,255,255,0.15)"></div>
+            <div>
+              <div style="font-size:13px;font-weight:600">#FFFFFF — High-emphasis only</div>
+              <div style="font-size:12px;color:var(--muted)">Use sparingly — button labels on CatalystGreen CTAs, or single-word emphasis where maximum contrast is required. Never for body copy or headings.</div>
             </div>
           </div>
         </div>
@@ -431,11 +439,17 @@ RELATED
     <hr>
 
     <!-- ==================== TYPOGRAPHY ==================== -->
-    <!-- CATALYST:DS:TYPOGRAPHY -->
-    <section class="ds-section" id="typography">
+    <!-- CATALYST:DS:TYPOGRAPHY -->\n    <section class="ds-section" id="typography">
       <div class="section-label">Foundations</div>
       <h2>Typography</h2>
-      <p class="section-desc">System font stack. No custom fonts — performance and legibility over branding. Hierarchy through weight and size, not font family.</p>
+      <p class="section-desc">Font direction under active exploration. Four candidates evaluated: Bricolage Grotesque, Plus Jakarta Sans, Syne + Geist Mono, Fraunces + Urbanist. See the full type exploration for live mockups on dark and light surfaces.</p>
+      <div style="margin-bottom:24px;padding:12px 16px;background:rgba(211,193,130,0.08);border:1px solid rgba(211,193,130,0.2);border-radius:8px;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:16px;">🔤</span>
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Typography direction is not locked</div>
+          <div style="font-size:12px;color:var(--muted)">Current build uses Erbaum. Four grotesque/serif alternatives are under review. <a href="specs/type-exploration-v1.html" style="color:var(--gold);text-decoration:none;">Open type exploration →</a></div>
+        </div>
+      </div>
 
       <div class="subsection">
         <h3>Type Scale</h3>
@@ -899,3 +913,4 @@ color: #E8E8E8; padding: 10px 14px; border-radius: 8px;
 
 </body>
 </html>
+

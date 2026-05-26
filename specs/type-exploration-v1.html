@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catalyst — Typography & Visual Direction Exploration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400;1,9..144,600&family=Urbanist:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* ─── RESET & BASE ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: #111418;
+  color: #E8EDF2;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ─── LAYOUT ─── */
+.page { max-width: 1400px; margin: 0 auto; padding: 0 48px 120px; }
+
+/* ─── HEADER ─── */
+.site-header {
+  padding: 52px 48px 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 72px;
+}
+.site-header-eyebrow {
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: #46675D;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.site-header-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 20px; height: 1px;
+  background: #46675D;
+}
+.site-header h1 {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: #EAEEF2;
+  margin-bottom: 16px;
+}
+.site-header h1 em { font-style: italic; color: #D3C182; }
+.site-header-sub {
+  font-size: 15px; color: #7E8FA0; line-height: 1.65;
+  max-width: 560px;
+}
+
+/* ─── DIRECTION SECTION ─── */
+.direction {
+  margin-bottom: 96px;
+  padding-bottom: 96px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.direction:last-child { border-bottom: none; }
+
+.direction-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 52px;
+  align-items: start;
+}
+
+.direction-num {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px; color: #46675D;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.direction-name {
+  font-size: clamp(28px, 3vw, 42px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: #EAEEF2;
+  margin-bottom: 8px;
+}
+.direction-desc {
+  font-size: 14px; color: #7E8FA0; line-height: 1.65;
+  margin-bottom: 20px;
+}
+.direction-tags {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.tag {
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 99px;
+  font-size: 11px; color: #7E8FA0;
+}
+
+.font-specimen {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 24px;
+}
+.specimen-label {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #5C6E82;
+  margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.specimen-pair {
+  font-size: 11px;
+  background: rgba(70,103,93,0.15);
+  color: #46675D;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.specimen-display {
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: #EAEEF2;
+  margin-bottom: 10px;
+}
+.specimen-body {
+  line-height: 1.6;
+  color: #8B97A6;
+  margin-bottom: 10px;
+}
+.specimen-abc {
+  letter-spacing: 0.04em;
+  color: #5C6E82;
+  font-size: 13px;
+}
+
+/* ─── MOCKUP GRID ─── */
+.mockup-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.mockup-col-label {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #5C6E82;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.mockup-col-label::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+/* ─── PHONE FRAME ─── */
+.phone {
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(255,255,255,0.04);
+  position: relative;
+}
+.phone-light {
+  border-color: rgba(0,0,0,0.12);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.18), 0 0 0 0.5px rgba(0,0,0,0.08);
+}
+
+/* ─────────────────────────────────────────────────────────
+   DIRECTION A — BRICOLAGE GROTESQUE
+   Tone: Expressive, editorial, surprisingly human.
+   Bricolage has slightly optical weight variation that gives
+   it a hand-drawn warmth rarely seen in grotesques.
+───────────────────────────────────────────────────────── */
+.dir-a { font-family: 'Bricolage Grotesque', sans-serif; }
+
+.dir-a .phone-bg { background: #1F1F1F; }
+.dir-a .phone-bg-light { background: #F5F3EF; }
+
+.dir-a .p-topbar {
+  height: 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.dir-a .p-topbar-light {
+  border-bottom-color: rgba(0,0,0,0.07);
+}
+.dir-a .p-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 14px; font-weight: 600;
+  color: #EAEEF2;
+  letter-spacing: -0.01em;
+}
+.dir-a .p-title-light { color: #1A1A1A; }
+.dir-a .p-subject {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 13px; color: #7E8FA0; font-weight: 400;
+}
+.dir-a .p-subject-light { color: #787878; }
+
+.dir-a .p-prog-track {
+  height: 2px; background: rgba(255,255,255,0.07);
+}
+.dir-a .p-prog-track-light { background: rgba(0,0,0,0.07); }
+.dir-a .p-prog-fill {
+  height: 100%; width: 35%;
+  background: #D3C182;
+}
+
+.dir-a .p-card {
+  margin: 14px;
+  background: #2F2F2F;
+  border-radius: 14px;
+  border: 1px solid rgba(190,220,228,0.15);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.dir-a .p-card-light {
+  background: #FFFFFF;
+  border-color: rgba(0,0,0,0.09);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+.dir-a .p-card-body { padding: 18px 16px 14px; }
+
+.dir-a .p-headline {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 17px; font-weight: 700;
+  color: #EAEEF2; line-height: 1.28;
+  letter-spacing: -0.025em;
+  margin-bottom: 6px;
+}
+.dir-a .p-headline-light { color: #1A1A1A; }
+.dir-a .p-body {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 12px; color: #7E8FA0;
+  line-height: 1.55; margin-bottom: 14px;
+  font-weight: 400;
+}
+.dir-a .p-body-light { color: #787878; }
+
+.dir-a .pill-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 5px; }
+.dir-a .pill {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 11px; font-weight: 600;
+  padding: 4px 10px; border-radius: 99px;
+  display: inline-flex; align-items: center; gap: 4px;
+  letter-spacing: -0.01em;
+}
+.dir-a .pill-gold { background: rgba(211,193,130,0.14); color: #D3C182; border: 1px solid rgba(211,193,130,0.25); }
+.dir-a .pill-blue { background: rgba(190,220,228,0.12); color: #BEDCE4; border: 1px solid rgba(190,220,228,0.22); }
+.dir-a .pill-muted { background: rgba(255,255,255,0.05); color: #7E8FA0; border: 1px solid rgba(255,255,255,0.08); }
+.dir-a .pill-gold-light { background: rgba(211,193,130,0.18); color: #7A6520; border: 1px solid rgba(211,193,130,0.35); }
+.dir-a .pill-blue-light { background: rgba(70,103,93,0.12); color: #46675D; border: 1px solid rgba(70,103,93,0.25); }
+.dir-a .pill-muted-light { background: rgba(0,0,0,0.06); color: #787878; border: 1px solid rgba(0,0,0,0.1); }
+
+.dir-a .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 12px 0; }
+.dir-a .divider-light { background: rgba(0,0,0,0.07); }
+
+.dir-a .section-label {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: #5C6E82; margin-bottom: 8px;
+}
+.dir-a .section-label-light { color: #AAAAAA; }
+
+.dir-a .focus-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: rgba(15,20,25,0.6);
+  border-radius: 9px;
+  margin-bottom: 5px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.dir-a .focus-row-light {
+  background: #F7F6F3;
+  border-color: rgba(0,0,0,0.05);
+}
+.dir-a .focus-accent { width: 3px; border-radius: 99px; align-self: stretch; min-height: 26px; flex-shrink: 0; }
+.dir-a .focus-body { flex: 1; min-width: 0; }
+.dir-a .focus-name {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 12px; font-weight: 600;
+  color: #EAEEF2; line-height: 1.3; margin-bottom: 1px;
+  letter-spacing: -0.01em;
+}
+.dir-a .focus-name-light { color: #1A1A1A; }
+.dir-a .focus-meta {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 10px; color: #5C6E82;
+}
+.dir-a .focus-meta-light { color: #AAAAAA; }
+.dir-a .badge {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 10px; font-weight: 700;
+  padding: 3px 8px; border-radius: 99px; flex-shrink: 0;
+  letter-spacing: -0.01em;
+}
+.dir-a .badge-red { background: rgba(220,80,80,0.15); color: #E8847A; }
+.dir-a .badge-muted { background: rgba(255,255,255,0.07); color: #7E8FA0; border: 1px solid rgba(255,255,255,0.1); }
+.dir-a .badge-green { background: rgba(70,103,93,0.25); color: #7ABFAE; }
+.dir-a .badge-red-light { background: rgba(220,80,80,0.1); color: #CC4444; }
+.dir-a .badge-muted-light { background: rgba(0,0,0,0.06); color: #AAAAAA; border: 1px solid rgba(0,0,0,0.1); }
+.dir-a .badge-green-light { background: rgba(70,103,93,0.15); color: #46675D; }
+
+.dir-a .btn {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  width: calc(100% - 28px);
+  margin: 0 14px 14px;
+  height: 44px;
+  background: #46675D;
+  color: #FFFFFF;
+  border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: -0.01em;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer;
+}
+.dir-a .btn-light {
+  background: #46675D;
+  color: #FFFFFF;
+}
+
+/* Empty state — Direction A */
+.dir-a .empty-card {
+  margin: 14px;
+  background: #2F2F2F;
+  border-radius: 14px;
+  border: 1px solid rgba(190,220,228,0.15);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  padding: 36px 20px 28px;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+}
+.dir-a .empty-card-light {
+  background: #FFFFFF;
+  border-color: rgba(0,0,0,0.09);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+.dir-a .empty-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: rgba(211,193,130,0.12);
+  border: 1px solid rgba(211,193,130,0.2);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+  font-size: 20px;
+}
+.dir-a .empty-h {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 15px; font-weight: 700;
+  color: #EAEEF2; letter-spacing: -0.02em;
+  margin-bottom: 6px; line-height: 1.2;
+}
+.dir-a .empty-h-light { color: #1A1A1A; }
+.dir-a .empty-p {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 12px; color: #7E8FA0; line-height: 1.55;
+  margin-bottom: 18px; max-width: 200px;
+}
+.dir-a .empty-p-light { color: #787878; }
+.dir-a .empty-btn {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  height: 38px; padding: 0 20px;
+  background: #46675D; color: #fff;
+  border: none; border-radius: 8px;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+}
+
+/* ─────────────────────────────────────────────────────────
+   DIRECTION B — PLUS JAKARTA SANS
+   Tone: Ultra-refined, Apple-adjacent, geometric precision.
+   The neutral grotesque executed with extreme discipline.
+───────────────────────────────────────────────────────── */
+.dir-b { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+/* ─────────────────────────────────────────────────────────
+   DIRECTION C — SYNE + GEIST MONO
+   Tone: Architectural, technical confidence, collector energy.
+   Syne has a slightly eccentric geometry — distinctive at
+   display sizes, totally readable at body. Pairing with
+   Geist Mono makes data feel intentional.
+───────────────────────────────────────────────────────── */
+.dir-c { font-family: 'Syne', sans-serif; }
+
+/* ─────────────────────────────────────────────────────────
+   DIRECTION D — FRAUNCES + URBANIST
+   Tone: Warm academic, slow & considered, trustworthy.
+   Fraunces is a variable optical-size serif with a wonky
+   personality at display. Urbanist keeps the body neutral.
+───────────────────────────────────────────────────────── */
+.dir-d { font-family: 'Urbanist', sans-serif; }
+
+/* ─── shared card pieces re-used across B/C/D ─── */
+.generic-phone-bg { background: #1F1F1F; }
+.generic-phone-bg-lt { background: #F4F4F2; }
+
+.generic-topbar {
+  height: 48px; padding: 0 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.generic-topbar-lt { border-bottom-color: rgba(0,0,0,0.06); }
+
+.generic-prog { height: 2px; }
+.generic-prog-track { background: rgba(255,255,255,0.07); }
+.generic-prog-track-lt { background: rgba(0,0,0,0.07); }
+.generic-prog-fill { height: 100%; width: 35%; background: #D3C182; }
+
+.generic-card {
+  margin: 14px;
+  background: #2F2F2F;
+  border-radius: 14px;
+  border: 1px solid rgba(190,220,228,0.15);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.generic-card-lt {
+  background: #FFFFFF;
+  border-color: rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.07);
+}
+.generic-card-body { padding: 18px 16px 14px; }
+
+.generic-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 12px 0; }
+.generic-divider-lt { background: rgba(0,0,0,0.06); }
+
+.generic-focus-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: rgba(15,20,25,0.55);
+  border-radius: 9px; margin-bottom: 5px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.generic-focus-row-lt {
+  background: #F6F5F2;
+  border-color: rgba(0,0,0,0.05);
+}
+.generic-accent { width: 3px; border-radius: 99px; align-self: stretch; min-height: 26px; flex-shrink: 0; }
+.generic-focus-body { flex: 1; min-width: 0; }
+
+.generic-btn {
+  width: calc(100% - 28px);
+  margin: 0 14px 14px;
+  height: 44px;
+  background: #46675D; color: #fff;
+  border: none; border-radius: 10px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+
+.generic-empty {
+  margin: 14px;
+  background: #2F2F2F;
+  border-radius: 14px;
+  border: 1px solid rgba(190,220,228,0.15);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  padding: 34px 20px 26px;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+}
+.generic-empty-lt {
+  background: #FFFFFF;
+  border-color: rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.generic-empty-icon {
+  width: 46px; height: 46px; border-radius: 12px;
+  background: rgba(211,193,130,0.12);
+  border: 1px solid rgba(211,193,130,0.2);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px; font-size: 18px;
+}
+.generic-empty-icon-lt {
+  background: rgba(70,103,93,0.1);
+  border-color: rgba(70,103,93,0.2);
+}
+
+/* ─── COMPARISON LABEL ─── */
+.compare-note {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.compare-note-item { font-size: 12px; color: #5C6E82; line-height: 1.5; }
+.compare-note-item strong { color: #8B97A6; font-weight: 500; display: block; margin-bottom: 3px; }
+
+/* ─── NAV ─── */
+.direction-nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(17,20,24,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 0 48px;
+  display: flex; gap: 0; align-items: center;
+  height: 52px;
+}
+.direction-nav a {
+  padding: 0 16px;
+  height: 100%;
+  display: flex; align-items: center;
+  font-size: 13px; color: #5C6E82;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 150ms, border-color 150ms;
+}
+.direction-nav a:hover { color: #EAEEF2; }
+.direction-nav a.active { color: #EAEEF2; border-bottom-color: #46675D; }
+.direction-nav-logo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 14px; font-weight: 700;
+  color: #46675D; letter-spacing: -0.02em;
+  margin-right: 24px;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  padding-right: 24px;
+  height: 100%;
+  display: flex; align-items: center;
+}
+</style>
+</head>
+<body>
+
+<nav class="direction-nav">
+  <div class="direction-nav-logo">Catalyst</div>
+  <a href="#dir-a" class="active">A — Bricolage</a>
+  <a href="#dir-b">B — Jakarta</a>
+  <a href="#dir-c">C — Syne</a>
+  <a href="#dir-d">D — Fraunces</a>
+</nav>
+
+<header class="site-header">
+  <div class="site-header-eyebrow">Typography & Visual Direction Exploration</div>
+  <h1>Four ways to be <em>premium.</em></h1>
+  <p class="site-header-sub">Each direction is a complete typographic identity — different font personality, same Catalyst palette. Today's Session card + empty state rendered in dark and light for each. Pick the one that feels like the app students want to open every day.</p>
+</header>
+
+<div class="page">
+
+<!-- ══════════════════════════════════════════
+     DIRECTION A — BRICOLAGE GROTESQUE
+════════════════════════════════════════════ -->
+<section class="direction" id="dir-a">
+  <div class="direction-meta">
+    <div>
+      <div class="direction-num">Direction A / 04</div>
+      <div class="direction-name" style="font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-0.03em;">Bricolage<br>Grotesque</div>
+      <p class="direction-desc" style="font-family:'Bricolage Grotesque',sans-serif;">The dark horse grotesque. Optical-axis variation gives each weight a slightly hand-drawn warmth that separates it from every clinical sans-serif in edtech. Bold without aggression. Reads as confident and human simultaneously.</p>
+      <div class="direction-tags">
+        <span class="tag">Expressive</span>
+        <span class="tag">Warm confidence</span>
+        <span class="tag">Variable font</span>
+        <span class="tag">Premium at all weights</span>
+      </div>
+    </div>
+    <div class="font-specimen">
+      <div class="specimen-label">
+        Font specimen
+        <span class="specimen-pair">Single family · Variable</span>
+      </div>
+      <div class="specimen-display" style="font-family:'Bricolage Grotesque',sans-serif;font-size:48px;font-weight:800;letter-spacing:-0.04em;margin-bottom:8px;">Memory<br>Management.</div>
+      <div class="specimen-display" style="font-family:'Bricolage Grotesque',sans-serif;font-size:32px;font-weight:300;letter-spacing:-0.025em;color:#7E8FA0;margin-bottom:12px;">Light · 300</div>
+      <div class="specimen-body" style="font-family:'Bricolage Grotesque',sans-serif;font-size:14px;">Based on your last 3 sessions — you're solid on scheduling but accuracy on memory topics dropped to 58%. This session focuses there.</div>
+      <div class="specimen-abc" style="font-family:'Bricolage Grotesque',sans-serif;">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq 0123456789</div>
+    </div>
+  </div>
+
+  <div class="mockup-grid">
+    <!-- Dark -->
+    <div>
+      <div class="mockup-col-label">Dark surface</div>
+      <div class="phone dir-a">
+        <div style="background:#1F1F1F;">
+          <div class="p-topbar dir-a" style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span class="p-title dir-a" style="font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:600;color:#EAEEF2;letter-spacing:-0.01em;">Today's session</span>
+            <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:12px;color:#5C6E82;font-weight:400;">OS</span>
+          </div>
+          <div style="height:2px;background:rgba(255,255,255,0.07);"><div style="height:100%;width:35%;background:#D3C182;"></div></div>
+          <div style="margin:14px;background:#2F2F2F;border-radius:14px;border:1px solid rgba(190,220,228,0.15);overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+            <div style="padding:18px 16px 14px;">
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:700;color:#EAEEF2;line-height:1.25;letter-spacing:-0.025em;margin-bottom:6px;">Memory Management needs you today.</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:12px;color:#7E8FA0;line-height:1.55;margin-bottom:14px;">Based on your last 3 sessions — accuracy on memory topics dropped to 58%.</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;">
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(211,193,130,0.14);color:#D3C182;border:1px solid rgba(211,193,130,0.25);">14 questions</span>
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(190,220,228,0.12);color:#BEDCE4;border:1px solid rgba(190,220,228,0.22);">~18 min</span>
+              </div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;">
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,0.05);color:#7E8FA0;border:1px solid rgba(255,255,255,0.08);">Bloom's 3–4</span>
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,0.05);color:#7E8FA0;border:1px solid rgba(255,255,255,0.08);">Your ZPD</span>
+              </div>
+              <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 0 12px;"></div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#5C6E82;margin-bottom:8px;">Focus areas</div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(15,20,25,0.6);border-radius:9px;margin-bottom:5px;border:1px solid rgba(255,255,255,0.04);">
+                <div style="width:3px;background:#DC5050;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;color:#EAEEF2;letter-spacing:-0.01em;margin-bottom:1px;">Virtual Memory & Paging</div>
+                  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:10px;color:#5C6E82;">6 questions · weakest subtopic</div>
+                </div>
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(220,80,80,0.15);color:#E8847A;">58%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(15,20,25,0.6);border-radius:9px;margin-bottom:5px;border:1px solid rgba(255,255,255,0.04);">
+                <div style="width:3px;background:#BEDCE4;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;color:#EAEEF2;letter-spacing:-0.01em;margin-bottom:1px;">Segmentation</div>
+                  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:10px;color:#5C6E82;">5 questions · new concept</div>
+                </div>
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,0.07);color:#7E8FA0;border:1px solid rgba(255,255,255,0.1);">New</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(15,20,25,0.6);border-radius:9px;border:1px solid rgba(255,255,255,0.04);">
+                <div style="width:3px;background:#46675D;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;color:#EAEEF2;letter-spacing:-0.01em;margin-bottom:1px;">Demand Paging</div>
+                  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:10px;color:#5C6E82;">3 questions · review due</div>
+                </div>
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(70,103,93,0.25);color:#7ABFAE;">Review</span>
+              </div>
+            </div>
+            <button style="font-family:'Bricolage Grotesque',sans-serif;width:calc(100% - 28px);margin:0 14px 14px;height:44px;background:#46675D;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;letter-spacing:-0.01em;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;">Begin session →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Light -->
+    <div>
+      <div class="mockup-col-label">Light surface</div>
+      <div class="phone phone-light" style="font-family:'Bricolage Grotesque',sans-serif;">
+        <div style="background:#F5F3EF;">
+          <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(0,0,0,0.07);">
+            <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:600;color:#1A1A1A;letter-spacing:-0.01em;">Today's session</span>
+            <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:12px;color:#AAAAAA;">OS</span>
+          </div>
+          <div style="height:2px;background:rgba(0,0,0,0.07);"><div style="height:100%;width:35%;background:#D3C182;"></div></div>
+          <div style="margin:14px;background:#FFFFFF;border-radius:14px;border:1px solid rgba(0,0,0,0.09);overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.08);">
+            <div style="padding:18px 16px 14px;">
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:700;color:#1A1A1A;line-height:1.25;letter-spacing:-0.025em;margin-bottom:6px;">Memory Management needs you today.</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:12px;color:#787878;line-height:1.55;margin-bottom:14px;">Based on your last 3 sessions — accuracy on memory topics dropped to 58%.</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;">
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(211,193,130,0.18);color:#7A6520;border:1px solid rgba(211,193,130,0.35);">14 questions</span>
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(70,103,93,0.12);color:#46675D;border:1px solid rgba(70,103,93,0.25);">~18 min</span>
+              </div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;">
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(0,0,0,0.05);color:#787878;border:1px solid rgba(0,0,0,0.09);">Bloom's 3–4</span>
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(0,0,0,0.05);color:#787878;border:1px solid rgba(0,0,0,0.09);">Your ZPD</span>
+              </div>
+              <div style="height:1px;background:rgba(0,0,0,0.06);margin:0 0 12px;"></div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#AAAAAA;margin-bottom:8px;">Focus areas</div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F7F6F3;border-radius:9px;margin-bottom:5px;">
+                <div style="width:3px;background:#DC5050;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;color:#1A1A1A;margin-bottom:1px;">Virtual Memory & Paging</div>
+                  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:10px;color:#AAAAAA;">6 questions · weakest subtopic</div>
+                </div>
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(220,80,80,0.1);color:#CC4444;">58%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F7F6F3;border-radius:9px;margin-bottom:5px;">
+                <div style="width:3px;background:#BEDCE4;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;color:#1A1A1A;margin-bottom:1px;">Segmentation</div>
+                  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:10px;color:#AAAAAA;">5 questions · new concept</div>
+                </div>
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(0,0,0,0.06);color:#AAAAAA;border:1px solid rgba(0,0,0,0.1);">New</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F7F6F3;border-radius:9px;">
+                <div style="width:3px;background:#46675D;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;color:#1A1A1A;margin-bottom:1px;">Demand Paging</div>
+                  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:10px;color:#AAAAAA;">3 questions · review due</div>
+                </div>
+                <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(70,103,93,0.15);color:#46675D;">Review</span>
+              </div>
+            </div>
+            <button style="font-family:'Bricolage Grotesque',sans-serif;width:calc(100% - 28px);margin:0 14px 14px;height:44px;background:#46675D;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;letter-spacing:-0.01em;cursor:pointer;">Begin session →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div>
+      <div class="mockup-col-label">Empty state</div>
+      <div class="phone" style="font-family:'Bricolage Grotesque',sans-serif;">
+        <div style="background:#1F1F1F;">
+          <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:600;color:#EAEEF2;letter-spacing:-0.01em;">Today's session</span>
+            <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:12px;color:#5C6E82;">—</span>
+          </div>
+          <div style="height:2px;background:rgba(255,255,255,0.07);"><div style="height:100%;width:0%;background:#D3C182;"></div></div>
+          <div style="margin:14px;background:#2F2F2F;border-radius:14px;border:1px solid rgba(190,220,228,0.15);box-shadow:0 8px 24px rgba(0,0,0,0.3);padding:40px 20px 32px;text-align:center;display:flex;flex-direction:column;align-items:center;">
+            <div style="width:52px;height:52px;border-radius:14px;background:rgba(211,193,130,0.1);border:1px solid rgba(211,193,130,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:22px;">🗺</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;color:#EAEEF2;letter-spacing:-0.025em;margin-bottom:6px;line-height:1.2;">No roadmap yet.</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:12px;color:#7E8FA0;line-height:1.55;margin-bottom:20px;max-width:200px;">Build your first learning plan and Catalyst will generate your session automatically.</div>
+            <button style="font-family:'Bricolage Grotesque',sans-serif;height:38px;padding:0 20px;background:#46675D;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;letter-spacing:-0.01em;cursor:pointer;">Build my roadmap →</button>
+            <div style="margin-top:14px;font-family:'Bricolage Grotesque',sans-serif;font-size:11px;color:#5C6E82;">takes under 2 minutes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="compare-note">
+      <div class="compare-note-item"><strong>Why it works</strong>Optical-axis variation gives each weight a slightly editorial weight that feels handcrafted. At 700+ weight, the glyphs develop a subtle quirk that stands out in a sea of perfectly geometric grotesques.</div>
+      <div class="compare-note-item"><strong>Light surface verdict</strong>Exceptionally clean on warm off-white. The slightly warm undertone in the letterforms pairs naturally with the parchment background.</div>
+      <div class="compare-note-item"><strong>Best for</strong>Students who want the app to feel designed, not assembled. The expressive weight range from 300 to 800 handles the full range from metadata to hero headlines with one import.</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     DIRECTION B — PLUS JAKARTA SANS
+════════════════════════════════════════════ -->
+<section class="direction" id="dir-b">
+  <div class="direction-meta">
+    <div>
+      <div class="direction-num">Direction B / 04</div>
+      <div class="direction-name" style="font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.03em;font-weight:800;">Plus Jakarta<br>Sans</div>
+      <p class="direction-desc" style="font-family:'Plus Jakarta Sans',sans-serif;">The modern benchmark. Geometric but not cold, refined but not sterile. Jakarta became the gold standard for premium product UI precisely because it's unobtrusive at body sizes and assertive at display. Apple-adjacent without being derivative.</p>
+      <div class="direction-tags">
+        <span class="tag">Geometric precision</span>
+        <span class="tag">Ultra-legible</span>
+        <span class="tag">Apple-adjacent</span>
+        <span class="tag">Safe premium</span>
+      </div>
+    </div>
+    <div class="font-specimen">
+      <div class="specimen-label">Font specimen <span class="specimen-pair">Single family · Variable</span></div>
+      <div class="specimen-display" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:46px;font-weight:800;letter-spacing:-0.04em;margin-bottom:8px;">Memory<br>Management.</div>
+      <div class="specimen-display" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:300;letter-spacing:-0.02em;color:#7E8FA0;margin-bottom:12px;">Light · 300</div>
+      <div class="specimen-body" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;">Based on your last 3 sessions — you're solid on scheduling but accuracy on memory topics dropped to 58%.</div>
+      <div class="specimen-abc" style="font-family:'Plus Jakarta Sans',sans-serif;">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp 0123456789</div>
+    </div>
+  </div>
+
+  <div class="mockup-grid">
+    <div>
+      <div class="mockup-col-label">Dark surface</div>
+      <div class="phone" style="font-family:'Plus Jakarta Sans',sans-serif;">
+        <div style="background:#1F1F1F;">
+          <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#EAEEF2;">Today's session</span>
+            <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#5C6E82;">OS</span>
+          </div>
+          <div style="height:2px;background:rgba(255,255,255,0.07);"><div style="height:100%;width:35%;background:#D3C182;"></div></div>
+          <div style="margin:14px;background:#2F2F2F;border-radius:14px;border:1px solid rgba(190,220,228,0.15);overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+            <div style="padding:18px 16px 14px;">
+              <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:700;color:#EAEEF2;line-height:1.28;letter-spacing:-0.02em;margin-bottom:6px;">Memory Management needs you today.</div>
+              <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#7E8FA0;line-height:1.55;margin-bottom:14px;">Based on your last 3 sessions — accuracy on memory topics dropped to 58%.</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;">
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(211,193,130,0.14);color:#D3C182;border:1px solid rgba(211,193,130,0.25);">14 questions</span>
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(190,220,228,0.12);color:#BEDCE4;border:1px solid rgba(190,220,228,0.22);">~18 min</span>
+              </div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;">
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,0.05);color:#7E8FA0;border:1px solid rgba(255,255,255,0.08);">Bloom's 3–4</span>
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,0.05);color:#7E8FA0;border:1px solid rgba(255,255,255,0.08);">Your ZPD</span>
+              </div>
+              <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 0 12px;"></div>
+              <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#5C6E82;margin-bottom:8px;">Focus areas</div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(15,20,25,0.6);border-radius:9px;margin-bottom:5px;border:1px solid rgba(255,255,255,0.04);">
+                <div style="width:3px;background:#DC5050;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#EAEEF2;margin-bottom:1px;">Virtual Memory & Paging</div><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#5C6E82;">6 questions · weakest subtopic</div></div>
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(220,80,80,0.15);color:#E8847A;">58%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(15,20,25,0.6);border-radius:9px;margin-bottom:5px;border:1px solid rgba(255,255,255,0.04);">
+                <div style="width:3px;background:#BEDCE4;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#EAEEF2;margin-bottom:1px;">Segmentation</div><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#5C6E82;">5 questions · new concept</div></div>
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,0.07);color:#7E8FA0;border:1px solid rgba(255,255,255,0.1);">New</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(15,20,25,0.6);border-radius:9px;border:1px solid rgba(255,255,255,0.04);">
+                <div style="width:3px;background:#46675D;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#EAEEF2;margin-bottom:1px;">Demand Paging</div><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#5C6E82;">3 questions · review due</div></div>
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(70,103,93,0.25);color:#7ABFAE;">Review</span>
+              </div>
+            </div>
+            <button style="font-family:'Plus Jakarta Sans',sans-serif;width:calc(100% - 28px);margin:0 14px 14px;height:44px;background:#46675D;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Begin session →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mockup-col-label">Light surface</div>
+      <div class="phone phone-light" style="font-family:'Plus Jakarta Sans',sans-serif;">
+        <div style="background:#F8F8F8;">
+          <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(0,0,0,0.07);">
+            <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#111111;">Today's session</span>
+            <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#AAAAAA;">OS</span>
+          </div>
+          <div style="height:2px;background:rgba(0,0,0,0.07);"><div style="height:100%;width:35%;background:#D3C182;"></div></div>
+          <div style="margin:14px;background:#FFFFFF;border-radius:14px;border:1px solid rgba(0,0,0,0.08);overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.07);">
+            <div style="padding:18px 16px 14px;">
+              <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:700;color:#111111;line-height:1.28;letter-spacing:-0.02em;margin-bottom:6px;">Memory Management needs you today.</div>
+              <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#787878;line-height:1.55;margin-bottom:14px;">Based on your last 3 sessions — accuracy on memory topics dropped to 58%.</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;">
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(211,193,130,0.2);color:#7A6520;border:1px solid rgba(211,193,130,0.3);">14 questions</span>
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(70,103,93,0.1);color:#46675D;border:1px solid rgba(70,103,93,0.2);">~18 min</span>
+              </div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;">
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(0,0,0,0.04);color:#787878;border:1px solid rgba(0,0,0,0.08);">Bloom's 3–4</span>
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(0,0,0,0.04);color:#787878;border:1px solid rgba(0,0,0,0.08);">Your ZPD</span>
+              </div>
+              <div style="height:1px;background:rgba(0,0,0,0.06);margin:0 0 12px;"></div>
+              <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#BBBBBB;margin-bottom:8px;">Focus areas</div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F5F5F5;border-radius:9px;margin-bottom:5px;">
+                <div style="width:3px;background:#DC5050;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#111111;margin-bottom:1px;">Virtual Memory & Paging</div><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#AAAAAA;">6 questions · weakest subtopic</div></div>
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(220,80,80,0.1);color:#CC4444;">58%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F5F5F5;border-radius:9px;margin-bottom:5px;">
+                <div style="width:3px;background:#BEDCE4;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#111111;margin-bottom:1px;">Segmentation</div><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#AAAAAA;">5 questions · new concept</div></div>
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(0,0,0,0.06);color:#AAAAAA;border:1px solid rgba(0,0,0,0.09);">New</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F5F5F5;border-radius:9px;">
+                <div style="width:3px;background:#46675D;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;color:#111111;margin-bottom:1px;">Demand Paging</div><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#AAAAAA;">3 questions · review due</div></div>
+                <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(70,103,93,0.12);color:#46675D;">Review</span>
+              </div>
+            </div>
+            <button style="font-family:'Plus Jakarta Sans',sans-serif;width:calc(100% - 28px);margin:0 14px 14px;height:44px;background:#46675D;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Begin session →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mockup-col-label">Empty state</div>
+      <div class="phone" style="font-family:'Plus Jakarta Sans',sans-serif;">
+        <div style="background:#1F1F1F;">
+          <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#EAEEF2;">Today's session</span>
+            <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#5C6E82;">—</span>
+          </div>
+          <div style="height:2px;background:rgba(255,255,255,0.07);"></div>
+          <div style="margin:14px;background:#2F2F2F;border-radius:14px;border:1px solid rgba(190,220,228,0.15);box-shadow:0 8px 24px rgba(0,0,0,0.3);padding:40px 20px 32px;text-align:center;display:flex;flex-direction:column;align-items:center;">
+            <div style="width:52px;height:52px;border-radius:14px;background:rgba(190,220,228,0.1);border:1px solid rgba(190,220,228,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:22px;">🗺</div>
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;color:#EAEEF2;letter-spacing:-0.02em;margin-bottom:6px;line-height:1.2;">No roadmap yet.</div>
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;color:#7E8FA0;line-height:1.55;margin-bottom:20px;max-width:200px;">Build your first learning plan and Catalyst will generate your session automatically.</div>
+            <button style="font-family:'Plus Jakarta Sans',sans-serif;height:38px;padding:0 20px;background:#46675D;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Build my roadmap →</button>
+            <div style="margin-top:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;color:#5C6E82;">takes under 2 minutes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="compare-note">
+      <div class="compare-note-item"><strong>Why it works</strong>The cleanest grotesque available. Optically perfect stroke weights, excellent kerning out of the box. Every weight between 300 and 800 is usable in the product. The go-to for apps that want to feel serious.</div>
+      <div class="compare-note-item"><strong>Light surface verdict</strong>Flawless on white. Jakarta was designed for both surfaces — the contrast ratios feel intentional at every size. The safest choice for a future light mode.</div>
+      <div class="compare-note-item"><strong>Best for</strong>If you want the product to feel like it belongs on the App Store's "Apps We Love" — this is the font. Not the most surprising, but executed at the highest possible level.</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     DIRECTION C — SYNE
+════════════════════════════════════════════ -->
+<section class="direction" id="dir-c">
+  <div class="direction-meta">
+    <div>
+      <div class="direction-num">Direction C / 04</div>
+      <div class="direction-name" style="font-family:'Syne',sans-serif;letter-spacing:-0.04em;font-weight:800;">Syne</div>
+      <p class="direction-desc" style="font-family:'Syne',sans-serif;">The designer's grotesque. Syne has an architectural eccentricity — the g, a, and t are slightly constructed, giving it a presence at display sizes that most grotesques lack. At body size it reads clean. At 72px it reads like a brand statement.</p>
+      <div class="direction-tags">
+        <span class="tag">Architectural</span>
+        <span class="tag">Distinctive character</span>
+        <span class="tag">Display-first</span>
+        <span class="tag">Technical confidence</span>
+      </div>
+    </div>
+    <div class="font-specimen">
+      <div class="specimen-label">Font specimen <span class="specimen-pair">Syne + Geist Mono</span></div>
+      <div class="specimen-display" style="font-family:'Syne',sans-serif;font-size:46px;font-weight:800;letter-spacing:-0.04em;margin-bottom:8px;">Memory<br>Management.</div>
+      <div class="specimen-display" style="font-family:'Syne',sans-serif;font-size:28px;font-weight:400;letter-spacing:-0.02em;color:#7E8FA0;margin-bottom:12px;">Regular · 400</div>
+      <div class="specimen-body" style="font-family:'Syne',sans-serif;font-size:14px;">Based on your last 3 sessions — accuracy on memory topics dropped to 58%.</div>
+      <div class="specimen-abc" style="font-family:'Syne',sans-serif;">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk 0123456789</div>
+      <div style="margin-top:8px;font-family:'Geist Mono',monospace;font-size:12px;color:#46675D;letter-spacing:0.04em;">CAT-007 · Bloom's 3–4 · IRT θ 1.2</div>
+    </div>
+  </div>
+
+  <div class="mockup-grid">
+    <div>
+      <div class="mockup-col-label">Dark surface</div>
+      <div class="phone" style="font-family:'Syne',sans-serif;">
+        <div style="background:#1F1F1F;">
+          <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:#EAEEF2;letter-spacing:-0.02em;">Today's session</span>
+            <span style="font-family:'Geist Mono',monospace;font-size:11px;color:#46675D;letter-spacing:0.06em;">OS</span>
+          </div>
+          <div style="height:2px;background:rgba(255,255,255,0.07);"><div style="height:100%;width:35%;background:#D3C182;"></div></div>
+          <div style="margin:14px;background:#2F2F2F;border-radius:14px;border:1px solid rgba(190,220,228,0.15);overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+            <div style="padding:18px 16px 14px;">
+              <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#EAEEF2;line-height:1.22;letter-spacing:-0.03em;margin-bottom:6px;">Memory Management needs you today.</div>
+              <div style="font-family:'Syne',sans-serif;font-size:12px;color:#7E8FA0;line-height:1.55;margin-bottom:14px;">Based on your last 3 sessions — accuracy on memory topics dropped to 58%.</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;">
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:4px 10px;border-radius:99px;background:rgba(211,193,130,0.14);color:#D3C182;border:1px solid rgba(211,193,130,0.25);letter-spacing:0.02em;">14 q</span>
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:4px 10px;border-radius:99px;background:rgba(190,220,228,0.12);color:#BEDCE4;border:1px solid rgba(190,220,228,0.22);letter-spacing:0.02em;">~18 min</span>
+              </div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;">
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,0.05);color:#7E8FA0;border:1px solid rgba(255,255,255,0.08);letter-spacing:0.02em;">B3–4</span>
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,0.05);color:#7E8FA0;border:1px solid rgba(255,255,255,0.08);letter-spacing:0.02em;">ZPD</span>
+              </div>
+              <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 0 12px;"></div>
+              <div style="font-family:'Geist Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#5C6E82;margin-bottom:8px;">Focus areas</div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(15,20,25,0.6);border-radius:9px;margin-bottom:5px;border:1px solid rgba(255,255,255,0.04);">
+                <div style="width:3px;background:#DC5050;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;color:#EAEEF2;letter-spacing:-0.02em;margin-bottom:1px;">Virtual Memory & Paging</div><div style="font-family:'Geist Mono',monospace;font-size:10px;color:#5C6E82;letter-spacing:0.02em;">6q · weakest</div></div>
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:3px 8px;border-radius:99px;background:rgba(220,80,80,0.15);color:#E8847A;letter-spacing:0.02em;">58%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(15,20,25,0.6);border-radius:9px;margin-bottom:5px;border:1px solid rgba(255,255,255,0.04);">
+                <div style="width:3px;background:#BEDCE4;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;color:#EAEEF2;letter-spacing:-0.02em;margin-bottom:1px;">Segmentation</div><div style="font-family:'Geist Mono',monospace;font-size:10px;color:#5C6E82;letter-spacing:0.02em;">5q · new</div></div>
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,0.07);color:#7E8FA0;border:1px solid rgba(255,255,255,0.1);letter-spacing:0.02em;">NEW</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(15,20,25,0.6);border-radius:9px;border:1px solid rgba(255,255,255,0.04);">
+                <div style="width:3px;background:#46675D;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;color:#EAEEF2;letter-spacing:-0.02em;margin-bottom:1px;">Demand Paging</div><div style="font-family:'Geist Mono',monospace;font-size:10px;color:#5C6E82;letter-spacing:0.02em;">3q · review</div></div>
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:3px 8px;border-radius:99px;background:rgba(70,103,93,0.25);color:#7ABFAE;letter-spacing:0.02em;">↻</span>
+              </div>
+            </div>
+            <button style="font-family:'Syne',sans-serif;width:calc(100% - 28px);margin:0 14px 14px;height:44px;background:#46675D;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;letter-spacing:-0.02em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;">Begin session →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mockup-col-label">Light surface</div>
+      <div class="phone phone-light" style="font-family:'Syne',sans-serif;">
+        <div style="background:#F2F2F0;">
+          <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(0,0,0,0.07);">
+            <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:#111111;letter-spacing:-0.02em;">Today's session</span>
+            <span style="font-family:'Geist Mono',monospace;font-size:11px;color:#46675D;letter-spacing:0.06em;">OS</span>
+          </div>
+          <div style="height:2px;background:rgba(0,0,0,0.07);"><div style="height:100%;width:35%;background:#D3C182;"></div></div>
+          <div style="margin:14px;background:#FFFFFF;border-radius:14px;border:1px solid rgba(0,0,0,0.08);overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.06);">
+            <div style="padding:18px 16px 14px;">
+              <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#111111;line-height:1.22;letter-spacing:-0.03em;margin-bottom:6px;">Memory Management needs you today.</div>
+              <div style="font-family:'Syne',sans-serif;font-size:12px;color:#787878;line-height:1.55;margin-bottom:14px;">Based on your last 3 sessions — accuracy on memory topics dropped to 58%.</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;">
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:4px 10px;border-radius:99px;background:rgba(211,193,130,0.2);color:#7A6520;border:1px solid rgba(211,193,130,0.3);letter-spacing:0.02em;">14 q</span>
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:4px 10px;border-radius:99px;background:rgba(70,103,93,0.1);color:#46675D;border:1px solid rgba(70,103,93,0.2);letter-spacing:0.02em;">~18 min</span>
+              </div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;">
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:4px 10px;border-radius:99px;background:rgba(0,0,0,0.05);color:#787878;border:1px solid rgba(0,0,0,0.09);letter-spacing:0.02em;">B3–4</span>
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:4px 10px;border-radius:99px;background:rgba(0,0,0,0.05);color:#787878;border:1px solid rgba(0,0,0,0.09);letter-spacing:0.02em;">ZPD</span>
+              </div>
+              <div style="height:1px;background:rgba(0,0,0,0.06);margin:0 0 12px;"></div>
+              <div style="font-family:'Geist Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#BBBBBB;margin-bottom:8px;">Focus areas</div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F5F4F2;border-radius:9px;margin-bottom:5px;">
+                <div style="width:3px;background:#DC5050;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;color:#111111;letter-spacing:-0.02em;margin-bottom:1px;">Virtual Memory & Paging</div><div style="font-family:'Geist Mono',monospace;font-size:10px;color:#AAAAAA;letter-spacing:0.02em;">6q · weakest</div></div>
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:3px 8px;border-radius:99px;background:rgba(220,80,80,0.1);color:#CC4444;letter-spacing:0.02em;">58%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F5F4F2;border-radius:9px;margin-bottom:5px;">
+                <div style="width:3px;background:#BEDCE4;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;color:#111111;letter-spacing:-0.02em;margin-bottom:1px;">Segmentation</div><div style="font-family:'Geist Mono',monospace;font-size:10px;color:#AAAAAA;letter-spacing:0.02em;">5q · new</div></div>
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:3px 8px;border-radius:99px;background:rgba(0,0,0,0.06);color:#AAAAAA;border:1px solid rgba(0,0,0,0.09);letter-spacing:0.02em;">NEW</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F5F4F2;border-radius:9px;">
+                <div style="width:3px;background:#46675D;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;color:#111111;letter-spacing:-0.02em;margin-bottom:1px;">Demand Paging</div><div style="font-family:'Geist Mono',monospace;font-size:10px;color:#AAAAAA;letter-spacing:0.02em;">3q · review</div></div>
+                <span style="font-family:'Geist Mono',monospace;font-size:10px;font-weight:500;padding:3px 8px;border-radius:99px;background:rgba(70,103,93,0.12);color:#46675D;letter-spacing:0.02em;">↻</span>
+              </div>
+            </div>
+            <button style="font-family:'Syne',sans-serif;width:calc(100% - 28px);margin:0 14px 14px;height:44px;background:#46675D;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;letter-spacing:-0.02em;cursor:pointer;">Begin session →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mockup-col-label">Empty state</div>
+      <div class="phone" style="font-family:'Syne',sans-serif;">
+        <div style="background:#1F1F1F;">
+          <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:#EAEEF2;letter-spacing:-0.02em;">Today's session</span>
+            <span style="font-family:'Geist Mono',monospace;font-size:10px;color:#5C6E82;letter-spacing:0.08em;">—</span>
+          </div>
+          <div style="height:2px;background:rgba(255,255,255,0.07);"></div>
+          <div style="margin:14px;background:#2F2F2F;border-radius:14px;border:1px solid rgba(190,220,228,0.15);box-shadow:0 8px 24px rgba(0,0,0,0.3);padding:40px 20px 32px;text-align:center;display:flex;flex-direction:column;align-items:center;">
+            <div style="width:52px;height:52px;border-radius:10px;background:rgba(211,193,130,0.1);border:1px solid rgba(211,193,130,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:22px;">🗺</div>
+            <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#EAEEF2;letter-spacing:-0.03em;margin-bottom:6px;line-height:1.15;">No roadmap yet.</div>
+            <div style="font-family:'Syne',sans-serif;font-size:12px;color:#7E8FA0;line-height:1.55;margin-bottom:20px;max-width:200px;">Build your first learning plan and Catalyst will generate your session automatically.</div>
+            <button style="font-family:'Syne',sans-serif;height:38px;padding:0 20px;background:#46675D;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;letter-spacing:-0.02em;cursor:pointer;">Build my roadmap →</button>
+            <div style="margin-top:14px;font-family:'Geist Mono',monospace;font-size:10px;color:#5C6E82;letter-spacing:0.06em;">~2 min setup</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="compare-note">
+      <div class="compare-note-item"><strong>Why it works</strong>The Geist Mono pairing for metadata is the secret weapon here. Data (question counts, Bloom levels, IRT values) reads as intentionally technical — like the app is built on something real. Syne headlines + Geist Mono labels is a premium two-font system.</div>
+      <div class="compare-note-item"><strong>Light surface verdict</strong>Strong. The warm grey (#F2F2F0) background matches Syne's slightly warm undertone. Better on warm surfaces than pure white.</div>
+      <div class="compare-note-item"><strong>Best for</strong>Students who are already CS-literate and respond to apps that feel engineered, not just designed. Signals sophistication and technical credibility simultaneously.</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     DIRECTION D — FRAUNCES + URBANIST
+════════════════════════════════════════════ -->
+<section class="direction" id="dir-d">
+  <div class="direction-meta">
+    <div>
+      <div class="direction-num">Direction D / 04</div>
+      <div class="direction-name" style="font-family:'Fraunces',serif;letter-spacing:-0.03em;font-weight:600;">Fraunces<br><span style="font-family:'Urbanist',sans-serif;font-size:clamp(18px,2vw,28px);font-weight:300;letter-spacing:-0.01em;color:#7E8FA0;">+ Urbanist</span></div>
+      <p class="direction-desc" style="font-family:'Urbanist',sans-serif;">The unexpected warmth play. Fraunces is a variable "wonky" serif — it has an optical-size axis and a "wonk" axis that gives display text a slightly playful, artisan quality. Paired with Urbanist (a geometric humanist sans) the system reads as warm, trustworthy, and genuinely different from every other edtech product.</p>
+      <div class="direction-tags">
+        <span class="tag">Warm authority</span>
+        <span class="tag">Serif display</span>
+        <span class="tag">Humanist body</span>
+        <span class="tag">Most distinctive</span>
+      </div>
+    </div>
+    <div class="font-specimen">
+      <div class="specimen-label">Font specimen <span class="specimen-pair">Fraunces (display) + Urbanist (UI)</span></div>
+      <div class="specimen-display" style="font-family:'Fraunces',serif;font-size:42px;font-weight:600;letter-spacing:-0.03em;margin-bottom:8px;font-style:italic;">Memory<br>Management.</div>
+      <div class="specimen-display" style="font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:-0.02em;color:#7E8FA0;margin-bottom:12px;">Regular · 300</div>
+      <div class="specimen-body" style="font-family:'Urbanist',sans-serif;font-size:14px;font-weight:400;">Based on your last 3 sessions — you're solid on scheduling but accuracy on memory topics dropped to 58%.</div>
+      <div class="specimen-abc" style="font-family:'Urbanist',sans-serif;font-weight:400;">Aa Bb Cc Dd Ee Ff Gg Hh Ii 0123456789</div>
+      <div style="margin-top:6px;font-family:'Fraunces',serif;font-size:13px;color:#D3C182;font-style:italic;font-weight:400;">Catalyst — Learning that compounds.</div>
+    </div>
+  </div>
+
+  <div class="mockup-grid">
+    <div>
+      <div class="mockup-col-label">Dark surface</div>
+      <div class="phone" style="font-family:'Urbanist',sans-serif;">
+        <div style="background:#1F1F1F;">
+          <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-family:'Urbanist',sans-serif;font-size:14px;font-weight:600;color:#EAEEF2;letter-spacing:0.01em;">Today's session</span>
+            <span style="font-family:'Urbanist',sans-serif;font-size:13px;color:#5C6E82;font-weight:400;">OS</span>
+          </div>
+          <div style="height:2px;background:rgba(255,255,255,0.07);"><div style="height:100%;width:35%;background:#D3C182;"></div></div>
+          <div style="margin:14px;background:#2F2F2F;border-radius:14px;border:1px solid rgba(190,220,228,0.15);overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+            <div style="padding:18px 16px 14px;">
+              <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:600;font-style:italic;color:#EAEEF2;line-height:1.22;letter-spacing:-0.02em;margin-bottom:6px;">Memory Management needs you today.</div>
+              <div style="font-family:'Urbanist',sans-serif;font-size:12px;color:#7E8FA0;line-height:1.6;margin-bottom:14px;font-weight:400;">Based on your last 3 sessions — accuracy on memory topics dropped to 58%.</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;">
+                <span style="font-family:'Urbanist',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(211,193,130,0.14);color:#D3C182;border:1px solid rgba(211,193,130,0.25);letter-spacing:0.02em;">14 questions</span>
+                <span style="font-family:'Urbanist',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(190,220,228,0.12);color:#BEDCE4;border:1px solid rgba(190,220,228,0.22);letter-spacing:0.02em;">~18 min</span>
+              </div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;">
+                <span style="font-family:'Urbanist',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,0.05);color:#7E8FA0;border:1px solid rgba(255,255,255,0.08);letter-spacing:0.02em;">Bloom's 3–4</span>
+                <span style="font-family:'Urbanist',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,0.05);color:#7E8FA0;border:1px solid rgba(255,255,255,0.08);letter-spacing:0.02em;">Your ZPD</span>
+              </div>
+              <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 0 12px;"></div>
+              <div style="font-family:'Urbanist',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#5C6E82;margin-bottom:8px;">Focus areas</div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(15,20,25,0.6);border-radius:9px;margin-bottom:5px;border:1px solid rgba(255,255,255,0.04);">
+                <div style="width:3px;background:#DC5050;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Urbanist',sans-serif;font-size:12px;font-weight:600;color:#EAEEF2;margin-bottom:1px;letter-spacing:0.01em;">Virtual Memory & Paging</div><div style="font-family:'Urbanist',sans-serif;font-size:10px;color:#5C6E82;letter-spacing:0.02em;">6 questions · weakest subtopic</div></div>
+                <span style="font-family:'Urbanist',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(220,80,80,0.15);color:#E8847A;letter-spacing:0.03em;">58%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(15,20,25,0.6);border-radius:9px;margin-bottom:5px;border:1px solid rgba(255,255,255,0.04);">
+                <div style="width:3px;background:#BEDCE4;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Urbanist',sans-serif;font-size:12px;font-weight:600;color:#EAEEF2;margin-bottom:1px;letter-spacing:0.01em;">Segmentation</div><div style="font-family:'Urbanist',sans-serif;font-size:10px;color:#5C6E82;letter-spacing:0.02em;">5 questions · new concept</div></div>
+                <span style="font-family:'Urbanist',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,0.07);color:#7E8FA0;border:1px solid rgba(255,255,255,0.1);letter-spacing:0.03em;">New</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(15,20,25,0.6);border-radius:9px;border:1px solid rgba(255,255,255,0.04);">
+                <div style="width:3px;background:#46675D;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Urbanist',sans-serif;font-size:12px;font-weight:600;color:#EAEEF2;margin-bottom:1px;letter-spacing:0.01em;">Demand Paging</div><div style="font-family:'Urbanist',sans-serif;font-size:10px;color:#5C6E82;letter-spacing:0.02em;">3 questions · review due</div></div>
+                <span style="font-family:'Urbanist',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(70,103,93,0.25);color:#7ABFAE;letter-spacing:0.03em;">Review</span>
+              </div>
+            </div>
+            <button style="font-family:'Urbanist',sans-serif;width:calc(100% - 28px);margin:0 14px 14px;height:44px;background:#46675D;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;letter-spacing:0.02em;cursor:pointer;">Begin session →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mockup-col-label">Light surface</div>
+      <div class="phone phone-light" style="font-family:'Urbanist',sans-serif;">
+        <div style="background:#F7F5F0;">
+          <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(0,0,0,0.07);">
+            <span style="font-family:'Urbanist',sans-serif;font-size:14px;font-weight:600;color:#1A1A1A;letter-spacing:0.01em;">Today's session</span>
+            <span style="font-family:'Urbanist',sans-serif;font-size:13px;color:#AAAAAA;">OS</span>
+          </div>
+          <div style="height:2px;background:rgba(0,0,0,0.07);"><div style="height:100%;width:35%;background:#D3C182;"></div></div>
+          <div style="margin:14px;background:#FFFFFF;border-radius:14px;border:1px solid rgba(0,0,0,0.08);overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.08);">
+            <div style="padding:18px 16px 14px;">
+              <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:600;font-style:italic;color:#1A1A1A;line-height:1.22;letter-spacing:-0.02em;margin-bottom:6px;">Memory Management needs you today.</div>
+              <div style="font-family:'Urbanist',sans-serif;font-size:12px;color:#787878;line-height:1.6;margin-bottom:14px;">Based on your last 3 sessions — accuracy on memory topics dropped to 58%.</div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;">
+                <span style="font-family:'Urbanist',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(211,193,130,0.2);color:#7A6520;border:1px solid rgba(211,193,130,0.3);letter-spacing:0.02em;">14 questions</span>
+                <span style="font-family:'Urbanist',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(70,103,93,0.1);color:#46675D;border:1px solid rgba(70,103,93,0.2);letter-spacing:0.02em;">~18 min</span>
+              </div>
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;">
+                <span style="font-family:'Urbanist',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(0,0,0,0.05);color:#787878;border:1px solid rgba(0,0,0,0.09);letter-spacing:0.02em;">Bloom's 3–4</span>
+                <span style="font-family:'Urbanist',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(0,0,0,0.05);color:#787878;border:1px solid rgba(0,0,0,0.09);letter-spacing:0.02em;">Your ZPD</span>
+              </div>
+              <div style="height:1px;background:rgba(0,0,0,0.06);margin:0 0 12px;"></div>
+              <div style="font-family:'Urbanist',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#BBBBBB;margin-bottom:8px;">Focus areas</div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F5F2EC;border-radius:9px;margin-bottom:5px;">
+                <div style="width:3px;background:#DC5050;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Urbanist',sans-serif;font-size:12px;font-weight:600;color:#1A1A1A;margin-bottom:1px;letter-spacing:0.01em;">Virtual Memory & Paging</div><div style="font-family:'Urbanist',sans-serif;font-size:10px;color:#AAAAAA;letter-spacing:0.02em;">6 questions · weakest subtopic</div></div>
+                <span style="font-family:'Urbanist',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(220,80,80,0.1);color:#CC4444;letter-spacing:0.03em;">58%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F5F2EC;border-radius:9px;margin-bottom:5px;">
+                <div style="width:3px;background:#BEDCE4;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Urbanist',sans-serif;font-size:12px;font-weight:600;color:#1A1A1A;margin-bottom:1px;letter-spacing:0.01em;">Segmentation</div><div style="font-family:'Urbanist',sans-serif;font-size:10px;color:#AAAAAA;letter-spacing:0.02em;">5 questions · new concept</div></div>
+                <span style="font-family:'Urbanist',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(0,0,0,0.06);color:#AAAAAA;border:1px solid rgba(0,0,0,0.09);letter-spacing:0.03em;">New</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F5F2EC;border-radius:9px;">
+                <div style="width:3px;background:#46675D;border-radius:99px;align-self:stretch;min-height:26px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><div style="font-family:'Urbanist',sans-serif;font-size:12px;font-weight:600;color:#1A1A1A;margin-bottom:1px;letter-spacing:0.01em;">Demand Paging</div><div style="font-family:'Urbanist',sans-serif;font-size:10px;color:#AAAAAA;letter-spacing:0.02em;">3 questions · review due</div></div>
+                <span style="font-family:'Urbanist',sans-serif;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(70,103,93,0.12);color:#46675D;letter-spacing:0.03em;">Review</span>
+              </div>
+            </div>
+            <button style="font-family:'Urbanist',sans-serif;width:calc(100% - 28px);margin:0 14px 14px;height:44px;background:#46675D;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;letter-spacing:0.02em;cursor:pointer;">Begin session →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="mockup-col-label">Empty state</div>
+      <div class="phone" style="font-family:'Urbanist',sans-serif;">
+        <div style="background:#1F1F1F;">
+          <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <span style="font-family:'Urbanist',sans-serif;font-size:14px;font-weight:600;color:#EAEEF2;letter-spacing:0.01em;">Today's session</span>
+            <span style="font-family:'Urbanist',sans-serif;font-size:13px;color:#5C6E82;">—</span>
+          </div>
+          <div style="height:2px;background:rgba(255,255,255,0.07);"></div>
+          <div style="margin:14px;background:#2F2F2F;border-radius:14px;border:1px solid rgba(190,220,228,0.15);box-shadow:0 8px 24px rgba(0,0,0,0.3);padding:40px 20px 32px;text-align:center;display:flex;flex-direction:column;align-items:center;">
+            <div style="width:52px;height:52px;border-radius:14px;background:rgba(70,103,93,0.15);border:1px solid rgba(70,103,93,0.25);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:22px;">🌱</div>
+            <div style="font-family:'Fraunces',serif;font-size:17px;font-weight:600;font-style:italic;color:#EAEEF2;letter-spacing:-0.02em;margin-bottom:6px;line-height:1.2;">Nothing here yet.</div>
+            <div style="font-family:'Urbanist',sans-serif;font-size:12px;color:#7E8FA0;line-height:1.6;margin-bottom:20px;max-width:200px;">Build your first roadmap and Catalyst will personalise a session just for you.</div>
+            <button style="font-family:'Urbanist',sans-serif;height:38px;padding:0 20px;background:#46675D;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;letter-spacing:0.02em;cursor:pointer;">Build my roadmap →</button>
+            <div style="margin-top:14px;font-family:'Fraunces',serif;font-style:italic;font-size:12px;color:#5C6E82;font-weight:400;">takes under 2 minutes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="compare-note">
+      <div class="compare-note-item"><strong>Why it works</strong>The italic Fraunces headline creates a distinct moment of warmth that no competitor has. Edtech is overrun with cold, geometric sans-serifs. A serif headline signals confidence and conviction — "we're not trying to look like everyone else."</div>
+      <div class="compare-note-item"><strong>Light surface verdict</strong>Exceptional. The warm parchment (#F7F5F0) background was made for this pairing. Fraunces has an old-book quality that pairs with warm off-whites in a way that cold geometric fonts can't.</div>
+      <div class="compare-note-item"><strong>Best for</strong>The highest risk and highest reward option. If this lands, Catalyst becomes instantly recognisable and genuinely premium. Instrument Serif (already in the design system) is a close cousin — could be used here instead of Fraunces with minimal adjustment.</div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+// Active nav highlighting
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.direction-nav a');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.direction-nav a[href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

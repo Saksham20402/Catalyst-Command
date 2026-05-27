@@ -4,7 +4,7 @@ CATALYST:MANIFEST — tickets.html
 PURPOSE   Canonical ticket store + Kanban board.
           ALL ticket data lives here. Edit here first, then sync index.html.
 UPDATED   2026-05-25
-NEXT ID   SCR-004 / DS-009 / AND-004
+NEXT ID   SCR-004 / DS-012 / AND-006
 
 FEATURES
           Code Snippet Ingestion — scraping, storage, rendering of code MCQs
@@ -27,9 +27,9 @@ TICKET SCHEMA
   created     "YYYY-MM-DD"
   updated     "YYYY-MM-DD"
 
-CURRENT TICKET INDEX (26 tickets — update when tickets change)
+CURRENT TICKET INDEX (31 tickets — update when tickets change)
   CAT-001  backend    done         critical  Design code snippet schema
-  CAT-002  backend    in-progress  high      Build snippet ingestion endpoint
+  CAT-002  backend    done         high      Build snippet ingestion endpoint
   CAT-003  backend    backlog      high      Adapt Qdrant for code embeddings
   CAT-004  backend    backlog      medium    Snippet bulk ingestion CLI
   CAT-005  ai-agents  backlog      critical  Code-aware Groq enrichment prompts
@@ -39,19 +39,19 @@ CURRENT TICKET INDEX (26 tickets — update when tickets change)
   DS-001   backend    done         critical  daily_sessions table migration
   DS-002   backend    done         critical  Per-topic accuracy classifier
   DS-003   backend    done         critical  DailySessionGenerator service
-  DS-004   backend    in-progress  critical  GET /api/sessions/today endpoint
+  DS-004   backend    done         critical  GET /api/sessions/today endpoint
   DS-005   backend    backlog      critical  Session submit endpoint rewrite
   DS-006   backend    backlog      critical  Cold-start seed topics
   DS-007   backend    backlog      high      Deduplicate questions across areas
   DS-008   backend    backlog      high      PATCH session complete endpoint
   AND-001  mobile     backlog      critical  Android roadmap wizard flow
   AND-002  mobile     backlog      critical  Android generating + roadmap reveal
-  AND-003  mobile     in-progress  critical  Android session + explanation panel
+  AND-003  mobile     done         critical  Android session + explanation panel
   ENR-001  backend    done         critical  Enrichment field schema + migrations
   ENR-002  ai-agents  done         critical  Groq enrichment service
   ENR-003  ai-agents  done         critical  Explanation prompt v1
   RM-001   backend    done         critical  Generate roadmap API endpoint
-  SCR-001  pipeline   in-progress  critical  Rich content scraper models
+  SCR-001  pipeline   done         critical  Rich content scraper models
   SCR-002  pipeline   backlog      high      Code snippet extraction from scraper
   SCR-003  pipeline   backlog      high      Image URL extraction from scraper
 
@@ -166,13 +166,16 @@ AFTER EDITING
     }
     .col {
       background: rgba(47,47,47,0.5); border-radius: var(--r);
-      border: 1px solid var(--border); display: flex; flex-direction: column; min-height: 200px;
+      border: 1px solid var(--border); display: flex; flex-direction: column;
+      min-height: 200px; overflow: hidden;
     }
+    .col-scroll { flex: 1; overflow-y: auto; }
     .col-head {
       padding: 16px 18px 14px; display: flex; align-items: center;
       justify-content: space-between; border-bottom: 1px solid var(--border);
-      position: sticky; top: 57px; background: rgba(40,40,40,0.97);
-      backdrop-filter: blur(8px); border-radius: var(--r) var(--r) 0 0; z-index: 10;
+      background: rgba(40,40,40,0.97);
+      backdrop-filter: blur(8px); border-radius: var(--r) var(--r) 0 0;
+      flex-shrink: 0;
     }
     .col-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
     .col-count {
@@ -435,12 +438,12 @@ TICKET SCHEMA (all fields required)
   {
     "id": "CAT-002",
     "title": "Build snippet ingestion endpoint",
-    "description": "POST /api/questions/snippet \u2014 accepts raw code question payload, validates schema, persists to Postgres, enqueues for enrichment.",
+    "description": "Scraper pipeline handles enrichment before Postgres insertion \u2014 question body, answers, and enrichment written atomically by the scraper. Separate ingestion endpoint redundant. Closed.",
     "area": "backend",
-    "status": "in-progress",
+    "status": "done",
     "priority": "high",
     "created": "2026-05-25",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "CAT-003",
@@ -535,12 +538,12 @@ TICKET SCHEMA (all fields required)
   {
     "id": "DS-004",
     "title": "GET /api/sessions/today endpoint",
-    "description": "Reads from daily_sessions cache. Lazy generation on first open. Reshapes payload to spec: wraps weeklyProgress as object, renames topic to topicName, promotes topicHeadline+reason to root, surfaces accuracy on weakness areas, adds isCompleted, strips questions from response.",
+    "description": "GET /api/sessions/today shipped. Reshapes DailySessionGenerator payload to Android spec: weeklyProgress as object, topic\u2192topicName, topicHeadline+reason promoted to root, accuracy surfaced on weakness areas, isCompleted added, questions stripped from response.",
     "area": "backend",
-    "status": "in-progress",
+    "status": "done",
     "priority": "critical",
     "created": "2026-05-18",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "DS-005",
@@ -605,12 +608,12 @@ TICKET SCHEMA (all fields required)
   {
     "id": "AND-003",
     "title": "Android session + explanation panel",
-    "description": "Session: MCQ card, per-question timer (green <60s, yellow <120s, red >=120s), Prev/Skip/Next/See Results nav. Explanation: State A (correct, green tick) and State B (incorrect, red cross), distractor note, bloom+difficulty pill, bookmark optimistic UI, 44dp tap targets.",
+    "description": "Android session screen and explanation panel shipped. Per-question timer (green/yellow/red), Prev/Skip/Next/See Results nav, State A/B explanation panel, distractor note, bookmark optimistic UI, 44dp tap targets. ViewModel and Screen complete.",
     "area": "mobile",
-    "status": "in-progress",
+    "status": "done",
     "priority": "critical",
     "created": "2026-05-13",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "ENR-001",
@@ -655,12 +658,12 @@ TICKET SCHEMA (all fields required)
   {
     "id": "SCR-001",
     "title": "Rich content scraper models",
-    "description": "Frozen dataclass Question with all pipeline fields including code_snippets[] and image_urls[]. to_embedding_input() stub. Collect-all-failures validation. Prerequisite for SCR-002 and SCR-003.",
+    "description": "Frozen dataclass Question with all pipeline fields including code_snippets[] and image_urls[]. to_embedding_input() stub implemented. Collect-all-failures validation. Prerequisite unblocked \u2014 SCR-002 and SCR-003 can proceed.",
     "area": "pipeline",
-    "status": "in-progress",
+    "status": "done",
     "priority": "critical",
     "created": "2026-05-20",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "SCR-002",
@@ -681,6 +684,56 @@ TICKET SCHEMA (all fields required)
     "priority": "high",
     "created": "2026-05-20",
     "updated": "2026-05-26"
+  },
+  {
+    "id": "DS-009",
+    "title": "Session submit endpoint rewrite",
+    "description": "POST /api/sessions/{id}/submit. Nested focus_area_attempts grouped by topic. Server-side correctness recomputation from payload_json \u2014 never trust client is_correct. 422 on unknown question IDs (reject, not skip). 409 idempotency on duplicate submission. Per-topic summary with updated_state using topic_type as previous_state for transition logic. SessionAttempt model for rich audit log alongside Answer rows.",
+    "area": "backend",
+    "status": "in-progress",
+    "priority": "critical",
+    "created": "2026-05-27",
+    "updated": "2026-05-27"
+  },
+  {
+    "id": "DS-010",
+    "title": "Cold-start seed topics fallback",
+    "description": "Day-1 users with zero answer history return empty sessions. When get_topic_accuracy returns all-new topics, seed session from canonical topic list for the subject at difficulty 1-2. Canonical OS list defined. Need equivalent lists for GMAT Quant, GMAT Verbal, CAT Quant, CAT Verbal before those segments launch.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "critical",
+    "created": "2026-05-27",
+    "updated": "2026-05-27"
+  },
+  {
+    "id": "AND-004",
+    "title": "Android roadmap wizard \u2014 subject to reveal",
+    "description": "4-screen wizard: subject selection (single-select chips, custom fallback) \u2192 topic selection (multi-select, API-driven, back preserves selection) \u2192 goal + exam date (stores on user profile, powers countdown) \u2192 diagnostic calibration (3-5 MCQs, skippable). Calls POST /api/roadmaps/generate/ on completion. Navigates to AND-005 generating screen.",
+    "area": "mobile",
+    "status": "backlog",
+    "priority": "critical",
+    "created": "2026-05-27",
+    "updated": "2026-05-27"
+  },
+  {
+    "id": "AND-005",
+    "title": "Android generating animation + roadmap reveal",
+    "description": "Screen 1: full-screen dark canvas (#1F1F1F), animated text messages cycling with fade in/out \u2014 'Analysing your goals', 'Mapping the subject graph', 'Engineering your learning path', 'Calibrating difficulty', 'Almost ready'. Text-only, no spinner. Auto-advances on API response. Screen 2: roadmap reveal \u2014 topic rows (mastered/in-progress/not-started), gold progress bar, exam countdown in header if date set, 'Start first session' CTA.",
+    "area": "mobile",
+    "status": "backlog",
+    "priority": "critical",
+    "created": "2026-05-27",
+    "updated": "2026-05-27"
+  },
+  {
+    "id": "DS-011",
+    "title": "Deduplicate questions across focus areas",
+    "description": "DailySessionGenerator returns same question ID in multiple focus areas when topics share semantically similar questions in Qdrant. Add deduplication step after all Qdrant searches complete \u2014 collect all question IDs across focus areas, remove any appearing more than once (keep in highest-priority focus area: weakness > new > review), then fetch from Postgres. Must run before payload is persisted to daily_sessions.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "high",
+    "created": "2026-05-27",
+    "updated": "2026-05-27"
   }
 ]
 </script>
@@ -725,28 +778,28 @@ TICKET SCHEMA (all fields required)
         <span class="col-title">Backlog</span>
         <span class="col-count" id="cnt-backlog">0</span>
       </div>
-      <div class="col-cards" id="cards-backlog"></div>
+      <div class="col-scroll"><div class="col-cards" id="cards-backlog"></div></div>
     </div>
     <div class="col" id="col-in-progress">
       <div class="col-head">
         <span class="col-title" style="color:var(--blue)">In Progress</span>
         <span class="col-count" id="cnt-in-progress">0</span>
       </div>
-      <div class="col-cards" id="cards-in-progress"></div>
+      <div class="col-scroll"><div class="col-cards" id="cards-in-progress"></div></div>
     </div>
     <div class="col" id="col-review">
       <div class="col-head">
         <span class="col-title" style="color:var(--gold)">Review</span>
         <span class="col-count" id="cnt-review">0</span>
       </div>
-      <div class="col-cards" id="cards-review"></div>
+      <div class="col-scroll"><div class="col-cards" id="cards-review"></div></div>
     </div>
     <div class="col" id="col-done">
       <div class="col-head">
         <span class="col-title" style="color:#7ABFAE">Done</span>
         <span class="col-count" id="cnt-done">0</span>
       </div>
-      <div class="col-cards" id="cards-done"></div>
+      <div class="col-scroll"><div class="col-cards" id="cards-done"></div></div>
     </div>
   </div>
 </div>

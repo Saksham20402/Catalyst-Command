@@ -1,0 +1,1038 @@
+<!--
+CATALYST:MANIFEST — specs/sessions-prd-v1.html
+════════════════════════════════════════════════════════
+PURPOSE   Product Requirements Document — Adaptive Daily Sessions
+          Full sessions flow: home widget → practice → submission → analysis.
+          Written for the engineering team. Combines product vision, technical
+          architecture, API contracts, and implementation guidance in one place.
+
+STATUS    Draft — 2026-05-27
+AUTHOR    Saksham (Head of Product)
+TICKETS   DS-001 (done) DS-002 (done) DS-003 (done) DS-004 (in-progress)
+          DS-005 DS-006 DS-007 DS-008 AND-001 AND-002 AND-003
+════════════════════════════════════════════════════════
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalyst — Sessions Flow PRD v1</title>
+  <style>
+    :root {
+      --bg: #1F1F1F; --card: #2F2F2F; --card2: #353535;
+      --green: #46675D; --blue: #BEDCE4; --gold: #D3C182;
+      --text: #E8E8E8; --muted: #787878; --border: rgba(255,255,255,0.07);
+      --danger: #E8847A; --r: 12px; --r-sm: 8px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(31,31,31,0.96); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px;
+    }
+    .logo { font-size: 13px; font-weight: 800; letter-spacing: 3px; color: var(--green); }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-right a { color: var(--muted); text-decoration: none; font-size: 13px; }
+    .nav-right a:hover { color: var(--text); }
+    .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .pill-draft { background: rgba(211,193,130,0.15); color: var(--gold); }
+    .pill-approved { background: rgba(70,103,93,0.25); color: #7ABFAE; }
+
+    .page { display: flex; min-height: calc(100vh - 56px); }
+    aside {
+      width: 240px; flex-shrink: 0; border-right: 1px solid var(--border);
+      padding: 32px 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto;
+    }
+    .aside-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); padding: 0 24px; margin-bottom: 8px; margin-top: 24px; }
+    .aside-label:first-child { margin-top: 0; }
+    .aside-link { display: block; padding: 7px 24px; font-size: 13px; color: var(--muted); text-decoration: none; border-left: 2px solid transparent; transition: color 0.15s; }
+    .aside-link:hover { color: var(--text); }
+    .aside-link.active { color: var(--text); border-left-color: var(--green); }
+
+    main { flex: 1; padding: 48px 52px 100px; max-width: 980px; overflow-x: hidden; }
+
+    .ds-section { margin-bottom: 64px; scroll-margin-top: 72px; }
+    .section-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--green); margin-bottom: 8px; }
+    h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.2px; margin-bottom: 6px; }
+    h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; margin-top: 28px; }
+    h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--blue); }
+    .section-desc { font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 28px; max-width: 640px; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+    p { font-size: 14px; line-height: 1.8; color: var(--muted); margin-bottom: 16px; }
+    strong { color: var(--text); font-weight: 600; }
+    code { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--blue); background: rgba(190,220,228,0.08); padding: 1px 5px; border-radius: 3px; }
+
+    /* META */
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 32px; }
+    .meta-cell { background: var(--card); padding: 16px 20px; }
+    .meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 4px; }
+    .meta-val { font-size: 14px; font-weight: 600; }
+    .meta-val.mono { font-family: 'SF Mono', monospace; font-size: 12px; color: var(--blue); font-weight: 400; }
+
+    /* CALLOUT BOXES */
+    .callout { border-radius: var(--r-sm); padding: 18px 20px; margin-bottom: 20px; border-left: 3px solid; }
+    .callout-vision { background: rgba(70,103,93,0.1); border-color: var(--green); }
+    .callout-warning { background: rgba(232,132,122,0.08); border-color: var(--danger); }
+    .callout-info { background: rgba(190,220,228,0.07); border-color: var(--blue); }
+    .callout-gold { background: rgba(211,193,130,0.08); border-color: var(--gold); }
+    .callout-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+    .callout-vision .callout-title { color: var(--green); }
+    .callout-warning .callout-title { color: var(--danger); }
+    .callout-info .callout-title { color: var(--blue); }
+    .callout-gold .callout-title { color: var(--gold); }
+    .callout p { margin-bottom: 0; }
+
+    /* FLOW DIAGRAM */
+    .flow { display: flex; flex-direction: column; gap: 2px; margin: 24px 0; }
+    .flow-row { display: flex; align-items: stretch; gap: 0; }
+    .flow-node {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--r-sm);
+      padding: 16px 20px; flex: 1; position: relative;
+    }
+    .flow-node.green { background: rgba(70,103,93,0.15); border-color: rgba(70,103,93,0.4); }
+    .flow-node.blue { background: rgba(190,220,228,0.07); border-color: rgba(190,220,228,0.2); }
+    .flow-node.gold { background: rgba(211,193,130,0.07); border-color: rgba(211,193,130,0.2); }
+    .flow-node-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .flow-node-sub { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .flow-node-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .flow-node.green .flow-node-tag { color: var(--green); }
+    .flow-node.blue .flow-node-tag { color: var(--blue); }
+    .flow-node.gold .flow-node-tag { color: var(--gold); }
+    .flow-arrow { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 18px; padding: 4px 0; }
+
+    /* TICKET LIST */
+    .ticket-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+    .ticket-item { display: flex; align-items: center; gap: 12px; background: var(--card); border-radius: var(--r-sm); padding: 12px 16px; border: 1px solid var(--border); }
+    .ticket-id-badge { font-family: 'SF Mono', monospace; font-size: 11px; background: rgba(190,220,228,0.1); color: var(--blue); padding: 2px 8px; border-radius: 4px; flex-shrink: 0; }
+    .ticket-title-text { font-size: 13px; font-weight: 500; flex: 1; }
+    .ticket-status { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; padding: 3px 8px; border-radius: 4px; }
+    .s-done { background: rgba(70,103,93,0.25); color: #7ABFAE; }
+    .s-progress { background: rgba(190,220,228,0.13); color: var(--blue); }
+    .s-backlog { background: rgba(255,255,255,0.07); color: var(--muted); }
+
+    /* API SPEC */
+    .api-block { background: #141414; border-radius: var(--r-sm); border: 1px solid var(--border); overflow: hidden; margin: 16px 0; }
+    .api-block-head { padding: 10px 16px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; font-size: 12px; }
+    .method { font-family: 'SF Mono', monospace; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+    .m-get { background: rgba(70,103,93,0.3); color: var(--green); }
+    .m-post { background: rgba(190,220,228,0.15); color: var(--blue); }
+    .m-patch { background: rgba(211,193,130,0.15); color: var(--gold); }
+    .api-path { font-family: 'SF Mono', monospace; font-size: 12px; color: var(--text); }
+    .api-block pre { padding: 16px; font-family: 'SF Mono', monospace; font-size: 12px; color: #B8C4CC; line-height: 1.7; overflow-x: auto; }
+    .api-block pre .k { color: var(--blue); }
+    .api-block pre .s { color: #98C379; }
+    .api-block pre .n { color: var(--gold); }
+    .api-block pre .c { color: #5C6370; font-style: italic; }
+
+    /* ACCURACY TABLE */
+    .table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+    .table th { text-align: left; padding: 10px 14px; background: var(--card); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; }
+    .table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--muted); }
+    .table tr:last-child td { border-bottom: none; }
+    .table td:first-child { color: var(--text); font-weight: 500; }
+    .pill { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .pill-weak { background: rgba(232,132,122,0.15); color: var(--danger); }
+    .pill-new { background: rgba(190,220,228,0.12); color: var(--blue); }
+    .pill-review { background: rgba(211,193,130,0.12); color: var(--gold); }
+    .pill-mastered { background: rgba(70,103,93,0.2); color: #7ABFAE; }
+
+    /* USER QUOTE */
+    .quote { background: var(--card); border-left: 3px solid var(--green); border-radius: 0 var(--r-sm) var(--r-sm) 0; padding: 16px 20px; margin: 16px 0; }
+    .quote-text { font-size: 14px; line-height: 1.7; color: var(--text); font-style: italic; margin-bottom: 8px; }
+    .quote-attr { font-size: 12px; color: var(--muted); }
+
+    /* STAT CARDS */
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+    .stat-card { background: var(--card); border-radius: var(--r-sm); padding: 20px; border: 1px solid var(--border); text-align: center; }
+    .stat-num { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 4px; }
+    .stat-label { font-size: 12px; color: var(--muted); }
+
+    /* HISTORY */
+    .history-list { display: flex; flex-direction: column; }
+    .history-item { display: flex; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .history-item:last-child { border-bottom: none; }
+    .history-ver { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--blue); width: 40px; flex-shrink: 0; margin-top: 2px; }
+    .history-date { color: var(--muted); width: 100px; flex-shrink: 0; font-size: 12px; margin-top: 2px; }
+    .history-body { flex: 1; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    /* PHONE MOCKUPS */
+    .screens-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 24px; margin: 24px 0; }
+    .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .phone-label { font-size: 11px; color: var(--muted); text-align: center; }
+    .phone {
+      width: 180px; background: #0A0A0A; border-radius: 24px;
+      border: 5px solid #3A3A3A; overflow: hidden;
+      box-shadow: 0 16px 32px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.06);
+    }
+    .ph-status { height: 30px; background: #0A0A0A; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.8); }
+    .ph-screen { background: #111; min-height: 340px; padding: 10px; }
+    .ph-bar { height: 18px; background: #0A0A0A; display: flex; align-items: center; justify-content: center; }
+    .ph-home { width: 60px; height: 3px; background: rgba(255,255,255,0.25); border-radius: 2px; }
+
+    /* mock UI elements */
+    .mock-header { background: #1F1F1F; padding: 8px 10px; border-radius: 6px; margin-bottom: 8px; }
+    .mock-h-title { font-size: 9px; font-weight: 700; color: #E8E8E8; margin-bottom: 2px; }
+    .mock-h-sub { font-size: 7px; color: #787878; }
+    .mock-card { background: #2F2F2F; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.07); }
+    .mock-eyebrow { font-size: 6px; text-transform: uppercase; letter-spacing: 1px; color: #46675D; margin-bottom: 3px; font-weight: 700; }
+    .mock-title { font-size: 9px; font-weight: 700; color: #E8E8E8; margin-bottom: 3px; }
+    .mock-sub { font-size: 7px; color: #787878; line-height: 1.4; }
+    .mock-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+    .mock-pill { font-size: 6px; font-weight: 700; padding: 2px 5px; border-radius: 3px; }
+    .mp-weak { background: rgba(232,132,122,0.2); color: #E8847A; }
+    .mp-new { background: rgba(190,220,228,0.15); color: #BEDCE4; }
+    .mp-review { background: rgba(211,193,130,0.15); color: #D3C182; }
+    .mock-btn { background: #46675D; color: white; font-size: 7px; font-weight: 700; padding: 5px 0; border-radius: 5px; text-align: center; margin-top: 6px; }
+    .mock-progress { height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+    .mock-progress-fill { height: 100%; border-radius: 2px; background: #D3C182; }
+    .mock-q { font-size: 8px; color: #E8E8E8; line-height: 1.5; margin-bottom: 6px; }
+    .mock-opt { background: #252525; border-radius: 4px; padding: 5px 7px; margin-bottom: 3px; font-size: 7px; color: #787878; border: 1px solid rgba(255,255,255,0.06); }
+    .mock-opt.correct { background: rgba(70,103,93,0.25); border-color: rgba(70,103,93,0.5); color: #7ABFAE; }
+    .mock-opt.wrong { background: rgba(232,132,122,0.15); border-color: rgba(232,132,122,0.3); color: #E8847A; }
+    .mock-expl { background: rgba(70,103,93,0.12); border: 1px solid rgba(70,103,93,0.25); border-radius: 5px; padding: 6px; margin-top: 4px; font-size: 7px; color: #BEDCE4; line-height: 1.5; }
+    .mock-timer { font-size: 10px; font-weight: 700; color: #7ABFAE; }
+    .mock-timer.yellow { color: #D3C182; }
+    .mock-timer.red { color: #E8847A; }
+    .mock-analysis { background: #252525; border-radius: 6px; padding: 7px; margin-bottom: 5px; }
+    .mock-analysis-title { font-size: 8px; font-weight: 700; color: #E8E8E8; margin-bottom: 4px; }
+    .mock-bar-wrap { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+    .mock-bar-label { font-size: 6px; color: #787878; width: 40px; flex-shrink: 0; }
+    .mock-bar-bg { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+    .mock-bar-fill { height: 100%; border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">CATALYST</span>
+  <div class="nav-right">
+    <a href="../specs/index.html">← All Specs</a>
+    <a href="../tickets.html">Tickets</a>
+    <span class="status-pill pill-draft">Draft · v1.0</span>
+  </div>
+</nav>
+
+<div class="page">
+  <aside>
+    <div class="aside-label">Product</div>
+    <a class="aside-link active" href="#overview">Overview</a>
+    <a class="aside-link" href="#problem">The Problem</a>
+    <a class="aside-link" href="#vision">Vision</a>
+    <a class="aside-link" href="#users">Who It's For</a>
+
+    <div class="aside-label">Feature</div>
+    <a class="aside-link" href="#flow">Full Flow</a>
+    <a class="aside-link" href="#screens">Screen-by-Screen</a>
+    <a class="aside-link" href="#session-widget">Today Widget</a>
+    <a class="aside-link" href="#practice">Practice Session</a>
+    <a class="aside-link" href="#explanation">Explanation Panel</a>
+    <a class="aside-link" href="#analysis">Post-Session Analysis</a>
+
+    <div class="aside-label">Engineering</div>
+    <a class="aside-link" href="#architecture">Architecture</a>
+    <a class="aside-link" href="#apis">API Contracts</a>
+    <a class="aside-link" href="#accuracy">Accuracy Classifier</a>
+    <a class="aside-link" href="#generator">Session Generator</a>
+    <a class="aside-link" href="#submission">Submission Logic</a>
+
+    <div class="aside-label">Reference</div>
+    <a class="aside-link" href="#tickets">Tickets</a>
+    <a class="aside-link" href="#decisions">Decisions Log</a>
+    <a class="aside-link" href="#history">History</a>
+  </aside>
+
+  <main>
+
+    <!-- ══ OVERVIEW ══════════════════════════════════════════════ -->
+    <section class="ds-section" id="overview">
+      <div class="section-eyebrow">PRD · Sessions Flow</div>
+      <h2>Adaptive Daily Sessions</h2>
+      <p class="section-desc">
+        The core learning loop of Catalyst. Every day, every student gets a session built specifically for
+        them — targeting their weak spots, introducing new concepts at the right time, and reinforcing what
+        they've already learned before it fades. This document is the single source of truth for the entire
+        sessions feature: what it does, why it works, and how to build it.
+      </p>
+
+      <div class="meta-grid">
+        <div class="meta-cell"><div class="meta-label">Feature</div><div class="meta-val">Adaptive Daily Sessions</div></div>
+        <div class="meta-cell"><div class="meta-label">Status</div><div class="meta-val">In Development</div></div>
+        <div class="meta-cell"><div class="meta-label">Version</div><div class="meta-val">v1.0</div></div>
+        <div class="meta-cell"><div class="meta-label">Platform</div><div class="meta-val">Android · iOS · Web</div></div>
+        <div class="meta-cell"><div class="meta-label">Author</div><div class="meta-val">Saksham · Head of Product</div></div>
+        <div class="meta-cell"><div class="meta-label">Last updated</div><div class="meta-val">27 May 2026</div></div>
+        <div class="meta-cell"><div class="meta-label">Core tickets</div><div class="meta-val mono">DS-001 → DS-008</div></div>
+        <div class="meta-cell"><div class="meta-label">Android tickets</div><div class="meta-val mono">AND-001 → AND-003</div></div>
+      </div>
+
+      <div class="callout callout-vision">
+        <div class="callout-title">The one sentence</div>
+        <p>Every morning, Catalyst tells you exactly what to study today — and it's different from yesterday because <em>you</em> are different from yesterday.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ THE PROBLEM ══════════════════════════════════════════ -->
+    <section class="ds-section" id="problem">
+      <div class="section-eyebrow">Context</div>
+      <h2>The Problem We're Solving</h2>
+
+      <p>We talked to students preparing for CAT, GMAT, and CS university exams. The same three things came up in every conversation.</p>
+
+      <div class="quote">
+        <div class="quote-text">"I open my notes or a question bank and I don't know where to start. I usually just pick something random, or I practice stuff I already know because it feels productive."</div>
+        <div class="quote-attr">— CS student, semester 3 exam prep</div>
+      </div>
+      <div class="quote">
+        <div class="quote-text">"I studied probability for two weeks, got good at it, then came back a month later for the mock test and it was like I'd never seen it. Gone."</div>
+        <div class="quote-attr">— CAT aspirant, 6 months to exam</div>
+      </div>
+      <div class="quote">
+        <div class="quote-text">"Every app just gives me questions. None of them tell me if I'm actually improving or why I'm getting things wrong."</div>
+        <div class="quote-attr">— GMAT prep, 3 months to test date</div>
+      </div>
+
+      <p>These aren't edge cases. They are the experience of the majority of self-studying students. The problems break down to three root causes:</p>
+
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-node">
+            <div class="flow-node-tag" style="color: var(--danger)">Problem 1</div>
+            <div class="flow-node-title">No direction</div>
+            <div class="flow-node-sub">Students waste decision energy choosing what to study. Most default to easy topics they already know — the illusion of productivity.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-node">
+            <div class="flow-node-tag" style="color: var(--danger)">Problem 2</div>
+            <div class="flow-node-title">No memory</div>
+            <div class="flow-node-sub">Knowledge decays. The forgetting curve is real. Without scheduled review, 70% of what a student learned last week is gone by next week. No app they use fights this.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-node">
+            <div class="flow-node-tag" style="color: var(--danger)">Problem 3</div>
+            <div class="flow-node-title">No feedback loop</div>
+            <div class="flow-node-sub">Students know their score but not their pattern. "73% accuracy" tells you nothing. "You consistently confuse preemptive and non-preemptive scheduling" tells you everything.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">The incumbent alternative</div>
+        <p>Coaching classes solve problem 1 (a teacher tells you what to study) but fail on 2 and 3. Question banks solve nothing — they're libraries, not systems. Catalyst is the first product built to solve all three simultaneously, at a cost that doesn't require ₹2 lakh in fees.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ VISION ════════════════════════════════════════════════ -->
+    <section class="ds-section" id="vision">
+      <div class="section-eyebrow">Product Vision</div>
+      <h2>What Sessions Sets Out to Achieve</h2>
+
+      <p>The daily session is the heartbeat of the product. Everything else — the roadmap, the explanation panel, the enrichment pipeline — exists to make this single daily moment as valuable as possible.</p>
+
+      <h3>The 5-minute rule</h3>
+      <p>A session must deliver genuine learning value in 5 minutes. Not a warmup. Not a review of easy questions. Actual cognitive challenge in the student's zone of proximal development — the zone where learning actually happens. If it takes longer, great. But 5 minutes must feel worth it.</p>
+
+      <h3>The system knows you</h3>
+      <p>After 3 sessions, the system should feel like it understands the student's specific weaknesses. After 10 sessions, it should feel like a tutor that's been watching them study. This is the moat — not the technology, but the accumulated understanding of each individual student that gets harder to replicate over time.</p>
+
+      <h3>Duolingo's lesson, not Duolingo's product</h3>
+      <p>We drew inspiration from Duolingo's love of teaching and their streak mechanics — the habit loop that builds a daily practice. But we're not making a game. We're making a system that a serious exam aspirant would respect. The engagement mechanics exist to serve learning, not the other way around.</p>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-num" style="color: var(--green)">D30</div>
+          <div class="stat-label">Target retention rate &gt;35%<br>(industry avg: 22%)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color: var(--blue)">6 min</div>
+          <div class="stat-label">Target avg session length<br>habit-forming range</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color: var(--gold)">1×</div>
+          <div class="stat-label">LLM call per student per day<br>&lt;₹0.01 at scale</div>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ WHO IT'S FOR ══════════════════════════════════════════ -->
+    <section class="ds-section" id="users">
+      <div class="section-eyebrow">Users</div>
+      <h2>Who This Feature Is For</h2>
+
+      <h3>Primary: Competitive exam aspirants</h3>
+      <p>CAT and GMAT students with a real exam date. They have a deadline. They have high willingness to pay. They make their own decisions. A feature that tells them "here's exactly what to work on today to be ready by November" speaks directly to their anxiety and converts it into productive action.</p>
+
+      <h3>Secondary: University CS students</h3>
+      <p>Operating Systems, Data Structures, DBMS. Semester exams in 6–8 weeks. Less pressure than competitive exams but the same cognitive problems — no direction, no retention, no feedback loop. The daily session serves them identically because the underlying mechanics (ZPD, spaced repetition, accuracy tracking) are subject-agnostic.</p>
+
+      <h3>Explicitly not a student who:</h3>
+      <p style="color: var(--muted)">— wants passive content (video lectures, reading material)<br>
+      — is looking for a social learning experience<br>
+      — needs to be motivated by gamification before engaging<br>
+      The student Catalyst serves already wants to study. They just need to know <em>what</em> and <em>how</em>.</p>
+    </section>
+
+    <hr>
+
+    <!-- ══ FULL FLOW ══════════════════════════════════════════════ -->
+    <section class="ds-section" id="flow">
+      <div class="section-eyebrow">Feature Design</div>
+      <h2>The Full Sessions Flow</h2>
+      <p class="section-desc">End-to-end user journey from app open to adaptive session, built on top of the existing roadmap infrastructure.</p>
+
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-node green">
+            <div class="flow-node-tag">Onboarding (one-time)</div>
+            <div class="flow-node-title">1. Roadmap Creation</div>
+            <div class="flow-node-sub">Student selects subject + topics + goal + exam date. Diagnostic calibration (3–5 MCQs). Roadmap generated via Qdrant semantic search + LLM block ordering. Stored as <code>roadmaps.generated_json</code>. This is the student's learning contract.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓ (next day and every day after)</div>
+        <div class="flow-row">
+          <div class="flow-node blue">
+            <div class="flow-node-tag">Daily — first app open</div>
+            <div class="flow-node-title">2. Today Widget Loads</div>
+            <div class="flow-node-sub"><code>GET /api/sessions/today</code> — checks <code>daily_sessions</code> cache. If no session for today, triggers <code>DailySessionGenerator</code>: accuracy classifier → LLM session plan → targeted Qdrant searches per focus area → persisted to DB. Returns widget payload in ~3s on first open, &lt;10ms on repeat.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-node">
+            <div class="flow-node-tag">Student action</div>
+            <div class="flow-node-title">3. Student Reviews Widget</div>
+            <div class="flow-node-sub">Sees today's subject, headline, estimated time, weekly progress, and up to 3 focus areas with their types (weakness / new / review). Taps "Begin Session."</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-node blue">
+            <div class="flow-node-tag">Session screen</div>
+            <div class="flow-node-title">4. Practice Session</div>
+            <div class="flow-node-sub">MCQ questions served grouped by focus area. Per-question timer (green &lt;60s, yellow &lt;120s, red ≥120s). Prev/Skip/Next/See Results navigation. Single-tap locks the answer immediately — no edit, no confirmation. Explanation panel renders on every answer.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-node">
+            <div class="flow-node-tag">Per question</div>
+            <div class="flow-node-title">5. Explanation Panel</div>
+            <div class="flow-node-sub">State A (correct): green header, principle-first explanation, optional distractor note. State B (incorrect): red header, explanation of what's actually right, distractor note explaining why their choice was tempting. Bookmark toggle. Next button with 300ms debounce.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-node gold">
+            <div class="flow-node-tag">End of session</div>
+            <div class="flow-node-title">6. Submit + Analysis</div>
+            <div class="flow-node-sub"><code>POST /api/sessions/{id}/submit</code> with nested attempts grouped by focus area. Server recomputes correctness from stored payload — never trusts client. Returns per-topic summary with <code>updated_state</code>. Analysis screen shows what improved, what didn't, and a coaching note generated by LLM from real data.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓ (tomorrow)</div>
+        <div class="flow-row">
+          <div class="flow-node green">
+            <div class="flow-node-tag">The loop closes</div>
+            <div class="flow-node-title">7. Tomorrow's Session Adapts</div>
+            <div class="flow-node-sub">Redis accuracy cache invalidated on submission. Next day's <code>DailySessionGenerator</code> call reads the updated answer history. If the student improved on CPU Scheduling, it appears as "review" next time. If they struggled, it stays "weakness" with harder questions. The system has learned.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ SCREEN BY SCREEN ══════════════════════════════════════ -->
+    <section class="ds-section" id="screens">
+      <div class="section-eyebrow">Screen Design</div>
+      <h2>Screen-by-Screen</h2>
+
+      <div class="screens-grid">
+
+        <!-- Screen 1: Today Widget -->
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="ph-status"><span>9:41</span><span>●●● ▲</span></div>
+            <div class="ph-screen">
+              <div class="mock-header">
+                <div class="mock-h-sub">Good morning, Saksham</div>
+                <div class="mock-h-title">Operating Systems</div>
+              </div>
+              <div class="mock-card">
+                <div class="mock-eyebrow">Today's Session</div>
+                <div class="mock-title">Plug your gaps in CPU Scheduling</div>
+                <div class="mock-sub">43% on 7 attempts — you understand the basics but lose marks on edge cases.</div>
+                <div class="mock-row">
+                  <span style="font-size:7px;color:#787878">18 questions · ~22 min</span>
+                  <span style="font-size:7px;color:#D3C182">Week 3/5 ●●●○○</span>
+                </div>
+              </div>
+              <div style="margin-bottom:4px">
+                <div style="font-size:7px;color:#787878;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Focus Areas</div>
+                <div class="mock-card" style="padding:5px 8px;">
+                  <div class="mock-row" style="margin-top:0">
+                    <span style="font-size:8px;font-weight:600;color:#E8E8E8">CPU Scheduling</span>
+                    <span class="mock-pill mp-weak">Weakness</span>
+                  </div>
+                  <div style="font-size:7px;color:#787878;margin-top:2px">8 questions · 43% accuracy</div>
+                </div>
+                <div class="mock-card" style="padding:5px 8px;">
+                  <div class="mock-row" style="margin-top:0">
+                    <span style="font-size:8px;font-weight:600;color:#E8E8E8">Virtual Memory</span>
+                    <span class="mock-pill mp-new">New</span>
+                  </div>
+                  <div style="font-size:7px;color:#787878;margin-top:2px">6 questions · starting fresh</div>
+                </div>
+                <div class="mock-card" style="padding:5px 8px;">
+                  <div class="mock-row" style="margin-top:0">
+                    <span style="font-size:8px;font-weight:600;color:#E8E8E8">Memory Management</span>
+                    <span class="mock-pill mp-review">Review</span>
+                  </div>
+                  <div style="font-size:7px;color:#787878;margin-top:2px">5 questions · 78% accuracy</div>
+                </div>
+              </div>
+              <div class="mock-btn">Begin Session →</div>
+            </div>
+            <div class="ph-bar"><div class="ph-home"></div></div>
+          </div>
+          <div class="phone-label">Today Widget</div>
+        </div>
+
+        <!-- Screen 2: Question -->
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="ph-status"><span>9:47</span><span>●●● ▲</span></div>
+            <div class="ph-screen">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:7px;color:#787878">CPU Scheduling · 3 of 8</span>
+                <span class="mock-timer">0:42</span>
+              </div>
+              <div class="mock-progress"><div class="mock-progress-fill" style="width:37%"></div></div>
+              <div class="mock-q">Which scheduling algorithm minimises average waiting time in a non-preemptive environment?</div>
+              <div class="mock-opt">A. First Come First Serve (FCFS)</div>
+              <div class="mock-opt">B. Round Robin</div>
+              <div class="mock-opt" style="background:rgba(70,103,93,0.1);border-color:rgba(70,103,93,0.3);color:#BEDCE4">C. Shortest Job First (SJF)</div>
+              <div class="mock-opt">D. Priority Scheduling</div>
+              <div style="display:flex;gap:4px;margin-top:8px;">
+                <div style="flex:1;background:#252525;border-radius:4px;padding:5px;text-align:center;font-size:7px;color:#787878">← Prev</div>
+                <div style="flex:1;background:#252525;border-radius:4px;padding:5px;text-align:center;font-size:7px;color:#787878">Skip</div>
+                <div style="flex:1;background:#46675D;border-radius:4px;padding:5px;text-align:center;font-size:7px;color:white;font-weight:700">Next →</div>
+              </div>
+            </div>
+            <div class="ph-bar"><div class="ph-home"></div></div>
+          </div>
+          <div class="phone-label">Practice — Question</div>
+        </div>
+
+        <!-- Screen 3: Explanation correct -->
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="ph-status"><span>9:47</span><span>●●● ▲</span></div>
+            <div class="ph-screen">
+              <div style="background:rgba(70,103,93,0.25);border-radius:5px;padding:6px 8px;margin-bottom:7px;display:flex;align-items:center;gap:5px;">
+                <span style="font-size:10px">✓</span>
+                <span style="font-size:8px;font-weight:700;color:#7ABFAE">Correct</span>
+              </div>
+              <div class="mock-opt correct">C. Shortest Job First (SJF)</div>
+              <div class="mock-expl">
+                <div style="font-size:6px;font-weight:700;color:#D3C182;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Why this is correct</div>
+                SJF minimises average waiting time by always picking the shortest next job. When you have full knowledge of burst times, this is provably optimal. Think of it as "shortest queue lane wins."
+              </div>
+              <div style="margin-top:5px;display:flex;gap:5px;">
+                <div style="flex:1;font-size:7px;color:#787878;background:#252525;border-radius:3px;padding:4px;">Bloom: Apply</div>
+                <div style="flex:1;font-size:7px;color:#D3C182;background:rgba(211,193,130,0.1);border-radius:3px;padding:4px;">Difficulty: 3</div>
+                <div style="font-size:7px;color:#787878;background:#252525;border-radius:3px;padding:4px;">🔖</div>
+              </div>
+              <div style="margin-top:6px;background:#46675D;border-radius:4px;padding:6px;text-align:center;font-size:8px;font-weight:700;color:white">Next Question →</div>
+            </div>
+            <div class="ph-bar"><div class="ph-home"></div></div>
+          </div>
+          <div class="phone-label">Explanation — Correct</div>
+        </div>
+
+        <!-- Screen 4: Explanation wrong -->
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="ph-status"><span>9:48</span><span>●●● ▲</span></div>
+            <div class="ph-screen">
+              <div style="background:rgba(232,132,122,0.15);border-radius:5px;padding:6px 8px;margin-bottom:7px;display:flex;align-items:center;gap:5px;">
+                <span style="font-size:10px">✗</span>
+                <span style="font-size:8px;font-weight:700;color:#E8847A">Incorrect</span>
+              </div>
+              <div class="mock-opt wrong">B. Round Robin (your answer)</div>
+              <div class="mock-opt correct">C. Shortest Job First (SJF) ✓</div>
+              <div class="mock-expl">
+                <div style="font-size:6px;font-weight:700;color:#D3C182;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Why SJF is correct</div>
+                SJF minimises average waiting time by always executing the shortest job next. This is provably optimal when burst times are known in advance.
+              </div>
+              <div style="background:rgba(232,132,122,0.08);border:1px solid rgba(232,132,122,0.2);border-radius:5px;padding:5px;margin-top:4px;">
+                <div style="font-size:6px;font-weight:700;color:#E8847A;margin-bottom:2px">⚠ Common trap</div>
+                <div style="font-size:7px;color:#787878;line-height:1.4">Students often pick Round Robin because it feels fair — but fairness and minimum wait time are different goals entirely.</div>
+              </div>
+              <div style="margin-top:6px;background:#46675D;border-radius:4px;padding:6px;text-align:center;font-size:8px;font-weight:700;color:white">Next Question →</div>
+            </div>
+            <div class="ph-bar"><div class="ph-home"></div></div>
+          </div>
+          <div class="phone-label">Explanation — Incorrect</div>
+        </div>
+
+        <!-- Screen 5: Analysis -->
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="ph-status"><span>9:58</span><span>●●● ▲</span></div>
+            <div class="ph-screen">
+              <div class="mock-header">
+                <div class="mock-h-title">Session Complete</div>
+                <div class="mock-h-sub">13 of 18 answered · 76% accuracy</div>
+              </div>
+              <div class="mock-analysis">
+                <div class="mock-analysis-title">Per-topic breakdown</div>
+                <div class="mock-bar-wrap"><span class="mock-bar-label">CPU Sched.</span><div class="mock-bar-bg"><div class="mock-bar-fill" style="width:62%;background:#E8847A"></div></div><span style="font-size:6px;color:#E8847A;margin-left:3px">62%</span></div>
+                <div class="mock-bar-wrap"><span class="mock-bar-label">Virtual Mem.</span><div class="mock-bar-bg"><div class="mock-bar-fill" style="width:83%;background:#7ABFAE"></div></div><span style="font-size:6px;color:#7ABFAE;margin-left:3px">83%</span></div>
+                <div class="mock-bar-wrap"><span class="mock-bar-label">Memory Mgmt</span><div class="mock-bar-bg"><div class="mock-bar-fill" style="width:80%;background:#D3C182"></div></div><span style="font-size:6px;color:#D3C182;margin-left:3px">80%</span></div>
+              </div>
+              <div class="mock-expl" style="border-color:rgba(190,220,228,0.2)">
+                <div style="font-size:6px;font-weight:700;color:#46675D;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Catalyst says</div>
+                Virtual Memory clicked today — 83% on your first attempt is strong. CPU Scheduling still needs work: you're solid on FCFS and SJF but losing marks on preemptive variants. Tomorrow we go deeper there.
+              </div>
+              <div style="display:flex;gap:4px;margin-top:6px;">
+                <div style="flex:1;background:#252525;border-radius:4px;padding:5px;text-align:center;font-size:7px;color:#787878">Review wrong</div>
+                <div style="flex:1;background:#46675D;border-radius:4px;padding:5px;text-align:center;font-size:7px;color:white;font-weight:700">Done</div>
+              </div>
+            </div>
+            <div class="ph-bar"><div class="ph-home"></div></div>
+          </div>
+          <div class="phone-label">Post-Session Analysis</div>
+        </div>
+
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ ARCHITECTURE ══════════════════════════════════════════ -->
+    <section class="ds-section" id="architecture">
+      <div class="section-eyebrow">Engineering</div>
+      <h2>System Architecture</h2>
+      <p class="section-desc">The sessions system is built in four independent layers. Each layer can be understood, tested, and deployed separately. The interface between layers is always a function call or a DB read — never a side effect.</p>
+
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-node green">
+            <div class="flow-node-tag">Layer 1 · Data</div>
+            <div class="flow-node-title">Per-topic accuracy classifier</div>
+            <div class="flow-node-sub"><code>get_topic_accuracy(user_id, roadmap_id)</code> — joins answers → questions, computes accuracy per topic, classifies into <strong>new / weakness / review / mastered</strong>. Redis-cached, invalidated on every answer submission. Zero N+1. 18 tests passing.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓ feeds</div>
+        <div class="flow-row">
+          <div class="flow-node blue">
+            <div class="flow-node-tag">Layer 2 · Generation</div>
+            <div class="flow-node-title">DailySessionGenerator</div>
+            <div class="flow-node-sub">One LLM call (Groq, ~300 tokens in/~200 out) to determine focus areas + copy. Then one targeted Qdrant semantic search per focus area using <code>"Subject: X. Topic: Y. Difficulty: Z"</code> query — reusing the same embedding pipeline as roadmap generation. Excludes questions answered in last 14 days. Persists full payload to <code>daily_sessions</code> table. 51 tests passing.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓ stored in</div>
+        <div class="flow-row">
+          <div class="flow-node">
+            <div class="flow-node-tag">Layer 3 · Cache</div>
+            <div class="flow-node-title">daily_sessions table</div>
+            <div class="flow-node-sub">One row per (user, roadmap, date). Unique constraint prevents duplicate generation on concurrent requests. <code>GET /api/sessions/today</code> reads from here — sub-10ms on all repeat opens within the same day. Generation only happens once per student per roadmap per day.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓ served by</div>
+        <div class="flow-row">
+          <div class="flow-node gold">
+            <div class="flow-node-tag">Layer 4 · API</div>
+            <div class="flow-node-title">Today endpoint + Submit endpoint</div>
+            <div class="flow-node-sub"><code>GET /api/sessions/today</code> reshapes the cached payload to the Android spec. <code>POST /api/sessions/{id}/submit</code> recomputes correctness server-side, writes SessionAttempt rows, runs topic state transitions, invalidates Redis, returns per-topic summary.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Key design principle</div>
+        <p>The expensive operations (Qdrant search, LLM call) happen exactly <strong>once per student per day</strong>, lazily on first app open. Every subsequent open reads from the DB cache. At 1,000 DAU, total LLM cost is under ₹50/day.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ API CONTRACTS ══════════════════════════════════════════ -->
+    <section class="ds-section" id="apis">
+      <div class="section-eyebrow">Engineering</div>
+      <h2>API Contracts</h2>
+
+      <h3>GET /api/sessions/today</h3>
+      <div class="api-block">
+        <div class="api-block-head">
+          <span class="method m-get">GET</span>
+          <span class="api-path">/api/sessions/today</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:auto">Auth: session cookie</span>
+        </div>
+        <pre>{
+  <span class="k">"subject"</span>:          <span class="s">"Operating Systems"</span>,
+  <span class="k">"topicHeadline"</span>:    <span class="s">"Plug your gaps in CPU Scheduling"</span>,
+  <span class="k">"reason"</span>:           <span class="s">"43% on 7 attempts — you understand the basics but lose marks on edge cases."</span>,
+  <span class="k">"questionCount"</span>:    <span class="n">19</span>,
+  <span class="k">"estimatedMinutes"</span>: <span class="n">23</span>,
+  <span class="k">"bloomsRange"</span>:      { <span class="k">"min"</span>: <span class="n">2</span>, <span class="k">"max"</span>: <span class="n">4</span> },
+  <span class="k">"weeklyProgress"</span>:   { <span class="k">"completed"</span>: <span class="n">3</span>, <span class="k">"target"</span>: <span class="n">5</span> },
+  <span class="k">"focusAreas"</span>: [
+    {
+      <span class="k">"topicName"</span>:     <span class="s">"CPU Scheduling"</span>,
+      <span class="k">"questionCount"</span>: <span class="n">8</span>,
+      <span class="k">"type"</span>:          <span class="s">"weakness"</span>,  <span class="c">// "weakness" | "new" | "review"</span>
+      <span class="k">"accuracy"</span>:      <span class="n">43</span>           <span class="c">// int if weakness, null otherwise</span>
+    }
+  ],
+  <span class="k">"sessionId"</span>:        <span class="s">"uuid"</span>,
+  <span class="k">"isCompleted"</span>:      <span class="n">false</span>
+}
+
+<span class="c">// Error states:
+// 401 — unauthenticated
+// 404 — {error: "no_active_roadmap"}
+// 202 — {status: "generating", job_id: "..."} — first open of day, poll until ready</span></pre>
+      </div>
+
+      <h3>POST /api/sessions/{id}/submit</h3>
+      <div class="api-block">
+        <div class="api-block-head">
+          <span class="method m-post">POST</span>
+          <span class="api-path">/api/sessions/{session_id}/submit</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:auto">Auth: Bearer + cookie</span>
+        </div>
+        <pre><span class="c">// Request body:</span>
+{
+  <span class="k">"submitted_at"</span>:                  <span class="s">"2026-05-27T14:32:00.000Z"</span>,
+  <span class="k">"session_started_at"</span>:            <span class="s">"2026-05-27T14:20:00.000Z"</span>,
+  <span class="k">"device_timezone_offset_minutes"</span>: <span class="n">330</span>,
+  <span class="k">"focus_area_attempts"</span>: [
+    {
+      <span class="k">"topic_name"</span>: <span class="s">"CPU Scheduling"</span>,
+      <span class="k">"topic_type"</span>: <span class="s">"weakness"</span>,
+      <span class="k">"attempts"</span>: [
+        {
+          <span class="k">"question_id"</span>:          <span class="s">"uuid"</span>,
+          <span class="k">"selected_index"</span>:       <span class="n">2</span>,      <span class="c">// null = skipped</span>
+          <span class="k">"is_correct"</span>:           <span class="n">true</span>,   <span class="c">// ignored — server recomputes</span>
+          <span class="k">"time_to_first_tap_ms"</span>: <span class="n">8400</span>,   <span class="c">// capped at 120,000</span>
+          <span class="k">"answer_changed"</span>:       <span class="n">false</span>,
+          <span class="k">"bloom_level"</span>:          <span class="n">3</span>,
+          <span class="k">"difficulty"</span>:           <span class="s">"medium"</span>,
+          <span class="k">"sequence_position"</span>:    <span class="n">1</span>
+        }
+      ]
+    }
+  ]
+}
+
+<span class="c">// Response 200:</span>
+{
+  <span class="k">"status"</span>:     <span class="s">"submitted"</span>,
+  <span class="k">"session_id"</span>: <span class="s">"uuid"</span>,
+  <span class="k">"summary"</span>: {
+    <span class="k">"total_questions"</span>: <span class="n">19</span>,
+    <span class="k">"answered"</span>:        <span class="n">17</span>,
+    <span class="k">"correct"</span>:         <span class="n">13</span>,
+    <span class="k">"accuracy_rate"</span>:   <span class="n">0.765</span>,
+    <span class="k">"topics"</span>: [
+      {
+        <span class="k">"topic_name"</span>:    <span class="s">"CPU Scheduling"</span>,
+        <span class="k">"correct"</span>:       <span class="n">5</span>,
+        <span class="k">"total"</span>:         <span class="n">8</span>,
+        <span class="k">"updated_state"</span>: <span class="s">"review"</span>   <span class="c">// was "weakness" — improved</span>
+      }
+    ]
+  }
+}
+
+<span class="c">// 409 = already submitted (treat as success — idempotent)
+// 422 = unknown question ID (question not in session payload — bug or tamper)</span></pre>
+      </div>
+
+      <h3>PATCH /api/sessions/{id}/complete</h3>
+      <div class="api-block">
+        <div class="api-block-head">
+          <span class="method m-patch">PATCH</span>
+          <span class="api-path">/api/sessions/{session_id}/complete</span>
+        </div>
+        <pre><span class="c">// Sets is_completed=true, completed_at=now()
+// Invalidates Redis accuracy cache for user+roadmap
+// Returns:</span>
+{ <span class="k">"isCompleted"</span>: <span class="n">true</span> }</pre>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ ACCURACY CLASSIFIER ════════════════════════════════════ -->
+    <section class="ds-section" id="accuracy">
+      <div class="section-eyebrow">Engineering</div>
+      <h2>Topic Accuracy Classifier</h2>
+      <p class="section-desc">The four-state model that drives every session composition decision. Built, tested, and live.</p>
+
+      <div class="callout callout-gold">
+        <div class="callout-title">Status: Done · 18 tests passing</div>
+        <p><code>practice/service/topicAccuracy.py</code> — <code>get_topic_accuracy(user_id, roadmap_id)</code>. Redis-first, exactly 2 DB queries, zero N+1. Invalidated from <code>ProcessAttempts.py</code> outside the atomic block so it only fires on successful commit.</p>
+      </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>State</th>
+            <th>Condition</th>
+            <th>Session behaviour</th>
+            <th>Question count</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pill pill-new">new</span></td>
+            <td>attempts &lt; 3 (any accuracy)</td>
+            <td>Introductory questions, lower difficulty, builds foundation</td>
+            <td>6</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-weak">weakness</span></td>
+            <td>accuracy &lt; 65% AND attempts ≥ 3</td>
+            <td>Priority — always first focus area. Mixed difficulty targeting gaps</td>
+            <td>8</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-review">review</span></td>
+            <td>accuracy ≥ 65% AND attempts ≥ 3 AND not mastered</td>
+            <td>Spaced repetition — medium-hard questions to sharpen retention</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-mastered">mastered</span></td>
+            <td>accuracy ≥ 80% AND attempts ≥ 5</td>
+            <td>Excluded from sessions. V2: one question every 7 days as confidence booster</td>
+            <td>0 (V1)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Why attempts &lt; 3 = "new" regardless of accuracy</div>
+        <p>A student who answered 1 question wrong has 0% accuracy — but you can't confidently call that a weakness yet. Sparse data misleads the classifier. Requiring ≥ 3 attempts before weakness/review classification prevents the system from overreacting to a single bad answer and serving remedial content prematurely.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ SESSION GENERATOR ════════════════════════════════════ -->
+    <section class="ds-section" id="generator">
+      <div class="section-eyebrow">Engineering</div>
+      <h2>DailySessionGenerator</h2>
+
+      <div class="callout callout-gold">
+        <div class="callout-title">Status: Done · 51 tests passing</div>
+        <p><code>roadmap/service/dailySessionGenerator.py</code> — 5-step synchronous pipeline. Reuses the existing Qdrant infrastructure from roadmap generation.</p>
+      </div>
+
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-node">
+            <div class="flow-node-tag">Step 1</div>
+            <div class="flow-node-title">Cache check</div>
+            <div class="flow-node-sub">If <code>daily_sessions</code> row exists for (user, roadmap, today) — return it immediately. Zero work on repeat calls. This is the path for 95%+ of app opens.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓ (only on first open of the day)</div>
+        <div class="flow-row">
+          <div class="flow-node blue">
+            <div class="flow-node-tag">Step 2</div>
+            <div class="flow-node-title">LLM session plan</div>
+            <div class="flow-node-sub">One Groq call (~300 tokens in, ~200 out) with: roadmap subject, full topic list, per-topic accuracy + classifications from the accuracy classifier. Returns: up to 3 focus areas ranked by priority, question counts, <code>topicHeadline</code>, <code>reason</code> copy. Fractions of a cent per call.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-node green">
+            <div class="flow-node-tag">Step 3</div>
+            <div class="flow-node-title">Targeted Qdrant search per focus area</div>
+            <div class="flow-node-sub">For each focus area, build query: <code>"Subject: OS. Topic: CPU Scheduling. Difficulty: 3"</code>. Embed via HuggingFace Inference API (same all-MiniLM-L6-v2 model as roadmap generation). Cosine search in Qdrant. Filter in Python by difficulty (avoids Qdrant payload inconsistency from pre-migration string values). Exclude question IDs answered in last 14 days. One Qdrant search + one Postgres IN query per focus area — no N+1.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-node">
+            <div class="flow-node-tag">Step 4</div>
+            <div class="flow-node-title">Compute derived fields</div>
+            <div class="flow-node-sub">questionCount = sum of all focus area counts. estimatedMinutes = questionCount × 1.2 rounded. bloomsRange.min/max = MIN/MAX bloom_level across all fetched questions. weeklyProgress = COUNT sessions completed this week.</div>
+          </div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-node gold">
+            <div class="flow-node-tag">Step 5</div>
+            <div class="flow-node-title">Persist to daily_sessions</div>
+            <div class="flow-node-sub">Full payload written to <code>daily_sessions</code> table including the full question objects inside each focus area (not returned to client — used for server-side correctness recomputation on submit). Returns payload.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Known issue: duplicate question IDs (DS-007)</div>
+        <p>The generator can return the same question ID in multiple focus areas when topics share semantically similar questions in Qdrant. Fix: add deduplication step after all Qdrant searches complete — remove any question ID appearing more than once before persisting. Not yet implemented.</p>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Cold-start fallback needed (DS-006)</div>
+        <p>Day-1 users with zero answer history return an empty session because the accuracy classifier has nothing to query. Fallback: when all topics classify as "new", seed the session from the canonical topic list for the subject at difficulty 1–2. Canonical OS list defined. GMAT/CAT canonical lists needed before those segments launch.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ SUBMISSION LOGIC ══════════════════════════════════════ -->
+    <section class="ds-section" id="submission">
+      <div class="section-eyebrow">Engineering</div>
+      <h2>Session Submission Logic</h2>
+      <p class="section-desc">The submit endpoint closes the learning loop. Every decision here is intentional.</p>
+
+      <h3>Server-side correctness recomputation</h3>
+      <p>The client sends <code>is_correct</code> but the server ignores it. Correctness is always recomputed by loading the session's <code>payload_json</code> from <code>daily_sessions</code> and comparing <code>selected_index</code> against <code>question.correct_index</code>. This prevents any client-side manipulation of scores and ensures the adaptive engine always trains on accurate data.</p>
+
+      <h3>Topic state transitions</h3>
+      <p>The <code>topic_type</code> sent per focus area by the client (e.g. <code>"weakness"</code>) is used as the <code>previous_state</code> input to the transition function — the client already knows the state because it came from the today endpoint. No <code>UserTopicState</code> table needed in V1.</p>
+
+      <table class="table">
+        <thead>
+          <tr><th>Previous state</th><th>Session accuracy</th><th>New state</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>weakness</td><td>≥ 80%</td><td><span class="pill pill-mastered">mastered</span></td></tr>
+          <tr><td>weakness</td><td>50–79%</td><td><span class="pill pill-review">review</span></td></tr>
+          <tr><td>weakness</td><td>&lt; 50%</td><td><span class="pill pill-weak">weakness</span></td></tr>
+          <tr><td>new</td><td>≥ 80%</td><td><span class="pill pill-mastered">mastered</span></td></tr>
+          <tr><td>new</td><td>50–79%</td><td><span class="pill pill-review">review</span></td></tr>
+          <tr><td>new</td><td>&lt; 50%</td><td><span class="pill pill-weak">weakness</span></td></tr>
+          <tr><td>review</td><td>≥ 80%</td><td><span class="pill pill-mastered">mastered</span></td></tr>
+          <tr><td>review</td><td>&lt; 80%</td><td><span class="pill pill-review">review</span></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Idempotency</h3>
+      <p>If <code>daily_sessions.submitted_at</code> is already set, return <code>409 {"status": "already_submitted"}</code>. The Android app treats 409 as success — safe to retry on network failure.</p>
+
+      <h3>Unknown question IDs</h3>
+      <p>Return <code>422</code>. Do not skip and log. Question IDs come from the server's own session payload — an unknown ID is a client bug or a tampered request, not an edge case to handle gracefully. Silently skipping corrupts the adaptive engine's accuracy signal.</p>
+
+      <h3>SessionAttempt model</h3>
+      <p>A new <code>SessionAttempt</code> table stores rich per-question data: <code>time_to_first_tap_ms</code> (capped at 120,000), <code>sequence_position</code>, <code>bloom_level</code>, <code>answer_changed</code>, and the recomputed <code>is_correct</code>. The existing <code>Answer</code> table is written to in parallel for analytics continuity — flagged for migration once the analytics pipeline is updated to read from <code>SessionAttempt</code>.</p>
+    </section>
+
+    <hr>
+
+    <!-- ══ TICKETS ════════════════════════════════════════════════ -->
+    <section class="ds-section" id="tickets">
+      <div class="section-eyebrow">Reference</div>
+      <h2>Linked Tickets</h2>
+
+      <h3>Daily Sessions Backend</h3>
+      <div class="ticket-list">
+        <div class="ticket-item"><span class="ticket-id-badge">DS-001</span><span class="ticket-title-text">daily_sessions table migration</span><span class="ticket-status s-done">Done</span></div>
+        <div class="ticket-item"><span class="ticket-id-badge">DS-002</span><span class="ticket-title-text">Per-topic accuracy classifier</span><span class="ticket-status s-done">Done</span></div>
+        <div class="ticket-item"><span class="ticket-id-badge">DS-003</span><span class="ticket-title-text">DailySessionGenerator service (Qdrant-backed)</span><span class="ticket-status s-done">Done</span></div>
+        <div class="ticket-item"><span class="ticket-id-badge">DS-004</span><span class="ticket-title-text">GET /api/sessions/today endpoint</span><span class="ticket-status s-progress">In Progress</span></div>
+        <div class="ticket-item"><span class="ticket-id-badge">DS-005</span><span class="ticket-title-text">Session submit endpoint rewrite</span><span class="ticket-status s-backlog">Backlog</span></div>
+        <div class="ticket-item"><span class="ticket-id-badge">DS-006</span><span class="ticket-title-text">Cold-start seed topics</span><span class="ticket-status s-backlog">Backlog</span></div>
+        <div class="ticket-item"><span class="ticket-id-badge">DS-007</span><span class="ticket-title-text">Deduplicate questions across focus areas</span><span class="ticket-status s-backlog">Backlog</span></div>
+        <div class="ticket-item"><span class="ticket-id-badge">DS-008</span><span class="ticket-title-text">PATCH session complete endpoint</span><span class="ticket-status s-backlog">Backlog</span></div>
+      </div>
+
+      <h3>Android</h3>
+      <div class="ticket-list">
+        <div class="ticket-item"><span class="ticket-id-badge">AND-001</span><span class="ticket-title-text">Android roadmap wizard flow</span><span class="ticket-status s-backlog">Backlog</span></div>
+        <div class="ticket-item"><span class="ticket-id-badge">AND-002</span><span class="ticket-title-text">Android generating + roadmap reveal</span><span class="ticket-status s-backlog">Backlog</span></div>
+        <div class="ticket-item"><span class="ticket-id-badge">AND-003</span><span class="ticket-title-text">Android session + explanation panel</span><span class="ticket-status s-progress">In Progress</span></div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ DECISIONS ══════════════════════════════════════════════ -->
+    <section class="ds-section" id="decisions">
+      <div class="section-eyebrow">Reference</div>
+      <h2>Decisions Log</h2>
+      <p class="section-desc">Every significant architecture or product decision made during design and implementation. Recorded here so future team members understand why, not just what.</p>
+
+      <div class="dev-notes">
+        <div class="dev-note">
+          <div class="dev-note-title">Lazy generation over Celery beat</div>
+          <div class="dev-note-body">Sessions are generated on first app open, not at midnight via a scheduled job. Reason: simpler infrastructure at current scale. No Celery beat to maintain, no missed jobs if a user doesn't open the app. When DAU reaches ~10,000 and the 3-second first-open lag becomes a product issue, switch to midnight pre-generation.</div>
+        </div>
+        <div class="dev-note">
+          <div class="dev-note-title">One LLM call per day, not per question</div>
+          <div class="dev-note-body">The session plan (focus areas, copy, question counts) comes from a single Groq call. Questions are fetched via Qdrant, not LLM. This keeps the hot path cheap: at 1,000 DAU, total LLM cost for sessions is under ₹50/day. Any LLM call per question per user would multiply this by 15–20x.</div>
+        </div>
+        <div class="dev-note">
+          <div class="dev-note-title">topic_type from client as previous_state</div>
+          <div class="dev-note-body">The submission endpoint uses the client's topic_type field as the previous state for transition logic rather than a UserTopicState table. Rationale: the client already knows the state (it came from the today endpoint), storing it server-side for V1 adds a table and migration for minimal benefit. Revisit if we need historical state tracking for analytics.</div>
+        </div>
+        <div class="dev-note">
+          <div class="dev-note-title">422 on unknown question IDs — reject, not skip</div>
+          <div class="dev-note-body">Question IDs originate from the server's own session payload. An unknown ID is always a bug or a tamper — not a valid edge case. Skipping corrupts the accuracy classifier's training data. Rejected.</div>
+        </div>
+        <div class="dev-note">
+          <div class="dev-note-title">Difficulty filtered in Python, not Qdrant</div>
+          <div class="dev-note-body">Pre-migration, Qdrant stored difficulty as strings ("easy"/"medium"/"hard"). Post-migration they're integers 1–5. Filtering in Python avoids Qdrant payload inconsistency for questions embedded before the migration. Fix Qdrant payload values when the question bank is re-embedded and move filter back to Qdrant query.</div>
+        </div>
+        <div class="dev-note">
+          <div class="dev-note-title">roadmap_question table left untouched (intentional debt)</div>
+          <div class="dev-note-body">The roadmap_question join table exists but nothing writes to it — roadmaps are stored as generated_json blobs. The daily sessions layer was built on top of raw answer history rather than requiring a proper per-question mastery state. This is conscious technical debt, documented here, to be addressed in V2 when the July cohort's data informs a proper FSRS migration.</div>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ══ HISTORY ════════════════════════════════════════════════ -->
+    <section class="ds-section" id="history">
+      <div class="section-eyebrow">Reference</div>
+      <h2>Version History</h2>
+      <div class="history-list">
+        <div class="history-item">
+          <div class="history-ver">v1.0</div>
+          <div class="history-date">27 May 2026</div>
+          <div class="history-body">Initial PRD. DS-001 through DS-003 complete. DS-004 in progress. Full architecture documented, all API contracts defined, decisions log populated. Screen mockups added for all 5 screens.</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Sidebar active link tracking
+  const links = document.querySelectorAll('.aside-link');
+  const sections = document.querySelectorAll('.ds-section');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.aside-link[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

@@ -185,6 +185,28 @@ AFTER EDITING
     .col-cards { padding: 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
     .col-empty { padding: 24px 12px; text-align: center; color: var(--muted); font-size: 12px; }
 
+
+    /* STATUS CHANGE */
+    .status-change-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .status-btn {
+      font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 6px;
+      border: 1px solid transparent; cursor: pointer; transition: all 0.15s;
+      background: rgba(255,255,255,0.05); color: var(--muted);
+    }
+    .status-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+    .status-btn.active-status { border-color: var(--green); color: var(--text); background: rgba(70,103,93,0.2); }
+    .status-btn[data-s="done"].active-status { border-color: #7ABFAE; background: rgba(70,103,93,0.25); }
+    .status-btn[data-s="in-progress"].active-status { border-color: var(--blue); background: rgba(190,220,228,0.1); }
+    .status-btn[data-s="review"].active-status { border-color: var(--gold); background: rgba(211,193,130,0.1); }
+    .status-btn[data-s="backlog"].active-status { border-color: var(--muted); background: rgba(255,255,255,0.07); }
+    .status-changed-toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--green); color: white; padding: 10px 20px; border-radius: 8px;
+      font-size: 12px; font-weight: 600; z-index: 9999; opacity: 0;
+      transition: opacity 0.2s; pointer-events: none;
+    }
+    .status-changed-toast.show { opacity: 1; }
+
     /* TICKET CARD */
     .ticket {
       background: var(--card); border-radius: var(--r-sm); padding: 14px 16px;
@@ -688,9 +710,9 @@ TICKET SCHEMA (all fields required)
   {
     "id": "DS-009",
     "title": "Session submit endpoint rewrite",
-    "description": "POST /api/sessions/{id}/submit. Nested focus_area_attempts grouped by topic. Server-side correctness recomputation from payload_json \u2014 never trust client is_correct. 422 on unknown question IDs (reject, not skip). 409 idempotency on duplicate submission. Per-topic summary with updated_state using topic_type as previous_state for transition logic. SessionAttempt model for rich audit log alongside Answer rows.",
+    "description": "POST /api/sessions/{id}/submit shipped. Nested focus_area_attempts grouped by topic. Server-side correctness recomputation from payload_json. 422 on unknown IDs. 409 idempotency on duplicate. Per-topic summary with updated_state using topic_type as previous_state. SessionAttempt model for rich audit log. Redis accuracy cache invalidated outside atomic block on commit.",
     "area": "backend",
-    "status": "in-progress",
+    "status": "done",
     "priority": "critical",
     "created": "2026-05-27",
     "updated": "2026-05-27"
@@ -821,7 +843,14 @@ TICKET SCHEMA (all fields required)
       <div class="panel-val" id="p-area"></div>
       <div class="panel-label">Status &amp; Priority</div>
       <div class="panel-tags" id="p-tags"></div>
-      <div class="panel-label">Dates</div>
+      <div class="panel-label" style="margin-top:14px">Move to</div>
+      <div class="status-change-row" id="p-status-btns">
+        <button class="status-btn" data-s="backlog">Backlog</button>
+        <button class="status-btn" data-s="in-progress">In Progress</button>
+        <button class="status-btn" data-s="review">Review</button>
+        <button class="status-btn" data-s="done">Done</button>
+      </div>
+      <div class="panel-label" style="margin-top:14px">Dates</div>
       <div class="panel-val" id="p-dates" style="font-size:12px;color:var(--muted)"></div>
     </div>
     <div class="panel-actions">
@@ -1002,10 +1031,48 @@ TICKET SCHEMA (all fields required)
       <span class="badge ${statusClass(t.status)}">${statusLabel(t.status)}</span>
       <span class="badge ${priorityClass(t.priority)}">${t.priority}</span>`;
     document.getElementById('p-dates').textContent = `Created ${formatDate(t.created)} · Updated ${formatDate(t.updated)}`;
+    // Highlight current status button
+    document.querySelectorAll('.status-btn').forEach(btn => {
+      btn.classList.toggle('active-status', btn.dataset.s === t.status);
+    });
     document.getElementById('panel-overlay').classList.add('open');
   }
   document.getElementById('panel-close').addEventListener('click', () => {
     document.getElementById('panel-overlay').classList.remove('open');
+  });
+
+  // STATUS CHANGE BUTTONS
+  document.querySelectorAll('.status-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!activeTicket) return;
+      const newStatus = btn.dataset.s;
+      if (newStatus === activeTicket.status) return;
+      // Update in raw data array
+      const idx = raw.findIndex(t => t.id === activeTicket.id);
+      if (idx !== -1) {
+        const today = new Date().toISOString().slice(0,10);
+        raw[idx].status = newStatus;
+        raw[idx].updated = today;
+        activeTicket = raw[idx];
+        tickets = [...raw];
+        // Re-render board
+        render(getFiltered());
+        // Update panel tags and button highlights
+        document.getElementById('p-tags').innerHTML = `
+          <span class="badge ${statusClass(newStatus)}">${statusLabel(newStatus)}</span>
+          <span class="badge ${priorityClass(activeTicket.priority)}">${activeTicket.priority}</span>`;
+        document.getElementById('p-dates').textContent =
+          `Created ${formatDate(activeTicket.created)} · Updated ${formatDate(today)}`;
+        document.querySelectorAll('.status-btn').forEach(b => {
+          b.classList.toggle('active-status', b.dataset.s === newStatus);
+        });
+        // Toast
+        const toast = document.getElementById('status-toast');
+        toast.textContent = `${activeTicket.id} moved to ${statusLabel(newStatus)}`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2200);
+      }
+    });
   });
   document.getElementById('panel-overlay').addEventListener('click', e => {
     if (e.target === document.getElementById('panel-overlay'))
@@ -1069,5 +1136,6 @@ TICKET SCHEMA (all fields required)
   });
 </script>
 
+<div class="status-changed-toast" id="status-toast"></div>
 </body>
 </html>

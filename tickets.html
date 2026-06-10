@@ -4,7 +4,7 @@ CATALYST:MANIFEST — tickets.html
 PURPOSE   Canonical ticket store + Kanban board.
           ALL ticket data lives here. Edit here first, then sync index.html.
 UPDATED   2026-05-25
-NEXT ID   SCR-004 / DS-012 / AND-006
+NEXT ID   CUR-007 / SCR-004 / AND-006
 
 FEATURES
           Code Snippet Ingestion — scraping, storage, rendering of code MCQs
@@ -27,7 +27,7 @@ TICKET SCHEMA
   created     "YYYY-MM-DD"
   updated     "YYYY-MM-DD"
 
-CURRENT TICKET INDEX (31 tickets — update when tickets change)
+CURRENT TICKET INDEX (37 tickets — update when tickets change)
   CAT-001  backend    done         critical  Design code snippet schema
   CAT-002  backend    done         high      Build snippet ingestion endpoint
   CAT-003  backend    backlog      high      Adapt Qdrant for code embeddings
@@ -445,8 +445,7 @@ TICKET SCHEMA (all fields required)
      Area values: "backend" | "ai-agents" | "mobile"
      Next ticket ID: CAT-009
      ============================================= -->
-<script type="application/json" id="tickets-data">
-[
+<script type="application/json" id="tickets-data">[
   {
     "id": "CAT-001",
     "title": "Design code snippet schema",
@@ -570,22 +569,22 @@ TICKET SCHEMA (all fields required)
   {
     "id": "DS-005",
     "title": "Session submit endpoint rewrite",
-    "description": "POST /api/sessions/{id}/submit. Nested focus_area_attempts grouped by topic. Server-side correctness recomputation from payload_json. 422 on unknown IDs. 409 on duplicate. Per-topic summary with updated_state. topic_type from request used as previous_state for transition logic.",
+    "description": "Superseded by DS-009 which shipped the full submit endpoint rewrite with SessionAttempt model, server-side correctness recomputation, 409 idempotency, 422 on unknown IDs, and per-topic state transitions.",
     "area": "backend",
-    "status": "backlog",
+    "status": "done",
     "priority": "critical",
     "created": "2026-05-26",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "DS-006",
     "title": "Cold-start seed topics",
-    "description": "Day-1 users with zero answer history get empty sessions. Fallback: when all topics are new, seed session from canonical topic list for the subject. Canonical OS list defined. Needs GMAT/CAT equivalents.",
+    "description": "Superseded by DS-010 which covers cold-start seed topics with phased canonical topic lists.",
     "area": "backend",
-    "status": "backlog",
+    "status": "done",
     "priority": "critical",
     "created": "2026-05-26",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "DS-007",
@@ -756,8 +755,68 @@ TICKET SCHEMA (all fields required)
     "priority": "high",
     "created": "2026-05-27",
     "updated": "2026-05-27"
+  },
+  {
+    "id": "CUR-001",
+    "title": "Phased curriculum structure \u2014 SUBJECT_TOPICS",
+    "description": "Restructure SUBJECT_TOPICS from flat list[str] to list[dict] with phase and prereqs fields. OS curriculum: Process Management (phase 1, no prereqs) \u2192 Concurrency & Synchronisation (phase 2, prereq: Process Management) \u2192 Memory Management (phase 3, prereq: Process Management) \u2192 File Systems (phase 4, prereq: Memory Management) \u2192 I/O Systems (phase 5, prereq: Process Management) \u2192 Virtualisation/Security/Networking (phase 6). Update the ~4 callsites that read SUBJECT_TOPICS: sessionTopicAccuracy, dailySessionGenerator, LLM session plan prompt, fallback planner. No session logic changes in this ticket \u2014 just the data structure and the callsites. Prerequisite for CUR-002 and CUR-003.",
+    "area": "backend",
+    "status": "in-progress",
+    "priority": "critical",
+    "created": "2026-05-27",
+    "updated": "2026-05-27"
+  },
+  {
+    "id": "CUR-002",
+    "title": "Prereq gating for new topic introduction",
+    "description": "A topic is only eligible as 'new' if all its prereqs are at least 'review' state (65%+ accuracy, 3+ attempts) in get_topic_accuracy(). Before the LLM session plan call in DailySessionGenerator, filter the topic list to only eligible topics. Process Management has no prereqs \u2014 available from day 1. Concurrency unlocks only after Process Management hits review. If no non-mastered topics are eligible (all locked by prereqs), fall back to the lowest-phase unlocked topic. Depends on CUR-001.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "critical",
+    "created": "2026-05-27",
+    "updated": "2026-05-27"
+  },
+  {
+    "id": "CUR-003",
+    "title": "Phase-ordered topic priority in session planning",
+    "description": "When multiple topics are eligible for a session, lower phase numbers get priority. Phase 1 topics beat phase 2 topics as the primary focus area even if both are in 'new' state. This produces the natural semester flow: processes first, then concurrency, then memory. Update the LLM session plan prompt to receive the ordered eligible topic list and respect the ordering. Also update tie-breaking in _fallback_focus_areas to use phase order. Depends on CUR-001.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "critical",
+    "created": "2026-05-27",
+    "updated": "2026-05-27"
+  },
+  {
+    "id": "CUR-004",
+    "title": "Advance mode \u2014 post-mastery bloom 4-6 questions",
+    "description": "Once a topic reaches 'mastered' state, it re-enters sessions as 'advance' type rather than disappearing. Advance questions are bloom 4-6 only (analysis, evaluation, creation) \u2014 the hard application questions that separate a student who understands from one who can apply. Adds 'advance' as a fifth topic type alongside weakness/new/review/mastered. Session generator treats advance as lowest priority \u2014 only included if the session has room after weakness/new/review are filled. Depends on CUR-002.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "high",
+    "created": "2026-05-27",
+    "updated": "2026-05-27"
+  },
+  {
+    "id": "CUR-005",
+    "title": "Canonical topic lists for GMAT and CAT",
+    "description": "Define phased canonical topic lists for GMAT Quant, GMAT Verbal, CAT Quant, CAT Verbal \u2014 same structure as OS curriculum in CUR-001. GMAT Quant: Arithmetic \u2192 Algebra \u2192 Word Problems \u2192 Geometry \u2192 Statistics \u2192 Data Sufficiency. GMAT Verbal: Critical Reasoning basics \u2192 Reading Comprehension \u2192 Sentence Correction \u2192 CR Advanced. CAT Quant and Verbal to be defined with SME input. Required before daily sessions work correctly for CAT/GMAT users. Depends on CUR-001.",
+    "area": "backend",
+    "status": "backlog",
+    "priority": "high",
+    "created": "2026-05-27",
+    "updated": "2026-05-27"
+  },
+  {
+    "id": "CUR-006",
+    "title": "Roadmap reveal \u2014 unlock progression UI",
+    "description": "Update the roadmap reveal screen (AND-005) to visually show the phased unlock structure. Locked topics (prereqs not met) shown as dimmed with a lock icon and the prereq topic named: 'Unlock after: Process Management'. Unlocked but not started shown as available. In-progress and mastered states as before. The student should be able to see exactly what unlocks what \u2014 the learning path is transparent, not a black box. Depends on CUR-001 and AND-005.",
+    "area": "mobile",
+    "status": "backlog",
+    "priority": "high",
+    "created": "2026-05-27",
+    "updated": "2026-05-27"
   }
-]
+]]
 </script>
 <!-- /CATALYST:TICKETS:DATA -->
 

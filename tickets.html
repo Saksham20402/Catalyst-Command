@@ -27,7 +27,7 @@ TICKET SCHEMA
   created     "YYYY-MM-DD"
   updated     "YYYY-MM-DD"
 
-CURRENT TICKET INDEX (37 tickets — update when tickets change)
+CURRENT TICKET INDEX (37 tickets — 18 done, 1 in-progress, 18 backlog — update when tickets change)
   CAT-001  backend    done         critical  Design code snippet schema
   CAT-002  backend    done         high      Build snippet ingestion endpoint
   CAT-003  backend    backlog      high      Adapt Qdrant for code embeddings
@@ -469,62 +469,62 @@ TICKET SCHEMA (all fields required)
   {
     "id": "CAT-003",
     "title": "Adapt Qdrant for code embeddings",
-    "description": "Update embedding pipeline to concatenate subject + question_text + snippet_body before vectorising; update Qdrant payload schema to include has_snippet flag.",
+    "description": "[DEFERRED \u2014 not in adaptive learning sprint] Update embedding pipeline to concatenate subject + question_text + snippet_body before vectorising; update Qdrant payload schema to include has_snippet flag.",
     "area": "backend",
     "status": "backlog",
-    "priority": "high",
+    "priority": "low",
     "created": "2026-05-25",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "CAT-004",
     "title": "Snippet bulk ingestion CLI",
-    "description": "Management command: python manage.py ingest_snippets --source file|url --subject str. Dry-run mode, progress bar, per-row success/failure report.",
+    "description": "[DEFERRED \u2014 not in adaptive learning sprint] Management command: python manage.py ingest_snippets --source file|url --subject str. Dry-run mode, progress bar, per-row success/failure report.",
     "area": "backend",
     "status": "backlog",
-    "priority": "medium",
+    "priority": "low",
     "created": "2026-05-25",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "CAT-005",
     "title": "Code-aware Groq enrichment prompts",
-    "description": "Update EXPLANATION_PROMPT to detect snippet-bearing questions and produce code-specific explanations referencing the snippet directly; update distractor logic.",
+    "description": "[DEFERRED \u2014 not in adaptive learning sprint] Update EXPLANATION_PROMPT to detect snippet-bearing questions and produce code-specific explanations referencing the snippet directly; update distractor logic.",
     "area": "ai-agents",
     "status": "backlog",
-    "priority": "critical",
+    "priority": "low",
     "created": "2026-05-25",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "CAT-006",
     "title": "Auto-detect programming language",
-    "description": "Before enrichment, detect language from snippet_body using lightweight heuristic or Groq call; write to snippet_language field.",
+    "description": "[DEFERRED \u2014 not in adaptive learning sprint] Before enrichment, detect language from snippet_body using lightweight heuristic or Groq call; write to snippet_language field.",
     "area": "ai-agents",
     "status": "backlog",
-    "priority": "high",
+    "priority": "low",
     "created": "2026-05-25",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "CAT-007",
     "title": "Code block renderer component",
-    "description": "Android: syntax-highlighted scrollable code block using WebView or Prism-equivalent; honours app theme; horizontal scroll for long lines.",
+    "description": "[DEFERRED \u2014 not in adaptive learning sprint] Android: syntax-highlighted scrollable code block using WebView or Prism-equivalent; honours app theme; horizontal scroll for long lines.",
     "area": "mobile",
     "status": "backlog",
-    "priority": "high",
+    "priority": "low",
     "created": "2026-05-25",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "CAT-008",
     "title": "Snippet MCQ card layout",
-    "description": "Android: extend QuestionCard to render snippet block above options when snippet_body is non-null; font mono, background #1A1A1A, copy-to-clipboard button.",
+    "description": "[DEFERRED \u2014 not in adaptive learning sprint] Android: extend QuestionCard to render snippet block above options when snippet_body is non-null; font mono, background #1A1A1A, copy-to-clipboard button.",
     "area": "mobile",
     "status": "backlog",
-    "priority": "medium",
+    "priority": "low",
     "created": "2026-05-25",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "DS-001",
@@ -589,12 +589,12 @@ TICKET SCHEMA (all fields required)
   {
     "id": "DS-007",
     "title": "Deduplicate questions across focus areas",
-    "description": "DailySessionGenerator returns same question ID in multiple focus areas. Add dedup step after all Qdrant searches \u2014 remove any question ID appearing more than once across focus areas before persisting.",
+    "description": "Superseded by DS-011 \u2014 same scope. Use DS-011.",
     "area": "backend",
-    "status": "backlog",
+    "status": "done",
     "priority": "high",
     "created": "2026-05-26",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "DS-008",
@@ -609,22 +609,22 @@ TICKET SCHEMA (all fields required)
   {
     "id": "AND-001",
     "title": "Android roadmap wizard flow",
-    "description": "4-screen flow: subject selection (single-select chips) \u2192 topic selection (multi-select, API-driven) \u2192 goal + exam date (stored on user profile) \u2192 diagnostic calibration (3-5 MCQs, skippable). Calls POST /api/roadmaps/generate/ on completion. Exam date powers countdown + readiness score.",
+    "description": "Superseded by AND-004 which has the full up-to-date spec including calibration screen and exam date storage on user profile.",
     "area": "mobile",
-    "status": "backlog",
+    "status": "done",
     "priority": "critical",
     "created": "2026-05-13",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "AND-002",
     "title": "Android generating + roadmap reveal",
-    "description": "Screen 1: animated text messages ('Analysing your goals', 'Mapping subject graph', etc), text-only no spinner, dark canvas. Screen 2: roadmap reveal with topic rows (mastered/in-progress/not-started), progress bar, exam countdown if date set, Start Session CTA.",
+    "description": "Superseded by AND-005 which has the full up-to-date spec matching the web app generating animation pattern.",
     "area": "mobile",
-    "status": "backlog",
+    "status": "done",
     "priority": "critical",
     "created": "2026-05-13",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "AND-003",
@@ -689,22 +689,22 @@ TICKET SCHEMA (all fields required)
   {
     "id": "SCR-002",
     "title": "Code snippet extraction from scraper",
-    "description": "Extract fenced code blocks and inline code from scraped question HTML. Populate code_snippets[] on Question model. Language detection heuristic. Handles Sanfoundry and similar sources.",
+    "description": "[DEFERRED \u2014 not in adaptive learning sprint] Extract fenced code blocks and inline code from scraped question HTML. Populate code_snippets[] on Question model. Language detection heuristic. Handles Sanfoundry and similar sources.",
     "area": "pipeline",
     "status": "backlog",
-    "priority": "high",
+    "priority": "low",
     "created": "2026-05-20",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "SCR-003",
     "title": "Image URL extraction from scraper",
-    "description": "Extract question-bearing images from scraped HTML, upload to S3/Supabase storage, populate image_urls[] on Question model. Skip decorative images using size/position/alt-text heuristic.",
+    "description": "[DEFERRED \u2014 not in adaptive learning sprint] Extract question-bearing images from scraped HTML, upload to S3/Supabase storage, populate image_urls[] on Question model. Skip decorative images using size/position/alt-text heuristic.",
     "area": "pipeline",
     "status": "backlog",
-    "priority": "high",
+    "priority": "low",
     "created": "2026-05-20",
-    "updated": "2026-05-26"
+    "updated": "2026-05-27"
   },
   {
     "id": "DS-009",
